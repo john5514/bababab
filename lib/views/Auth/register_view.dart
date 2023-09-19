@@ -12,6 +12,8 @@ class RegisterView extends StatelessWidget {
   final TextEditingController confirmPasswordController =
       TextEditingController();
 
+  RegisterView({Key? key}) : super(key: key); // Corrected the key constructor
+
   @override
   Widget build(BuildContext context) {
     InputDecorationTheme inputDecoration =
@@ -32,68 +34,88 @@ class RegisterView extends StatelessWidget {
                       .displayLarge, // Adjust as needed
                 ),
                 const SizedBox(height: 20),
-                TextField(
-                  controller: firstNameController,
-                  keyboardAppearance: Brightness.dark,
-                  style: const TextStyle(color: Colors.white),
-                  decoration: InputDecoration(
-                    labelText: 'First Name',
-                    labelStyle: inputDecoration.labelStyle,
-                    focusedBorder: inputDecoration.focusedBorder,
-                    enabledBorder: inputDecoration.enabledBorder,
-                  ),
-                ),
+                Obx(() => TextField(
+                      controller: firstNameController,
+                      keyboardAppearance: Brightness.dark,
+                      style: const TextStyle(color: Colors.white),
+                      decoration: InputDecoration(
+                        labelText: 'First Name',
+                        labelStyle: inputDecoration.labelStyle,
+                        focusedBorder: inputDecoration.focusedBorder,
+                        enabledBorder: inputDecoration.enabledBorder,
+                        errorText:
+                            authController.firstNameErrorMessage.value.isEmpty
+                                ? null
+                                : authController.firstNameErrorMessage.value,
+                      ),
+                    )),
                 const SizedBox(height: 10),
-                TextField(
-                  controller: lastNameController,
-                  keyboardAppearance: Brightness.dark,
-                  style: const TextStyle(color: Colors.white),
-                  decoration: InputDecoration(
-                    labelText: 'Last Name',
-                    labelStyle: inputDecoration.labelStyle,
-                    focusedBorder: inputDecoration.focusedBorder,
-                    enabledBorder: inputDecoration.enabledBorder,
-                  ),
-                ),
+                Obx(() => TextField(
+                      controller: lastNameController,
+                      keyboardAppearance: Brightness.dark,
+                      style: const TextStyle(color: Colors.white),
+                      decoration: InputDecoration(
+                        labelText: 'Last Name',
+                        labelStyle: inputDecoration.labelStyle,
+                        focusedBorder: inputDecoration.focusedBorder,
+                        enabledBorder: inputDecoration.enabledBorder,
+                        errorText:
+                            authController.lastNameErrorMessage.value.isEmpty
+                                ? null
+                                : authController.lastNameErrorMessage.value,
+                      ),
+                    )),
                 const SizedBox(height: 10),
-                TextField(
-                  controller: emailController,
-                  keyboardType: TextInputType.emailAddress,
-                  keyboardAppearance: Brightness.dark,
-                  style: const TextStyle(color: Colors.white),
-                  decoration: InputDecoration(
-                    labelText: 'Email',
-                    labelStyle: inputDecoration.labelStyle,
-                    focusedBorder: inputDecoration.focusedBorder,
-                    enabledBorder: inputDecoration.enabledBorder,
-                  ),
-                ),
+                Obx(() => TextField(
+                      controller: emailController,
+                      keyboardType: TextInputType.emailAddress,
+                      keyboardAppearance: Brightness.dark,
+                      style: const TextStyle(color: Colors.white),
+                      decoration: InputDecoration(
+                        labelText: 'Email',
+                        labelStyle: inputDecoration.labelStyle,
+                        focusedBorder: inputDecoration.focusedBorder,
+                        enabledBorder: inputDecoration.enabledBorder,
+                        errorText:
+                            authController.emailErrorMessage.value.isEmpty
+                                ? null
+                                : authController.emailErrorMessage.value,
+                      ),
+                    )),
                 const SizedBox(height: 10),
-                TextField(
-                  controller: passwordController,
-                  keyboardAppearance: Brightness.dark,
-                  style: const TextStyle(color: Colors.white),
-                  obscureText: true,
-                  decoration: InputDecoration(
-                    labelText: 'Password',
-                    labelStyle: inputDecoration.labelStyle,
-                    focusedBorder: inputDecoration.focusedBorder,
-                    enabledBorder: inputDecoration.enabledBorder,
-                  ),
-                ),
+                Obx(() => TextField(
+                      controller: passwordController,
+                      keyboardAppearance: Brightness.dark,
+                      style: const TextStyle(color: Colors.white),
+                      obscureText: true,
+                      decoration: InputDecoration(
+                        labelText: 'Password',
+                        labelStyle: inputDecoration.labelStyle,
+                        focusedBorder: inputDecoration.focusedBorder,
+                        enabledBorder: inputDecoration.enabledBorder,
+                        errorText:
+                            authController.passwordErrorMessage.value.isEmpty
+                                ? null
+                                : authController.passwordErrorMessage.value,
+                      ),
+                    )),
                 const SizedBox(height: 10),
-                TextField(
-                  controller: confirmPasswordController,
-                  keyboardAppearance: Brightness.dark,
-                  style: const TextStyle(color: Colors.white),
-                  obscureText: true,
-                  decoration: InputDecoration(
-                    labelText: 'Confirm Password',
-                    labelStyle: inputDecoration.labelStyle,
-                    focusedBorder: inputDecoration.focusedBorder,
-                    enabledBorder: inputDecoration.enabledBorder,
-                  ),
-                ),
+                Obx(() => TextField(
+                      controller: confirmPasswordController,
+                      keyboardAppearance: Brightness.dark,
+                      style: const TextStyle(color: Colors.white),
+                      obscureText: true,
+                      decoration: InputDecoration(
+                        labelText: 'Confirm Password',
+                        labelStyle: inputDecoration.labelStyle,
+                        focusedBorder: inputDecoration.focusedBorder,
+                        enabledBorder: inputDecoration.enabledBorder,
+                        errorText: authController
+                                .confirmPasswordErrorMessage.value.isEmpty
+                            ? null
+                            : authController.confirmPasswordErrorMessage.value,
+                      ),
+                    )),
                 const SizedBox(height: 20),
                 Obx(
                   () => ElevatedButton(
@@ -106,6 +128,7 @@ class RegisterView extends StatelessWidget {
                               emailController.text,
                               passwordController.text,
                               confirmPasswordController.text,
+                              context,
                             );
                           },
                     child: authController.isLoading.value

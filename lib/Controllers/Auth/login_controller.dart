@@ -18,21 +18,25 @@ class LoginController extends GetxController {
       emailErrorMessage.value = '';
       passwordErrorMessage.value = '';
 
+      bool hasError = false;
+
       if (email.isEmpty) {
         emailErrorMessage.value = 'Please enter your email';
-        showFlushbar("Error", 'Please enter your email', context);
-        return;
+        hasError = true;
       }
 
       if (password.isEmpty) {
         passwordErrorMessage.value = 'Please enter your password';
-        showFlushbar("Error", 'Please enter your password', context);
-        return;
+        hasError = true;
       }
 
       if (!GetUtils.isEmail(email)) {
         emailErrorMessage.value = 'Invalid email format';
-        showFlushbar("Error", 'Invalid email format', context);
+        hasError = true;
+      }
+
+      if (hasError) {
+        showFlushbar("Error", 'Please correct the errors', context);
         return;
       }
 
@@ -42,7 +46,7 @@ class LoginController extends GetxController {
         isLoggedIn.value = true;
         userEmail.value = email;
         Get.offAllNamed('/home');
-        showFlushbar("Success", "Login successful!", context);
+        showFlushbar("Success", "Login successful!", context, Colors.blue);
       } else {
         if (error.toLowerCase().contains("password")) {
           passwordErrorMessage.value = error;
@@ -59,11 +63,14 @@ class LoginController extends GetxController {
     }
   }
 
-  void showFlushbar(String title, String message, BuildContext context) {
+  void showFlushbar(String title, String message, BuildContext context,
+      [Color? color]) {
     Flushbar(
       title: title,
       message: message,
       duration: Duration(seconds: 3),
+      backgroundColor:
+          color ?? Colors.red, // Default to red if color is not provided
     )..show(context);
   }
 
