@@ -1,18 +1,36 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiService {
   final String baseUrl = "https://v3.mash3div.com/api/auth/";
+  String? cookie;
+
+  Future<void> updateCookie(http.Response response) async {
+    String? rawCookie = response.headers['set-cookie'];
+    if (rawCookie != null) {
+      int index = rawCookie.indexOf(';');
+      cookie = (index == -1) ? rawCookie : rawCookie.substring(0, index);
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      prefs.setString('cookie', cookie!);
+    }
+  }
+
+  Future<void> loadCookie() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    cookie = prefs.getString('cookie');
+  }
 
   Future<String?> login(String email, String password) async {
+    await loadCookie();
     try {
       final response = await http.post(
         Uri.parse('${baseUrl}login'),
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: {'Content-Type': 'application/json', 'Cookie': cookie ?? ""},
         body: jsonEncode({'email': email, 'password': password}),
       );
+
+      await updateCookie(response);
 
       final Map<String, dynamic> responseJson = json.decode(response.body);
 
@@ -26,7 +44,13 @@ class ApiService {
     }
   }
 
-  Future<bool> register(
+  Future<void> logout() async {
+    cookie = null;
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.remove('cookie');
+  }
+
+  Future<Map<String, dynamic>> register(
       String email, String password, String firstName, String lastName) async {
     try {
       final response = await http.post(
@@ -42,26 +66,25 @@ class ApiService {
         }),
       );
 
-      print("API Response: ${response.body}"); // Debugging line
-
       Map<String, dynamic> responseBody = json.decode(response.body);
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         if (responseBody['status'] == 'success') {
-          return true;
+          return {'success': true};
         } else {
-          print(
-              "Failed to register, Message: ${responseBody['error']['message']}"); // Debugging line
-          return false;
+          return {
+            'success': false,
+            'message': responseBody['error']['message']
+          };
         }
       } else {
-        print(
-            "Failed to register, Status code: ${response.statusCode}"); // Debugging line
-        return false;
+        return {
+          'success': false,
+          'message': 'Status code: ${response.statusCode}'
+        };
       }
     } catch (e) {
-      print('Error occurred: $e');
-      return false;
+      return {'success': false, 'message': 'Error occurred: $e'};
     }
   }
 

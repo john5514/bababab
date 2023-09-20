@@ -73,16 +73,20 @@ class RegisterController extends GetxController {
         return;
       }
 
-      final success =
+      final Map<String, dynamic> result =
           await apiService.register(email, password, firstName, lastName);
 
-      if (success) {
+      if (result['success']) {
         showFlushbar(
             "Success", "Registration successful!", context, Colors.blue);
         Get.offNamed('/'); // Navigate to Login screen
       } else {
-        errorMessage.value = 'Registration failed';
-        showFlushbar("Error", "Registration failed", context, Colors.red);
+        errorMessage.value = result['message'] ?? 'Registration failed';
+        if (errorMessage.value == 'Invalid password format') {
+          errorMessage.value +=
+              '\nPassword must contain at least one uppercase letter, one lowercase letter, and one number.';
+        }
+        showFlushbar("Error", errorMessage.value, context, Colors.red);
       }
     } catch (e) {
       errorMessage.value = e.toString();

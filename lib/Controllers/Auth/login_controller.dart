@@ -11,6 +11,14 @@ class LoginController extends GetxController {
   var passwordErrorMessage = ''.obs; // Specific to password
   final ApiService apiService = ApiService();
 
+  Future<void> init() async {
+    await apiService
+        .loadCookie(); // Load the cookie when the controller is initialized
+    if (apiService.cookie != null) {
+      isLoggedIn.value = true; // Update isLoggedIn based on the cookie status
+    }
+  }
+
   Future<void> login(
       String email, String password, BuildContext context) async {
     try {
@@ -77,5 +85,6 @@ class LoginController extends GetxController {
   void logout() {
     isLoggedIn.value = false;
     userEmail.value = '';
+    apiService.logout(); // Clear the cookie
   }
 }
