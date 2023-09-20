@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 
 final ThemeData appTheme = ThemeData(
+  // <-- Add this line for active icon color
   primaryColor: Colors.black,
+  secondaryHeaderColor: Colors.white,
   hintColor: Colors.orange,
+
   textSelectionTheme: const TextSelectionThemeData(
     cursorColor: Colors.white,
   ),
