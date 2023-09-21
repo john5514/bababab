@@ -1,3 +1,6 @@
+// WalletView.dart
+
+import 'package:bicrypto/views/wallets/FiatWalletView.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:bicrypto/Controllers/wallet_controller.dart'; // Import your WalletController
@@ -13,7 +16,7 @@ class WalletView extends StatelessWidget {
       child: Scaffold(
         appBar: AppBar(
           title: Text('Wallet'),
-          backgroundColor: appTheme.primaryColor, // Use your custom theme color
+          backgroundColor: appTheme.primaryColor,
           bottom: TabBar(
             tabs: [
               Tab(text: 'Fiat Wallets'),
@@ -21,25 +24,13 @@ class WalletView extends StatelessWidget {
             ],
           ),
         ),
-        body: Obx(
-          () {
-            if (walletController.isLoading.value) {
-              return Center(
-                child: CircularProgressIndicator(
-                  color: appTheme.hintColor, // Use your custom theme color
-                ),
-              );
-            } else {
-              return TabBarView(
-                children: [
-                  // Content for Fiat Wallets
-                  Center(child: Text('Fiat Wallets Content')),
-                  // Content for Spot Wallets
-                  Center(child: Text('Spot Wallets Content')),
-                ],
-              );
-            }
-          },
+        body: TabBarView(
+          children: [
+            FiatWalletView(), // Your FiatWalletView goes here
+            Center(
+                child: Text(
+                    'Spot Wallets Content')), // Placeholder for Spot Wallets
+          ],
         ),
       ),
     );
