@@ -13,8 +13,20 @@ class LoginController extends GetxController {
 
   Future<void> init() async {
     await apiService
-        .loadCookie(); // Load the cookie when the controller is initialized
-    if (apiService.cookie != null) {
+        .loadTokens(); // Load the cookie when the controller is initialized
+    if (apiService.tokens.isNotEmpty &&
+        apiService.tokens.containsKey('access-token') &&
+        apiService.tokens['access-token'] != null &&
+        apiService.tokens['access-token'] != '' &&
+        apiService.tokens.containsKey('session-id') &&
+        apiService.tokens['session-id'] != null &&
+        apiService.tokens['session-id'] != '' &&
+        apiService.tokens.containsKey('csrf-token') &&
+        apiService.tokens['csrf-token'] != null &&
+        apiService.tokens['csrf-token'] != '' &&
+        apiService.tokens.containsKey('refresh-token') &&
+        apiService.tokens['refresh-token'] != null &&
+        apiService.tokens['refresh-token'] != '') {
       isLoggedIn.value = true; // Update isLoggedIn based on the cookie status
     }
   }

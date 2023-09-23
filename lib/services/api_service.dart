@@ -4,33 +4,42 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiService {
   final String baseUrl = "https://v3.mash3div.com/api/auth/";
-  String? cookie;
+  Map<String, String?> tokens = {
+    'access-token': null,
+    'refresh-token': null,
+    'csrf-token': null,
+    'session-id': null,
+  };
 
-  Future<void> updateCookie(http.Response response) async {
-    String? rawCookie = response.headers['set-cookie'];
-    if (rawCookie != null) {
-      int index = rawCookie.indexOf(';');
-      cookie = (index == -1) ? rawCookie : rawCookie.substring(0, index);
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      prefs.setString('cookie', cookie!);
+  Future<void> updateTokensFromHeaders(Map<String, String> headers) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    for (var key in tokens.keys) {
+      if (headers.containsKey(key)) {
+        tokens[key] = headers[key];
+        prefs.setString(key, headers[key]!);
+      }
     }
   }
 
-  Future<void> loadCookie() async {
+  Future<void> loadTokens() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    cookie = prefs.getString('cookie');
+    for (var key in tokens.keys) {
+      tokens[key] = prefs.getString(key);
+    }
   }
 
   Future<String?> login(String email, String password) async {
-    await loadCookie();
     try {
       final response = await http.post(
         Uri.parse('${baseUrl}login'),
-        headers: {'Content-Type': 'application/json', 'Cookie': cookie ?? ""},
+        headers: {
+          'Content-Type': 'application/json',
+          'client-platform': 'app',
+        },
         body: jsonEncode({'email': email, 'password': password}),
       );
 
-      await updateCookie(response);
+      await updateTokensFromHeaders(response.headers);
 
       final Map<String, dynamic> responseJson = json.decode(response.body);
 
@@ -42,12 +51,6 @@ class ApiService {
     } catch (e) {
       return e.toString();
     }
-  }
-
-  Future<void> logout() async {
-    cookie = null;
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.remove('cookie');
   }
 
   Future<Map<String, dynamic>> register(
@@ -65,6 +68,8 @@ class ApiService {
           'last_name': lastName,
         }),
       );
+
+      await updateTokensFromHeaders(response.headers);
 
       Map<String, dynamic> responseBody = json.decode(response.body);
 
@@ -85,6 +90,15 @@ class ApiService {
       }
     } catch (e) {
       return {'success': false, 'message': 'Error occurred: $e'};
+    }
+  }
+
+  Future<void> logout() async {
+    // Clear all tokens
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    for (var key in tokens.keys) {
+      prefs.remove(key);
+      tokens[key] = null;
     }
   }
 
