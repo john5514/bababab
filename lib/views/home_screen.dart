@@ -22,17 +22,6 @@ class HomeView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: appTheme.primaryColor,
-        actions: [
-          IconButton(
-            onPressed: () {
-              loginController.logout();
-            },
-            icon: Icon(Icons.logout),
-          ),
-        ],
-      ),
       body: Obx(
         () => IndexedStack(
           index: homeController.currentTabIndex.value, // <-- Use HomeController

@@ -13,16 +13,35 @@ class WalletController extends GetxController {
   var fiatTransactions = [].obs;
   var currencies = [].obs;
   var selectedCurrency = ''.obs;
+  var walletBalance = 0.0.obs;
+  var fiatWalletInfo = <dynamic>[].obs; // Updated to List<dynamic>
 
   @override
   void onInit() {
     super.onInit();
     fetchFiatBalance();
     fetchFiatTransactions();
-    // fetchFiatDepositMethods();
-    // fetchFiatWithdrawMethods();
-    // fetchFiatDepositGateways();
+    fetchWalletBalance();
     fetchCurrencies();
+    fetchFiatWalletInfo();
+  }
+
+  Future<void> fetchFiatWalletInfo() async {
+    try {
+      isLoading(true);
+      var response =
+          await walletService.fetchUserWallets(); // Keep the type as var
+
+      if (response is List<dynamic>) {
+        fiatWalletInfo.assignAll(response);
+      } else {
+        print("Unexpected response format: $response");
+      }
+    } catch (e) {
+      print("Error fetching fiat wallet info: $e");
+    } finally {
+      isLoading(false);
+    }
   }
 
 // Fetch balance
@@ -74,6 +93,19 @@ class WalletController extends GetxController {
     }
   }
 
+  Future<void> fetchWalletBalance() async {
+    try {
+      isLoading(true);
+      double balance = await walletService.fetchWalletBalance();
+      walletBalance.value = balance;
+      print("Fetched Wallet Balance: $balance");
+    } catch (e) {
+      print("Error fetching wallet balance: $e");
+    } finally {
+      isLoading(false);
+    }
+  }
+
   void fetchCurrencies() async {
     try {
       isLoading(true);
@@ -92,41 +124,4 @@ class WalletController extends GetxController {
       isLoading(false);
     }
   }
-
-  // void fetchFiatDepositMethods() async {
-  //   try {
-  //     isLoading(true);
-  //     var response = await walletService.getFiatDepositMethods();
-  //     if (response != null && response is Map && response.containsKey('data')) {
-  //       fiatDepositMethods.assignAll(response['data']);
-  //     }
-  //   } finally {
-  //     isLoading(false);
-  //   }
-  // }
-
-  // void fetchFiatWithdrawMethods() async {
-  //   try {
-  //     isLoading(true);
-  //     var response = await walletService.getFiatWithdrawMethods();
-  //     if (response != null && response is Map && response.containsKey('data')) {
-  //       fiatWithdrawMethods.assignAll(response['data']);
-  //     }
-  //   } finally {
-  //     isLoading(false);
-  //   }
-  // }
-
-  // void fetchFiatDepositGateways() async {
-  //   try {
-  //     isLoading(true);
-  //     var response = await walletService.getFiatDepositGateways();
-  //     if (response != null && response is Map && response.containsKey('data')) {
-  //       fiatDepositGateways.assignAll(response['data']);
-  //     }
-  //   } finally {
-  //     isLoading(false);
-  //   }
-  // }
-  // Add more methods to handle other functionalities
 }
