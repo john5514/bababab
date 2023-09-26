@@ -33,7 +33,10 @@ class WalletController extends GetxController {
           await walletService.fetchUserWallets(); // Keep the type as var
 
       if (response is List<dynamic>) {
-        fiatWalletInfo.assignAll(response);
+        // Filter out only fiat wallets
+        var fiatWallets =
+            response.where((wallet) => wallet['type'] == 'FIAT').toList();
+        fiatWalletInfo.assignAll(fiatWallets);
       } else {
         print("Unexpected response format: $response");
       }
@@ -76,6 +79,7 @@ class WalletController extends GetxController {
       isLoading(true);
       await walletService.createWallet(currency);
       // Refresh the wallet data after creating a new wallet
+      await fetchFiatWalletInfo(); // Refresh the list of wallets
       fetchFiatBalance();
       fetchFiatTransactions();
       // Show a success message
@@ -110,7 +114,7 @@ class WalletController extends GetxController {
     try {
       isLoading(true);
       var response = await walletService.getCurrencies();
-      print("Fetched Currencies: $response"); // Add this line
+
       if (response != null && response is Map && response.containsKey('data')) {
         var data = response['data'];
         if (data is Map && data.containsKey('result')) {

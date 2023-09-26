@@ -1,56 +1,86 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:bicrypto/Controllers/wallet_controller.dart'; // Import your WalletController
-import 'package:bicrypto/Style/styles.dart'; // Import your custom theme
+import 'package:bicrypto/Controllers/wallet_controller.dart';
+import 'package:bicrypto/Style/styles.dart';
 
 class FiatWalletView extends StatelessWidget {
   final WalletController walletController = Get.find();
 
+  FiatWalletView({super.key});
+
+  String getCurrencySymbol(String currencyCode) {
+    var currency = walletController.currencies
+        .firstWhere((c) => c['code'] == currencyCode, orElse: () => null);
+    String currencySymbol =
+        currency != null ? currency['symbol'] : currencyCode;
+
+    return currencySymbol;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text('Fiat Wallet',
+            style: TextStyle(color: appTheme.secondaryHeaderColor)),
+        backgroundColor: appTheme.primaryColor,
+      ),
       body: Obx(
         () {
-          if (walletController.isLoading.value) {
+          if (walletController.isLoading.value ||
+              walletController.currencies.isEmpty) {
             return Center(
               child: CircularProgressIndicator(
-                color: appTheme.hintColor, // Use your custom theme color
+                color: appTheme.hintColor,
               ),
             );
           } else if (walletController.fiatWalletInfo.isEmpty) {
             return Center(
               child: Text(
                 'You do not have a fiat wallet. Please create one.',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color:
-                      appTheme.secondaryHeaderColor, // Set the text color here
-                ),
+                style: appTheme.textTheme.bodyLarge,
               ),
             );
           } else {
-            return ListView(
-              children:
-                  walletController.fiatWalletInfo.map<Widget>((walletInfo) {
-                return ListTile(
-                  title: Text(
-                    '${walletInfo['currency']} Wallet',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: appTheme.secondaryHeaderColor,
-                    ),
+            return ListView.builder(
+              itemCount: walletController.fiatWalletInfo.length,
+              itemBuilder: (context, index) {
+                var walletInfo = walletController.fiatWalletInfo[index];
+                String currencySymbol =
+                    getCurrencySymbol(walletInfo['currency']);
+                return Card(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15.0),
                   ),
-                  subtitle: Text(
-                    'Balance: ${walletInfo['balance']}\nAddress: ${walletInfo['addresses']?.values?.first['address']}',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: appTheme.secondaryHeaderColor,
+                  margin: EdgeInsets.all(12),
+                  elevation: 8,
+                  shadowColor: appTheme.hintColor.withOpacity(0.5),
+                  child: InkWell(
+                    onTap: () {
+                      // Handle card tap
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.all(20.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            '$currencySymbol ${walletInfo['balance'].toStringAsFixed(1)}',
+                            style: appTheme.textTheme.displayLarge?.copyWith(
+                                color: appTheme.scaffoldBackgroundColor),
+                          ),
+                          SizedBox(height: 12),
+                          Text(
+                            '${walletInfo['currency']} Wallet',
+                            style: appTheme.textTheme.bodyLarge?.copyWith(
+                                color: appTheme.scaffoldBackgroundColor),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 );
-              }).toList(),
+              },
             );
           }
         },
@@ -107,6 +137,7 @@ class FiatWalletView extends StatelessWidget {
           );
         },
         child: Icon(Icons.add),
+        backgroundColor: appTheme.floatingActionButtonTheme.backgroundColor,
       ),
     );
   }
