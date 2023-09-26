@@ -26,6 +26,20 @@ class WalletController extends GetxController {
     fetchFiatWalletInfo();
   }
 
+  double calculateIncome() {
+    // Calculate and return the total income based on the transaction data
+    return fiatTransactions
+        .where((trx) => trx['amount'] > 0)
+        .fold(0.0, (sum, trx) => sum + trx['amount']);
+  }
+
+  double calculateExpense() {
+    // Calculate and return the total expense based on the transaction data
+    return fiatTransactions
+        .where((trx) => trx['amount'] < 0)
+        .fold(0.0, (sum, trx) => sum + trx['amount']);
+  }
+
   Future<void> fetchFiatWalletInfo() async {
     try {
       isLoading(true);
@@ -61,12 +75,13 @@ class WalletController extends GetxController {
   Future<void> fetchFiatTransactions() async {
     try {
       isLoading(true);
-      // Fetch transactions from API (replace with actual API call)
-      fiatTransactions.assignAll([
-        {"date": "2023-09-01", "amount": 100},
-        {"date": "2023-09-02", "amount": 200},
-        // ... (more transactions)
-      ]);
+      // Fetch transactions from API
+      List<dynamic> transactions =
+          await walletService.fetchWalletTransactions();
+      fiatTransactions.assignAll(transactions);
+    } catch (e) {
+      print("Error fetching fiat transactions: $e");
+      // Handle the error appropriately, e.g., show an error message to the user
     } finally {
       isLoading(false);
     }

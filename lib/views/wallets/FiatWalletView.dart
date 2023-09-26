@@ -1,8 +1,8 @@
+import 'package:bicrypto/Controllers/walletinfo_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:bicrypto/Controllers/wallet_controller.dart';
 import 'package:bicrypto/Style/styles.dart';
-import 'package:currency_symbols/currency_symbols.dart';
 
 class FiatWalletView extends StatelessWidget {
   final WalletController walletController = Get.find();
@@ -63,6 +63,20 @@ class FiatWalletView extends StatelessWidget {
                 var walletInfo = walletController.fiatWalletInfo[index];
                 String currencySymbol =
                     getCurrencySymbol(walletInfo['currency']);
+
+                // Define a list of gradients to be used for the cards
+                List<LinearGradient> gradients = [
+                  LinearGradient(colors: [Colors.blue, Colors.blueAccent]),
+                  LinearGradient(colors: [Colors.red, Colors.redAccent]),
+                  LinearGradient(colors: [Colors.green, Colors.greenAccent]),
+                  LinearGradient(colors: [Colors.purple, Colors.purpleAccent]),
+                  // Add more gradients as needed
+                ];
+
+                // Select a gradient based on the index
+                LinearGradient selectedGradient =
+                    gradients[index % gradients.length];
+
                 return Card(
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(15.0),
@@ -72,23 +86,36 @@ class FiatWalletView extends StatelessWidget {
                   shadowColor: appTheme.hintColor.withOpacity(0.5),
                   child: InkWell(
                     onTap: () {
-                      // Handle card tap
+                      var walletName = walletInfo['currency'];
+                      var walletBalance = (walletInfo['balance'] is int)
+                          ? walletInfo['balance'].toDouble()
+                          : walletInfo['balance'];
+                      Get.put(WalletInfoController());
+                      Get.find<WalletInfoController>()
+                          .setWalletInfo(walletName, walletBalance);
+
+                      Get.toNamed('/wallet-info');
                     },
-                    child: Padding(
+                    child: Container(
                       padding: const EdgeInsets.all(20.0),
+                      decoration: BoxDecoration(
+                        gradient:
+                            selectedGradient, // Apply the selected gradient
+                        borderRadius: BorderRadius.circular(15.0),
+                      ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
                             '$currencySymbol ${walletInfo['balance'].toStringAsFixed(1)}',
                             style: appTheme.textTheme.displayLarge?.copyWith(
-                                color: appTheme.scaffoldBackgroundColor),
+                                color: appTheme.secondaryHeaderColor),
                           ),
                           SizedBox(height: 12),
                           Text(
                             '${walletInfo['currency']} Wallet',
                             style: appTheme.textTheme.bodyLarge?.copyWith(
-                                color: appTheme.scaffoldBackgroundColor),
+                                color: appTheme.secondaryHeaderColor),
                           ),
                         ],
                       ),
