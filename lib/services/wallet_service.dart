@@ -69,13 +69,13 @@ class WalletService {
       Uri.parse('https://v3.mash3div.com/api/currencies'),
       headers: headers,
     );
-    // print(
-    //     "API Response for Currencies: ${response?.body}"); // Log the API response
+    print(
+        "API Response for Currencies: ${response?.body}"); // Log the API response
     if (response?.statusCode == 200) {
       return jsonDecode(response!.body);
     } else {
-      // print(
-      //     "Error fetching currencies: ${response?.statusCode}, ${response?.body}");
+      print(
+          "Error fetching currencies: ${response?.statusCode}, ${response?.body}");
       throw Exception('Failed to load currencies');
     }
   }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:bicrypto/Controllers/wallet_controller.dart';
 import 'package:bicrypto/Style/styles.dart';
+import 'package:currency_symbols/currency_symbols.dart';
 
 class FiatWalletView extends StatelessWidget {
   final WalletController walletController = Get.find();
@@ -9,12 +10,26 @@ class FiatWalletView extends StatelessWidget {
   FiatWalletView({super.key});
 
   String getCurrencySymbol(String currencyCode) {
+    // Mapping of currency codes to correct symbols
+    Map<String, String> correctSymbols = {
+      'ANG': 'ƒ',
+      'AWG': 'ƒ',
+      'AFN': '؋',
+      'AZN': '₼',
+    };
+
     var currency = walletController.currencies
         .firstWhere((c) => c['code'] == currencyCode, orElse: () => null);
-    String currencySymbol =
-        currency != null ? currency['symbol'] : currencyCode;
 
-    return currencySymbol;
+    // If the currency code is in the mapping, return the correct symbol, otherwise return the symbol from the API
+    if (currency != null) {
+      String apiSymbol = currency['symbol'];
+      return correctSymbols.containsKey(currencyCode)
+          ? correctSymbols[currencyCode]!
+          : apiSymbol;
+    } else {
+      return currencyCode;
+    }
   }
 
   @override
