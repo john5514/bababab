@@ -152,15 +152,15 @@ class WalletInfoView extends StatelessWidget {
                   Expanded(
                     child: OutlinedButton(
                       onPressed: () {
-                        // Handle deposit
+                        Get.toNamed('/deposit');
                       },
                       style: OutlinedButton.styleFrom(
-                        side: BorderSide(color: Colors.red),
+                        side: BorderSide(color: Colors.green),
                         padding: EdgeInsets.all(15),
                       ),
                       child: Text(
                         'Deposit',
-                        style: TextStyle(color: Colors.red),
+                        style: TextStyle(color: Colors.green),
                       ),
                     ),
                   ),
@@ -168,15 +168,15 @@ class WalletInfoView extends StatelessWidget {
                   Expanded(
                     child: OutlinedButton(
                       onPressed: () {
-                        // Handle withdrawal
+                        Get.toNamed('/withdraw');
                       },
                       style: OutlinedButton.styleFrom(
-                        side: BorderSide(color: Colors.green),
+                        side: BorderSide(color: Colors.red),
                         padding: EdgeInsets.all(15),
                       ),
                       child: Text(
                         'Withdraw',
-                        style: TextStyle(color: Colors.green),
+                        style: TextStyle(color: Colors.red),
                       ),
                     ),
                   ),

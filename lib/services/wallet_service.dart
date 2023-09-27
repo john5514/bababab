@@ -70,8 +70,8 @@ class WalletService {
       Uri.parse('https://v3.mash3div.com/api/currencies'),
       headers: headers,
     );
-    print(
-        "API Response for Currencies: ${response?.body}"); // Log the API response
+    // print(
+    //     "API Response for Currencies: ${response?.body}"); // Log the API response
     if (response?.statusCode == 200) {
       return jsonDecode(response!.body);
     } else {
@@ -100,6 +100,7 @@ class WalletService {
     }
   }
 
+////////////////////////// Fiat Wallet /////////////////////////
   Future<List<dynamic>> fetchFiatDepositMethods() async {
     await loadHeaders();
     final response = await HttpClientHelper.get(
@@ -107,8 +108,18 @@ class WalletService {
       headers: headers,
     );
     if (response?.statusCode == 200) {
-      return jsonDecode(response!.body);
+      print(
+          "Fetched Deposit Methods: ${response?.body}"); // Print the fetched data
+      var decodedResponse = jsonDecode(response!.body);
+      if (decodedResponse['status'] == 'success') {
+        return decodedResponse['data']
+            ['result']; // Return the list of deposit methods
+      } else {
+        throw Exception('Failed to fetch fiat deposit methods');
+      }
     } else {
+      print(
+          "Failed to fetch deposit methods. Status Code: ${response?.statusCode}"); // Print the status code
       throw Exception('Failed to fetch fiat deposit methods');
     }
   }
@@ -133,8 +144,17 @@ class WalletService {
       headers: headers,
     );
     if (response?.statusCode == 200) {
-      return jsonDecode(response!.body);
+      print("Fetched Deposit Gateways: ${response?.body}");
+      var decodedResponse = jsonDecode(response!.body);
+      if (decodedResponse['status'] == 'success') {
+        return decodedResponse['data']
+            ['result']; // Extract the list of gateways
+      } else {
+        throw Exception('Failed to fetch fiat deposit gateways');
+      }
     } else {
+      print(
+          "Failed to fetch deposit gateways. Status Code: ${response?.statusCode}");
       throw Exception('Failed to fetch fiat deposit gateways');
     }
   }
@@ -146,8 +166,16 @@ class WalletService {
       headers: headers,
     );
     if (response?.statusCode == 200) {
-      return jsonDecode(response!.body);
+      print("Fetched Withdraw Methods: ${response?.body}");
+      var decodedResponse = jsonDecode(response!.body);
+      if (decodedResponse['status'] == 'success') {
+        return decodedResponse['data']['result'];
+      } else {
+        throw Exception('Failed to fetch fiat withdraw methods');
+      }
     } else {
+      print(
+          "Failed to fetch withdraw methods. Status Code: ${response?.statusCode}");
       throw Exception('Failed to fetch fiat withdraw methods');
     }
   }
@@ -201,6 +229,7 @@ class WalletService {
     }
   }
 
+///////////////////////// Spot Wallet /////////////////////////
   Future<Map<String, dynamic>> fetchSpotWallet(String currency) async {
     await loadHeaders();
     final response = await HttpClientHelper.get(
@@ -361,8 +390,8 @@ class WalletService {
       print(
           "Transaction Response: ${response!.body}"); // Print the raw response
       var decodedResponse = jsonDecode(response.body);
-      print(
-          "Decoded Transactions: $decodedResponse"); // Print the decoded response
+      //print(
+      // "Decoded Transactions: $decodedResponse"); // Print the decoded response
 
       // Extract the result field from the decoded response
       List<dynamic> transactions = decodedResponse['data']['result'];
@@ -389,8 +418,8 @@ class WalletService {
       return false;
     }).toList();
 
-    print(
-        "Weekly Transactions: $weeklyTransactions"); // Print the weekly transactions
+    //print(
+    //"Weekly Transactions: $weeklyTransactions"); // Print the weekly transactions
 
     // Summarize the weekly transactions here
     double totalAmount = weeklyTransactions.fold(
@@ -401,7 +430,7 @@ class WalletService {
       'numberOfTransactions': weeklyTransactions.length,
     };
 
-    print("Weekly Summary: $summary"); // Print the weekly summary
+    //print("Weekly Summary: $summary"); // Print the weekly summary
 
     return summary;
   }

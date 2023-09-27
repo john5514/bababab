@@ -41,7 +41,7 @@ class WalletController extends GetxController {
 
   double calculateIncome() {
     // Calculate and return the total income based on the transaction data
-    print("Fiat Transactions: $fiatTransactions");
+    //print("Fiat Transactions: $fiatTransactions");
     return fiatTransactions
         .where((trx) => trx['amount'] > 0)
         .fold(0.0, (sum, trx) => sum + trx['amount']);
@@ -72,9 +72,9 @@ class WalletController extends GetxController {
       // Clear the previous summaries and add the new summary
       weeklySummaries.clear();
       weeklySummaries.add(lastWeekSummary);
-      print("Weekly Summaries: $weeklySummaries");
+      // print("Weekly Summaries: $weeklySummaries");
     } catch (e) {
-      print("Error fetching weekly summary: $e");
+      // print("Error fetching weekly summary: $e");
     } finally {
       isLoading(false);
     }
