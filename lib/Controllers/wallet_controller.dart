@@ -41,6 +41,7 @@ class WalletController extends GetxController {
 
   double calculateIncome() {
     // Calculate and return the total income based on the transaction data
+    print("Fiat Transactions: $fiatTransactions");
     return fiatTransactions
         .where((trx) => trx['amount'] > 0)
         .fold(0.0, (sum, trx) => sum + trx['amount']);
@@ -56,28 +57,22 @@ class WalletController extends GetxController {
   Future<void> fetchWeeklySummary() async {
     try {
       isLoading(true);
-      List<dynamic> transactions =
-          await walletService.fetchWalletTransactions();
-      Map<String, WeeklySummary> summaryMap = {};
+      Map<String, dynamic> weeklySummary =
+          await walletService.getWeeklySummary();
 
-      for (var transaction in transactions) {
-        double amount = transaction['amount'];
-        DateTime date = DateTime.parse(transaction['date']);
-        int weekOfYear = ((dayOfYear(date) - date.weekday + 10) / 7).floor();
-        String weekKey = '${date.year}-W$weekOfYear';
+      // Create a WeeklySummary object from the obtained summary
+      WeeklySummary lastWeekSummary = WeeklySummary(
+        'Last 7 Days',
+        weeklySummary['totalAmount'] > 0 ? weeklySummary['totalAmount'] : 0,
+        weeklySummary['totalAmount'] < 0
+            ? weeklySummary['totalAmount'].abs()
+            : 0,
+      );
 
-        if (!summaryMap.containsKey(weekKey)) {
-          summaryMap[weekKey] = WeeklySummary(weekKey, 0, 0);
-        }
-
-        if (amount > 0) {
-          summaryMap[weekKey]?.income += amount;
-        } else {
-          summaryMap[weekKey]?.expense += amount.abs();
-        }
-      }
-
-      weeklySummaries.assignAll(summaryMap.values.toList());
+      // Clear the previous summaries and add the new summary
+      weeklySummaries.clear();
+      weeklySummaries.add(lastWeekSummary);
+      print("Weekly Summaries: $weeklySummaries");
     } catch (e) {
       print("Error fetching weekly summary: $e");
     } finally {

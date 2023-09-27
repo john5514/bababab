@@ -63,6 +63,10 @@ class WalletInfoView extends StatelessWidget {
                   ],
                 ),
                 SizedBox(height: 20),
+                Text(
+                  'Weekly Summary (Last 7 Days)',
+                  style: appTheme.textTheme.bodyLarge,
+                ),
                 AspectRatio(
                   aspectRatio: 1,
                   child: Padding(

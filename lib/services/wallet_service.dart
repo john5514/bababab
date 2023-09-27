@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:bicrypto/services/api_service.dart';
 import 'package:http_client_helper/http_client_helper.dart';
+import 'package:intl/intl.dart';
 
 class WalletService {
   final String baseUrl = "https://v3.mash3div.com/api/wallets";
@@ -336,19 +337,6 @@ class WalletService {
   //   }
   // }
 
-  Future<List<dynamic>> fetchWalletTransactions() async {
-    await loadHeaders();
-    final response = await HttpClientHelper.get(
-      Uri.parse('${baseUrl}/transactions'),
-      headers: headers,
-    );
-    if (response?.statusCode == 200) {
-      return jsonDecode(response!.body);
-    } else {
-      throw Exception('Failed to fetch wallet transactions');
-    }
-  }
-
   Future<Map<String, dynamic>> fetchWalletTransactionById(
       String referenceId) async {
     await loadHeaders();
@@ -361,5 +349,60 @@ class WalletService {
     } else {
       throw Exception('Failed to fetch wallet transaction by id');
     }
+  }
+
+  Future<List<dynamic>> fetchWalletTransactions() async {
+    await loadHeaders();
+    final response = await HttpClientHelper.get(
+      Uri.parse('${baseUrl}/transactions'),
+      headers: headers,
+    );
+    if (response?.statusCode == 200) {
+      print(
+          "Transaction Response: ${response!.body}"); // Print the raw response
+      var decodedResponse = jsonDecode(response.body);
+      print(
+          "Decoded Transactions: $decodedResponse"); // Print the decoded response
+
+      // Extract the result field from the decoded response
+      List<dynamic> transactions = decodedResponse['data']['result'];
+
+      return transactions;
+    } else {
+      throw Exception('Failed to fetch wallet transactions');
+    }
+  }
+
+  Future<Map<String, dynamic>> getWeeklySummary() async {
+    final List<dynamic> transactions = await fetchWalletTransactions();
+    final DateTime now = DateTime.now();
+    final DateTime lastWeek = now.subtract(Duration(days: 7));
+
+    List<dynamic> weeklyTransactions = transactions.where((transaction) {
+      // Check if the timestamp field is not null before parsing
+      String? timestamp = transaction['timestamp'];
+      if (timestamp != null) {
+        DateTime transactionDate =
+            DateFormat('yyyy-MM-ddTHH:mm:ss').parse(timestamp);
+        return transactionDate.isAfter(lastWeek);
+      }
+      return false;
+    }).toList();
+
+    print(
+        "Weekly Transactions: $weeklyTransactions"); // Print the weekly transactions
+
+    // Summarize the weekly transactions here
+    double totalAmount = weeklyTransactions.fold(
+        0, (sum, transaction) => sum + transaction['amount']);
+
+    Map<String, dynamic> summary = {
+      'totalAmount': totalAmount,
+      'numberOfTransactions': weeklyTransactions.length,
+    };
+
+    print("Weekly Summary: $summary"); // Print the weekly summary
+
+    return summary;
   }
 }

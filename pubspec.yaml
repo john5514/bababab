@@ -44,6 +44,7 @@ dependencies:
   http_client_helper: ^3.0.0
   currency_symbols: ^0.0.1+2
   fl_chart: ^0.63.0
+  intl: ^0.18.1
 
 dev_dependencies:
   flutter_test:
