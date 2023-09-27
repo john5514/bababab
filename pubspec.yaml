@@ -43,6 +43,7 @@ dependencies:
   cookie_jar: ^4.0.8
   http_client_helper: ^3.0.0
   currency_symbols: ^0.0.1+2
+  fl_chart: ^0.63.0
 
 dev_dependencies:
   flutter_test:

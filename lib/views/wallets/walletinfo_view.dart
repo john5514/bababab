@@ -1,14 +1,18 @@
 import 'package:bicrypto/Controllers/walletinfo_controller.dart';
-import 'package:bicrypto/Controllers/wallet_controller.dart'; // Import WalletController
+import 'package:bicrypto/Controllers/wallet_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:bicrypto/Style/styles.dart'; // Import your theme
+import 'package:bicrypto/Style/styles.dart';
+import 'package:fl_chart/fl_chart.dart';
 
 class WalletInfoView extends StatelessWidget {
   final WalletInfoController walletInfoController =
       Get.put(WalletInfoController());
-  final WalletController walletController =
-      Get.find(); // Get the WalletController instance
+  final WalletController walletController = Get.find();
+
+  final Color leftBarColor = Colors.green;
+  final Color rightBarColor = Colors.red;
+  final double barWidth = 14;
 
   @override
   Widget build(BuildContext context) {
@@ -57,6 +61,81 @@ class WalletInfoView extends StatelessWidget {
                           ?.copyWith(color: Colors.red),
                     ),
                   ],
+                ),
+                SizedBox(height: 20),
+                AspectRatio(
+                  aspectRatio: 1,
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: BarChart(
+                      BarChartData(
+                        maxY: 20,
+                        barGroups:
+                            walletController.weeklySummaries.map((summary) {
+                          int index =
+                              walletController.weeklySummaries.indexOf(summary);
+                          return BarChartGroupData(
+                            x: index,
+                            barRods: [
+                              BarChartRodData(
+                                fromY: 0,
+                                toY: summary.income,
+                                color: leftBarColor,
+                                width: barWidth,
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              BarChartRodData(
+                                fromY: 0,
+                                toY: summary.expense,
+                                color: rightBarColor,
+                                width: barWidth,
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                            ],
+                          );
+                        }).toList(),
+                        titlesData: FlTitlesData(
+                          show: true,
+                          leftTitles: AxisTitles(
+                            sideTitles: SideTitles(
+                              showTitles: true,
+                              reservedSize: 28,
+                              interval: 1,
+                              getTitlesWidget: (value, meta) {
+                                return Text('$value');
+                              },
+                            ),
+                          ),
+                          bottomTitles: AxisTitles(
+                            sideTitles: SideTitles(
+                              showTitles: true,
+                              reservedSize: 42,
+                              getTitlesWidget: (double value, TitleMeta meta) {
+                                int index = value.toInt();
+                                if (index >= 0 &&
+                                    index <
+                                        walletController
+                                            .weeklySummaries.length) {
+                                  return Text(
+                                    walletController
+                                        .weeklySummaries[index].week,
+                                    style: TextStyle(
+                                        color: Colors.white, fontSize: 22),
+                                  );
+                                }
+                                return Text('');
+                              },
+                            ),
+                          ),
+                        ),
+                        borderData: FlBorderData(
+                          show: true,
+                          border: Border.all(color: Colors.grey, width: 1),
+                        ),
+                        groupsSpace: 10,
+                      ),
+                    ),
+                  ),
                 ),
                 SizedBox(height: 40),
               ],

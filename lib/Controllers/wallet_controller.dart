@@ -1,9 +1,20 @@
 import 'package:bicrypto/services/api_service.dart';
 import 'package:get/get.dart';
-import 'package:bicrypto/services/wallet_service.dart'; // Import your WalletService
+import 'package:bicrypto/services/wallet_service.dart';
+
+class WeeklySummary {
+  final String week;
+  double income;
+  double expense;
+
+  WeeklySummary(this.week, this.income, this.expense);
+}
 
 class WalletController extends GetxController {
   final WalletService walletService = WalletService(ApiService());
+  int dayOfYear(DateTime date) {
+    return date.difference(DateTime(date.year, 1, 1)).inDays + 1;
+  }
 
   var fiatDepositMethods = [].obs;
   var fiatWithdrawMethods = [].obs;
@@ -14,7 +25,8 @@ class WalletController extends GetxController {
   var currencies = [].obs;
   var selectedCurrency = ''.obs;
   var walletBalance = 0.0.obs;
-  var fiatWalletInfo = <dynamic>[].obs; // Updated to List<dynamic>
+  var fiatWalletInfo = <dynamic>[].obs;
+  var weeklySummaries = <WeeklySummary>[].obs;
 
   @override
   void onInit() {
@@ -24,6 +36,7 @@ class WalletController extends GetxController {
     fetchWalletBalance();
     fetchCurrencies();
     fetchFiatWalletInfo();
+    fetchWeeklySummary();
   }
 
   double calculateIncome() {
@@ -38,6 +51,38 @@ class WalletController extends GetxController {
     return fiatTransactions
         .where((trx) => trx['amount'] < 0)
         .fold(0.0, (sum, trx) => sum + trx['amount']);
+  }
+
+  Future<void> fetchWeeklySummary() async {
+    try {
+      isLoading(true);
+      List<dynamic> transactions =
+          await walletService.fetchWalletTransactions();
+      Map<String, WeeklySummary> summaryMap = {};
+
+      for (var transaction in transactions) {
+        double amount = transaction['amount'];
+        DateTime date = DateTime.parse(transaction['date']);
+        int weekOfYear = ((dayOfYear(date) - date.weekday + 10) / 7).floor();
+        String weekKey = '${date.year}-W$weekOfYear';
+
+        if (!summaryMap.containsKey(weekKey)) {
+          summaryMap[weekKey] = WeeklySummary(weekKey, 0, 0);
+        }
+
+        if (amount > 0) {
+          summaryMap[weekKey]?.income += amount;
+        } else {
+          summaryMap[weekKey]?.expense += amount.abs();
+        }
+      }
+
+      weeklySummaries.assignAll(summaryMap.values.toList());
+    } catch (e) {
+      print("Error fetching weekly summary: $e");
+    } finally {
+      isLoading(false);
+    }
   }
 
   Future<void> fetchFiatWalletInfo() async {
