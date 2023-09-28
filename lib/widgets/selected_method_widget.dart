@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 class SelectedMethodPage extends StatelessWidget {
   final Map<String, dynamic> selectedMethod;
 
-  // Update the constructor to receive selectedMethod from the arguments
   const SelectedMethodPage({Key? key, required this.selectedMethod})
       : super(key: key);
 
@@ -14,7 +13,11 @@ class SelectedMethodPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Selected Method', style: TextStyle(color: Colors.white)),
+        title: Text(
+          selectedMethod['title'] ?? 'Selected Method',
+          style: TextStyle(color: Colors.white),
+        ),
+        backgroundColor: Colors.black,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -22,62 +25,75 @@ class SelectedMethodPage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Selected Method: ${selectedMethod['title']}',
-              style: TextStyle(fontSize: 18, color: Colors.white),
+              '${selectedMethod['title']}',
+              style: Theme.of(context).textTheme.displayLarge,
             ),
             SizedBox(height: 10),
             Text(
               'Instructions: ${selectedMethod['instructions'] ?? 'N/A'}',
-              style: TextStyle(color: Colors.white),
+              style: Theme.of(context).textTheme.bodyLarge,
             ),
             TextField(
               controller: amountController,
               keyboardType: TextInputType.number,
-              decoration: InputDecoration(labelText: 'Deposit Amount'),
+              style: TextStyle(color: Colors.white),
+              decoration: InputDecoration(
+                labelText: 'Deposit Amount',
+                labelStyle: TextStyle(color: Colors.white),
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.grey),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.orange),
+                ),
+              ),
             ),
             SizedBox(height: 10),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text('Flat Tax', style: TextStyle(color: Colors.white)),
-                Text('ALL ${selectedMethod['fixed_fee']}',
-                    style: TextStyle(color: Colors.white)),
-              ],
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text('Percentage Tax', style: TextStyle(color: Colors.white)),
-                Text('${selectedMethod['percentage_fee']}%',
-                    style: TextStyle(color: Colors.white)),
-              ],
-            ),
+            buildInfoRow('Flat Tax', 'ALL ${selectedMethod['fixed_fee']}'),
+            buildInfoRow(
+                'Percentage Tax', '${selectedMethod['percentage_fee']}%'),
             SizedBox(height: 10),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text('To pay today (ALL)',
-                    style: TextStyle(color: Colors.white, fontSize: 18)),
-                Text(
-                    'ALL ${calculateTotalAmount(amountController.text, selectedMethod)}',
-                    style: TextStyle(color: Colors.white, fontSize: 18)),
-              ],
+            buildInfoRow(
+              'To pay today (ALL)',
+              'ALL ${calculateTotalAmount(amountController.text, selectedMethod)}',
             ),
             CheckboxListTile(
-              title: Text('I agree to the Terms Of Service',
-                  style: TextStyle(color: Colors.white, fontSize: 12)),
+              title: Text(
+                'I agree to the Terms Of Service',
+                style: TextStyle(color: Colors.white, fontSize: 12),
+              ),
               value: isAgreedToTOS,
               onChanged: (value) {
                 isAgreedToTOS = value!;
               },
+              activeColor: Colors.orange,
             ),
+            SizedBox(height: 10),
             ElevatedButton(
               onPressed: isAgreedToTOS ? () {} : null,
               child: Text('Deposit'),
+              style: ElevatedButton.styleFrom(
+                primary: Colors.orange,
+                onPrimary: Colors.white,
+                elevation: 6.0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
             ),
           ],
         ),
       ),
+    );
+  }
+
+  Widget buildInfoRow(String label, String value) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(label, style: TextStyle(color: Colors.white)),
+        Text(value, style: TextStyle(color: Colors.white)),
+      ],
     );
   }
 
