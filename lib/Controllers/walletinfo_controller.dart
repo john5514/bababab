@@ -11,10 +11,10 @@ class WalletInfoController extends GetxController {
   var selectedMethod = Rx<Map<String, dynamic>?>(null);
 
   final WalletService walletService = Get.find();
-
   void setWalletInfo(String name, double balance) {
     walletName.value = name;
     walletBalance.value = balance;
+    fetchAllDepositOptions(); // Call the modified method here
   }
 
   @override
@@ -32,8 +32,17 @@ class WalletInfoController extends GetxController {
       var methods = await walletService.fetchFiatDepositMethods();
       var gateways = await walletService.fetchFiatDepositGateways();
 
+      // Since methods support all currencies, no need to filter them
+      var filteredMethods = methods;
+
+      // Filter gateways based on the selected wallet's currency
+      var filteredGateways = gateways.where((gateway) {
+        return gateway['currencies'] != null &&
+            gateway['currencies'].containsKey(walletName.value);
+      }).toList();
+
       // Combine them into a single list
-      var allOptions = [...methods, ...gateways];
+      var allOptions = [...filteredMethods, ...filteredGateways];
 
       fiatDepositMethods.assignAll(allOptions);
     } catch (e) {

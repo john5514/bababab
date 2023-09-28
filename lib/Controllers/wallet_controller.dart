@@ -16,9 +16,6 @@ class WalletController extends GetxController {
     return date.difference(DateTime(date.year, 1, 1)).inDays + 1;
   }
 
-  var fiatDepositMethods = [].obs;
-  var fiatWithdrawMethods = [].obs;
-  var fiatDepositGateways = [].obs;
   var isLoading = false.obs;
   var fiatBalance = 0.0.obs;
   var fiatTransactions = [].obs;

@@ -90,10 +90,13 @@ class FiatWalletView extends StatelessWidget {
                       var walletBalance = (walletInfo['balance'] is int)
                           ? walletInfo['balance'].toDouble()
                           : walletInfo['balance'];
+
+                      // Register the WalletInfoController instance
                       Get.put(WalletInfoController());
+
+                      // Set wallet info and navigate to the wallet info view
                       Get.find<WalletInfoController>()
                           .setWalletInfo(walletName, walletBalance);
-
                       Get.toNamed('/wallet-info');
                     },
                     child: Container(
