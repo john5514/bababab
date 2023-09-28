@@ -108,8 +108,8 @@ class WalletService {
       headers: headers,
     );
     if (response?.statusCode == 200) {
-      print(
-          "Fetched Deposit Methods: ${response?.body}"); // Print the fetched data
+      // print(
+      //     "Fetched Deposit Methods: ${response?.body}"); // Print the fetched data
       var decodedResponse = jsonDecode(response!.body);
       if (decodedResponse['status'] == 'success') {
         return decodedResponse['data']
@@ -118,8 +118,8 @@ class WalletService {
         throw Exception('Failed to fetch fiat deposit methods');
       }
     } else {
-      print(
-          "Failed to fetch deposit methods. Status Code: ${response?.statusCode}"); // Print the status code
+      // print(
+      //     "Failed to fetch deposit methods. Status Code: ${response?.statusCode}"); // Print the status code
       throw Exception('Failed to fetch fiat deposit methods');
     }
   }
@@ -144,7 +144,7 @@ class WalletService {
       headers: headers,
     );
     if (response?.statusCode == 200) {
-      print("Fetched Deposit Gateways: ${response?.body}");
+      // print("Fetched Deposit Gateways: ${response?.body}");
       var decodedResponse = jsonDecode(response!.body);
       if (decodedResponse['status'] == 'success') {
         return decodedResponse['data']
@@ -153,8 +153,8 @@ class WalletService {
         throw Exception('Failed to fetch fiat deposit gateways');
       }
     } else {
-      print(
-          "Failed to fetch deposit gateways. Status Code: ${response?.statusCode}");
+      // print(
+      //     "Failed to fetch deposit gateways. Status Code: ${response?.statusCode}");
       throw Exception('Failed to fetch fiat deposit gateways');
     }
   }
@@ -166,7 +166,7 @@ class WalletService {
       headers: headers,
     );
     if (response?.statusCode == 200) {
-      print("Fetched Withdraw Methods: ${response?.body}");
+      // print("Fetched Withdraw Methods: ${response?.body}");
       var decodedResponse = jsonDecode(response!.body);
       if (decodedResponse['status'] == 'success') {
         return decodedResponse['data']['result'];
@@ -174,8 +174,8 @@ class WalletService {
         throw Exception('Failed to fetch fiat withdraw methods');
       }
     } else {
-      print(
-          "Failed to fetch withdraw methods. Status Code: ${response?.statusCode}");
+      // print(
+      //     "Failed to fetch withdraw methods. Status Code: ${response?.statusCode}");
       throw Exception('Failed to fetch fiat withdraw methods');
     }
   }

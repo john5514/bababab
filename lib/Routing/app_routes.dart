@@ -9,6 +9,8 @@ import 'package:bicrypto/views/wallets/walletinfo_view.dart';
 import 'package:bicrypto/views/wallets/withdrowview.dart';
 import 'package:get/get.dart';
 
+import '../widgets/selected_method_widget.dart';
+
 class AppRoutes {
   static final routes = [
     GetPage(name: '/', page: () => LoginView()),
@@ -22,5 +24,13 @@ class AppRoutes {
     GetPage(
         name: '/completeDeposit',
         page: () => CompleteDepositView(method: Get.arguments)),
+    GetPage(
+      name: '/selected-method',
+      page: () {
+        // Extract the selectedMethod from the arguments
+        final args = Get.arguments as Map<String, dynamic>;
+        return SelectedMethodPage(selectedMethod: args);
+      },
+    ),
   ];
 }
