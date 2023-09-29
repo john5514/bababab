@@ -9,6 +9,7 @@ class DepositView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final WalletInfoController controller = Get.find();
+    final Map<String, dynamic> walletInfo = Get.arguments;
 
     return Scaffold(
       appBar: AppBar(
@@ -34,7 +35,8 @@ class DepositView extends StatelessWidget {
                 onTap: () {
                   Get.toNamed('/selected-method', arguments: {
                     'method': method,
-                    'currencyName': controller.walletName.value
+                    'currencyName': controller.walletName.value,
+                    'walletInfo': walletInfo,
                   });
                 },
               );

@@ -1,15 +1,21 @@
+import 'package:bicrypto/Controllers/walletinfo_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class SelectedMethodPage extends StatelessWidget {
   final Map<String, dynamic> selectedMethod;
   final String currencyName;
+  final Map<String, dynamic> walletInfo; // Added walletInfo
+  final WalletInfoController controller = Get.find();
 
   final RxBool isAgreedToTOS = false.obs;
 
-  SelectedMethodPage(
-      {Key? key, required this.selectedMethod, required this.currencyName})
-      : super(key: key);
+  SelectedMethodPage({
+    Key? key,
+    required this.selectedMethod,
+    required this.currencyName,
+    required this.walletInfo, // Added walletInfo to constructor
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -99,7 +105,19 @@ class SelectedMethodPage extends StatelessWidget {
                 )),
             SizedBox(height: 20),
             Obx(() => ElevatedButton(
-                  onPressed: isAgreedToTOS.value ? () {} : null,
+                  onPressed: isAgreedToTOS.value
+                      ? () async {
+                          // Construct the payload with necessary parameters
+                          final payload = {
+                            'amount': amountController.text,
+                            'transactionId': transactionIdController.text,
+                            // Add any other necessary parameters here
+                          };
+
+                          // Call the controller method to post the deposit
+                          await controller.postFiatDepositMethod(payload);
+                        }
+                      : null,
                   child: Text('Deposit'),
                   style: ElevatedButton.styleFrom(
                     primary: Colors.orange,

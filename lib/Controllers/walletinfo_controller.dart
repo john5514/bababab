@@ -113,10 +113,42 @@ class WalletInfoController extends GetxController {
   Future<void> postFiatDepositMethod(Map<String, dynamic> payload) async {
     try {
       isLoading(true);
+
+      // Validate and add necessary parameters to the payload
+      if (payload['amount'] == null || payload['transactionId'] == null) {
+        throw Exception(
+            'Invalid input: Amount and Transaction ID are required');
+      }
+
+      double amount = double.tryParse(payload['amount']) ?? 0;
+      if (amount <= 0) {
+        throw Exception('Invalid input: Amount should be a positive number');
+      }
+
+      // Retrieve the wallet identifier and method ID from the passed arguments
+      String walletIdentifier = walletInfo[
+          'walletIdentifier']; // Replace with the actual key for the wallet identifier in the walletInfo map
+      String methodId = selectedMethod[
+          'methodId']; // Replace with the actual key for the method ID in the selectedMethod map
+
+      // Add the missing parameters to the payload
+      payload['wallet'] = walletIdentifier;
+      payload['methodId'] = methodId;
+      payload['total'] = amount; // Assuming 'total' is the total deposit amount
+
+      // Call the service method to post the fiat deposit
       await walletService.postFiatDepositMethod(payload);
+
+      // Show success message
+      Get.snackbar('Success', 'Deposit successful',
+          snackPosition: SnackPosition.BOTTOM);
     } catch (e) {
+      // Log and show error message
       print("Failed to post fiat deposit method: $e");
+      Get.snackbar('Error', 'Failed to perform deposit: $e',
+          snackPosition: SnackPosition.BOTTOM);
     } finally {
+      // Reset loading state
       isLoading(false);
     }
   }

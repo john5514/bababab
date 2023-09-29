@@ -31,7 +31,10 @@ class AppRoutes {
         final selectedMethod = arguments['method'] as Map<String, dynamic>;
         final currencyName = arguments['currencyName'] as String;
         return SelectedMethodPage(
-            selectedMethod: selectedMethod, currencyName: currencyName);
+          selectedMethod: selectedMethod,
+          currencyName: currencyName,
+          walletInfo: {},
+        );
       },
     ),
   ];

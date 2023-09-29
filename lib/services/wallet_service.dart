@@ -225,7 +225,10 @@ class WalletService {
       body: jsonEncode(payload),
     );
     if (response?.statusCode != 200 && response?.statusCode != 201) {
+      print('Response Body: ${response?.body}');
       throw Exception('Failed to post fiat deposit method');
+    } else {
+      print('Deposit Method Successful. Response Body: ${response?.body}');
     }
   }
 

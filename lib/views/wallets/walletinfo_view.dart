@@ -152,7 +152,11 @@ class WalletInfoView extends StatelessWidget {
                   Expanded(
                     child: OutlinedButton(
                       onPressed: () {
-                        Get.toNamed('/deposit');
+                        Get.toNamed('/deposit', arguments: {
+                          'walletName': walletInfoController.walletName.value,
+                          'walletBalance':
+                              walletInfoController.walletBalance.value,
+                        });
                       },
                       style: OutlinedButton.styleFrom(
                         side: BorderSide(color: Colors.green),
