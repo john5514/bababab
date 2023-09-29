@@ -98,6 +98,10 @@ class FiatWalletView extends StatelessWidget {
                       var selectedMethod =
                           Get.find<WalletInfoController>().selectedMethod.value;
 
+                      // Print the walletInfo for debugging
+                      print(
+                          "Debugging: walletInfo after setting in onTap = $walletInfo");
+
                       // Set wallet info and navigate to the wallet info view
                       Get.find<WalletInfoController>().setWalletInfo(walletName,
                           walletBalance, walletInfo, selectedMethod ?? {});

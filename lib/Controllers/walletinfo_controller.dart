@@ -10,6 +10,7 @@ class WalletInfoController extends GetxController {
   var isLoading = false.obs;
   var selectedMethod = Rx<Map<String, dynamic>?>(null);
   var walletInfo = <String, dynamic>{}.obs;
+  final customFieldInputs = <String, dynamic>{}.obs;
 
   final WalletService walletService = Get.find();
   void setWalletInfo(String name, double balance, Map<String, dynamic> info,
@@ -24,6 +25,17 @@ class WalletInfoController extends GetxController {
     print("Debugging: selectedMethod = $method");
 
     fetchAllDepositOptions(); // Call the modified method here
+  }
+
+// Method to initialize wallet information
+  void initializeWalletInfo(
+      Map<String, dynamic> walletInfo, Map<String, dynamic> selectedMethod) {
+    String walletName = walletInfo['currency'] ?? '';
+    double walletBalance = (walletInfo['balance'] is int)
+        ? walletInfo['balance'].toDouble()
+        : (walletInfo['balance'] ?? 0.0);
+
+    setWalletInfo(walletName, walletBalance, walletInfo, selectedMethod);
   }
 
   @override
@@ -123,49 +135,74 @@ class WalletInfoController extends GetxController {
     try {
       isLoading(true);
 
-      // Validate and add necessary parameters to the payload
-      if (payload['amount'] == null || payload['transactionId'] == null) {
-        throw Exception(
-            'Invalid input: Amount and Transaction ID are required');
-      }
+      // Validate input and retrieve necessary parameters
+      String walletIdentifier = walletInfo.value['id']?.toString() ?? '';
+      String methodId = selectedMethod.value?['id']?.toString() ?? '';
 
-      double amount = double.tryParse(payload['amount']) ?? 0;
-      if (amount <= 0) {
-        throw Exception('Invalid input: Amount should be a positive number');
-      }
-
-      // Retrieve the wallet identifier and method ID from the passed arguments
-      String? walletIdentifier = walletInfo.value['walletIdentifier'];
-      String? methodId = selectedMethod.value?['methodId'];
-
-      // Print the values of walletIdentifier and methodId for debugging
+// Debugging: Print the values of walletIdentifier and methodId
       print("Debugging: walletIdentifier = $walletIdentifier");
       print("Debugging: methodId = $methodId");
 
-      if (walletIdentifier == null || methodId == null) {
+      if (walletIdentifier.isEmpty || methodId.isEmpty) {
         throw Exception('Wallet identifier or method ID is missing');
       }
 
-      // Add the missing parameters to the payload
-      payload['wallet'] = walletIdentifier;
-      payload['methodId'] = methodId;
-      payload['total'] = amount; // Assuming 'total' is the total deposit amount
-
-      // Call the service method to post the fiat deposit
-      await walletService.postFiatDepositMethod(payload);
-
-      // Show success message
-      Get.snackbar('Success', 'Deposit successful',
-          snackPosition: SnackPosition.BOTTOM);
+      // Construct and post the deposit payload
+      constructAndPostDepositPayload(payload, walletIdentifier, methodId);
     } catch (e) {
-      // Log and show error message
       print("Failed to post fiat deposit method: $e");
       Get.snackbar('Error', 'Failed to perform deposit: $e',
           snackPosition: SnackPosition.BOTTOM);
     } finally {
-      // Reset loading state
       isLoading(false);
     }
+  }
+
+  void validateInput(Map<String, dynamic> payload) {
+    if (payload['amount'] == null || payload['transactionId'] == null) {
+      throw Exception('Invalid input: Amount and Transaction ID are required');
+    }
+
+    double amount = double.tryParse(payload['amount']) ?? 0;
+    if (amount <= 0) {
+      throw Exception('Invalid input: Amount should be a positive number');
+    }
+  }
+
+  List<Map<String, dynamic>> formatCustomData() {
+    List<Map<String, dynamic>> result = [];
+
+    List<dynamic>? customFields = selectedMethod.value?['custom_fields'];
+
+    if (customFields != null) {
+      for (var field in customFields) {
+        String type = field['type'];
+        String title = field['title'];
+        dynamic value = customFieldInputs[title];
+
+        result.add({
+          'type': type,
+          'title': title,
+          'value': value,
+        });
+      }
+    }
+
+    return result;
+  }
+
+  void constructAndPostDepositPayload(Map<String, dynamic> payload,
+      String walletIdentifier, String methodId) async {
+    payload['wallet'] = walletIdentifier;
+    payload['methodId'] = methodId;
+    payload['total'] = double.tryParse(payload['amount']) ?? 0;
+
+    // Add formatted custom_data to the payload
+    payload['custom_data'] = formatCustomData();
+
+    await walletService.postFiatDepositMethod(payload);
+    Get.snackbar('Success', 'Deposit successful',
+        snackPosition: SnackPosition.BOTTOM);
   }
 
   Future<Map<String, dynamic>> fetchFiatDepositMethodById(String id) async {

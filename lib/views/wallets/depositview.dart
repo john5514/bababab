@@ -33,11 +33,19 @@ class DepositView extends StatelessWidget {
                   style: TextStyle(color: Colors.white),
                 ),
                 onTap: () {
-                  Get.toNamed('/selected-method', arguments: {
-                    'method': method,
-                    'currencyName': controller.walletName.value,
-                    'walletInfo': walletInfo,
-                  });
+                  if (method.isNotEmpty) {
+                    // Check if method is non-empty
+                    print(
+                        "Debugging: selectedMethod in DepositView before navigation = $method");
+                    Get.toNamed('/selected-method', arguments: {
+                      'method': method,
+                      'currencyName': controller.walletName.value,
+                      'walletInfo': controller.walletInfo.value,
+                    });
+                  } else {
+                    print("Error: selectedMethod is empty before navigation");
+                    // Optionally, show an error message to the user.
+                  }
                 },
               );
             },

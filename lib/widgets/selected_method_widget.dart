@@ -6,35 +6,27 @@ import 'package:get/get.dart';
 class SelectedMethodPage extends StatelessWidget {
   final Map<String, dynamic> selectedMethod;
   final String currencyName;
-  final Map<String, dynamic> walletInfo; // Added walletInfo
+  final Map<String, dynamic> walletInfo;
   final WalletInfoController controller = Get.find();
-
-  final RxBool isAgreedToTOS = false.obs;
+  final RxBool isAgreedToTOS = false.obs; // Define isAgreedToTOS here
 
   SelectedMethodPage({
     Key? key,
     required this.selectedMethod,
     required this.currencyName,
     required this.walletInfo,
-  }) : super(key: key) {
-    SchedulerBinding.instance!.addPostFrameCallback((_) {
-      // Extract walletName and walletBalance from walletInfo
-      String walletName = walletInfo['currency'] ?? '';
-      double walletBalance = (walletInfo['balance'] is int)
-          ? walletInfo['balance'].toDouble()
-          : (walletInfo['balance'] ?? 0.0);
-
-      // Call setWalletInfo with the correct parameters
-      controller.setWalletInfo(
-          walletName, walletBalance, walletInfo, selectedMethod);
-    });
-  }
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final TextEditingController amountController = TextEditingController();
     final TextEditingController transactionIdController =
         TextEditingController();
+
+    WidgetsBinding.instance!.addPostFrameCallback((_) {
+      print("Debugging: walletInfo in SelectedMethodPage = $walletInfo");
+      controller.initializeWalletInfo(walletInfo, selectedMethod);
+    });
 
     return Scaffold(
       appBar: AppBar(
@@ -124,7 +116,10 @@ class SelectedMethodPage extends StatelessWidget {
                           final payload = {
                             'amount': amountController.text,
                             'transactionId': transactionIdController.text,
-                            // Add any other necessary parameters here
+                            'walletId': walletInfo[
+                                'id'], // assuming the identifier is stored with the key 'id'
+                            'methodId': selectedMethod[
+                                'id'], // assuming the method ID is stored with the key 'id'
                           };
 
                           // Call the controller method to post the deposit

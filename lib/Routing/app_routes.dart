@@ -1,3 +1,4 @@
+import 'package:bicrypto/Controllers/walletinfo_controller.dart';
 import 'package:bicrypto/views/Auth/login_view.dart';
 import 'package:bicrypto/views/Auth/register_view.dart';
 import 'package:bicrypto/views/Auth/resetpassword_view.dart';
@@ -30,10 +31,13 @@ class AppRoutes {
         final arguments = Get.arguments as Map<String, dynamic>;
         final selectedMethod = arguments['method'] as Map<String, dynamic>;
         final currencyName = arguments['currencyName'] as String;
+        final walletInfo = arguments['walletInfo']
+            as Map<String, dynamic>; // Get walletInfo from the arguments
+
         return SelectedMethodPage(
           selectedMethod: selectedMethod,
           currencyName: currencyName,
-          walletInfo: {},
+          walletInfo: walletInfo, // Pass the walletInfo from the arguments
         );
       },
     ),
