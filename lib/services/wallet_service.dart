@@ -218,17 +218,26 @@ class WalletService {
   }
 
   Future<void> postFiatDepositMethod(Map<String, dynamic> payload) async {
-    await loadHeaders();
-    final response = await HttpClientHelper.post(
-      Uri.parse('${baseUrl}/fiat/deposit/method'),
-      headers: headers,
-      body: jsonEncode(payload),
-    );
-    if (response?.statusCode != 200 && response?.statusCode != 201) {
-      print('Response Body: ${response?.body}');
-      throw Exception('Failed to post fiat deposit method');
-    } else {
-      print('Deposit Method Successful. Response Body: ${response?.body}');
+    try {
+      await loadHeaders();
+
+      // Print the payload for debugging
+      print("Debugging: Sending payload = $payload");
+
+      final response = await HttpClientHelper.post(
+        Uri.parse('${baseUrl}/fiat/deposit/method'),
+        headers: headers,
+        body: jsonEncode(payload),
+      );
+      if (response?.statusCode != 200 && response?.statusCode != 201) {
+        print('Response Body: ${response?.body}');
+        throw Exception('Failed to post fiat deposit method');
+      } else {
+        print('Deposit Method Successful. Response Body: ${response?.body}');
+      }
+    } catch (e) {
+      print("Error in postFiatDepositMethod: $e");
+      rethrow;
     }
   }
 

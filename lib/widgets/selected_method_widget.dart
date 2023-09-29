@@ -1,5 +1,6 @@
 import 'package:bicrypto/Controllers/walletinfo_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart';
 
 class SelectedMethodPage extends StatelessWidget {
@@ -14,8 +15,20 @@ class SelectedMethodPage extends StatelessWidget {
     Key? key,
     required this.selectedMethod,
     required this.currencyName,
-    required this.walletInfo, // Added walletInfo to constructor
-  }) : super(key: key);
+    required this.walletInfo,
+  }) : super(key: key) {
+    SchedulerBinding.instance!.addPostFrameCallback((_) {
+      // Extract walletName and walletBalance from walletInfo
+      String walletName = walletInfo['currency'] ?? '';
+      double walletBalance = (walletInfo['balance'] is int)
+          ? walletInfo['balance'].toDouble()
+          : (walletInfo['balance'] ?? 0.0);
+
+      // Call setWalletInfo with the correct parameters
+      controller.setWalletInfo(
+          walletName, walletBalance, walletInfo, selectedMethod);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {

@@ -9,11 +9,20 @@ class WalletInfoController extends GetxController {
   var fiatDepositGateways = [].obs;
   var isLoading = false.obs;
   var selectedMethod = Rx<Map<String, dynamic>?>(null);
+  var walletInfo = <String, dynamic>{}.obs;
 
   final WalletService walletService = Get.find();
-  void setWalletInfo(String name, double balance) {
+  void setWalletInfo(String name, double balance, Map<String, dynamic> info,
+      Map<String, dynamic> method) {
     walletName.value = name;
     walletBalance.value = balance;
+    walletInfo.value = info; // set walletInfo
+    selectedMethod.value = method; // set selectedMethod
+
+    // Debugging: Print walletInfo and selectedMethod
+    print("Debugging: walletInfo = $info");
+    print("Debugging: selectedMethod = $method");
+
     fetchAllDepositOptions(); // Call the modified method here
   }
 
@@ -126,10 +135,16 @@ class WalletInfoController extends GetxController {
       }
 
       // Retrieve the wallet identifier and method ID from the passed arguments
-      String walletIdentifier = walletInfo[
-          'walletIdentifier']; // Replace with the actual key for the wallet identifier in the walletInfo map
-      String methodId = selectedMethod[
-          'methodId']; // Replace with the actual key for the method ID in the selectedMethod map
+      String? walletIdentifier = walletInfo.value['walletIdentifier'];
+      String? methodId = selectedMethod.value?['methodId'];
+
+      // Print the values of walletIdentifier and methodId for debugging
+      print("Debugging: walletIdentifier = $walletIdentifier");
+      print("Debugging: methodId = $methodId");
+
+      if (walletIdentifier == null || methodId == null) {
+        throw Exception('Wallet identifier or method ID is missing');
+      }
 
       // Add the missing parameters to the payload
       payload['wallet'] = walletIdentifier;

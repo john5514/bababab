@@ -94,9 +94,14 @@ class FiatWalletView extends StatelessWidget {
                       // Register the WalletInfoController instance
                       Get.put(WalletInfoController());
 
+                      // Fetch selectedMethod from the WalletInfoController
+                      var selectedMethod =
+                          Get.find<WalletInfoController>().selectedMethod.value;
+
                       // Set wallet info and navigate to the wallet info view
-                      Get.find<WalletInfoController>()
-                          .setWalletInfo(walletName, walletBalance);
+                      Get.find<WalletInfoController>().setWalletInfo(walletName,
+                          walletBalance, walletInfo, selectedMethod ?? {});
+
                       Get.toNamed('/wallet-info');
                     },
                     child: Container(
