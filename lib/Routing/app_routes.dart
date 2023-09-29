@@ -27,9 +27,11 @@ class AppRoutes {
     GetPage(
       name: '/selected-method',
       page: () {
-        // Extract the selectedMethod from the arguments
-        final args = Get.arguments as Map<String, dynamic>;
-        return SelectedMethodPage(selectedMethod: args);
+        final arguments = Get.arguments as Map<String, dynamic>;
+        final selectedMethod = arguments['method'] as Map<String, dynamic>;
+        final currencyName = arguments['currencyName'] as String;
+        return SelectedMethodPage(
+            selectedMethod: selectedMethod, currencyName: currencyName);
       },
     ),
   ];

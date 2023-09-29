@@ -32,7 +32,10 @@ class DepositView extends StatelessWidget {
                   style: TextStyle(color: Colors.white),
                 ),
                 onTap: () {
-                  Get.toNamed('/selected-method', arguments: method);
+                  Get.toNamed('/selected-method', arguments: {
+                    'method': method,
+                    'currencyName': controller.walletName.value
+                  });
                 },
               );
             },

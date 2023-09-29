@@ -38,6 +38,8 @@ final ThemeData appTheme = ThemeData(
       shadowColor: Colors.red,
       enabledMouseCursor: SystemMouseCursors.click,
       disabledMouseCursor: SystemMouseCursors.forbidden,
+      padding: EdgeInsets.symmetric(
+          vertical: 12.0, horizontal: 20.0), // Added padding
     ),
   ),
   scaffoldBackgroundColor: Colors.black,

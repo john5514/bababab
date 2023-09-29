@@ -1,15 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class SelectedMethodPage extends StatelessWidget {
   final Map<String, dynamic> selectedMethod;
+  final String currencyName;
 
-  const SelectedMethodPage({Key? key, required this.selectedMethod})
+  final RxBool isAgreedToTOS = false.obs;
+
+  SelectedMethodPage(
+      {Key? key, required this.selectedMethod, required this.currencyName})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final TextEditingController amountController = TextEditingController();
-    bool isAgreedToTOS = false;
+    final TextEditingController transactionIdController =
+        TextEditingController();
 
     return Scaffold(
       appBar: AppBar(
@@ -19,7 +25,7 @@ class SelectedMethodPage extends StatelessWidget {
         ),
         backgroundColor: Colors.black,
       ),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -28,16 +34,34 @@ class SelectedMethodPage extends StatelessWidget {
               '${selectedMethod['title']}',
               style: Theme.of(context).textTheme.displayLarge,
             ),
-            SizedBox(height: 10),
+            SizedBox(height: 20),
             Text(
               'Instructions: ${selectedMethod['instructions'] ?? 'N/A'}',
               style: Theme.of(context).textTheme.bodyLarge,
             ),
+            SizedBox(height: 20),
+            TextField(
+              controller: transactionIdController,
+              style: const TextStyle(color: Colors.white),
+              decoration: const InputDecoration(
+                labelText: 'Transaction ID',
+                labelStyle: TextStyle(color: Colors.white),
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.grey),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.orange),
+                ),
+              ),
+            ),
+            SizedBox(height: 20),
+            Divider(color: Colors.grey),
+            SizedBox(height: 20),
             TextField(
               controller: amountController,
               keyboardType: TextInputType.number,
-              style: TextStyle(color: Colors.white),
-              decoration: InputDecoration(
+              style: const TextStyle(color: Colors.white),
+              decoration: const InputDecoration(
                 labelText: 'Deposit Amount',
                 labelStyle: TextStyle(color: Colors.white),
                 enabledBorder: OutlineInputBorder(
@@ -48,39 +72,44 @@ class SelectedMethodPage extends StatelessWidget {
                 ),
               ),
             ),
-            SizedBox(height: 10),
-            buildInfoRow('Flat Tax', 'ALL ${selectedMethod['fixed_fee']}'),
+            SizedBox(height: 20),
             buildInfoRow(
-                'Percentage Tax', '${selectedMethod['percentage_fee']}%'),
+                'Flat Tax', '$currencyName ${selectedMethod['fixed_fee']}'),
             SizedBox(height: 10),
+            buildInfoRow('Percentage Tax',
+                '${(selectedMethod['percentage_fee'] as num).toDouble() / 100}%'), // Fixed percentage display
+            SizedBox(height: 20),
             buildInfoRow(
-              'To pay today (ALL)',
-              'ALL ${calculateTotalAmount(amountController.text, selectedMethod)}',
+              'To pay today ($currencyName)',
+              '$currencyName ${calculateTotalAmount(amountController.text, selectedMethod)}',
             ),
-            CheckboxListTile(
-              title: Text(
-                'I agree to the Terms Of Service',
-                style: TextStyle(color: Colors.white, fontSize: 12),
-              ),
-              value: isAgreedToTOS,
-              onChanged: (value) {
-                isAgreedToTOS = value!;
-              },
-              activeColor: Colors.orange,
-            ),
-            SizedBox(height: 10),
-            ElevatedButton(
-              onPressed: isAgreedToTOS ? () {} : null,
-              child: Text('Deposit'),
-              style: ElevatedButton.styleFrom(
-                primary: Colors.orange,
-                onPrimary: Colors.white,
-                elevation: 6.0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-            ),
+            SizedBox(height: 20),
+            SizedBox(height: 20),
+            Obx(() => CheckboxListTile(
+                  title: Text(
+                    'I agree to the Terms Of Service',
+                    style: TextStyle(color: Colors.white, fontSize: 12),
+                  ),
+                  value: isAgreedToTOS.value,
+                  onChanged: (value) {
+                    isAgreedToTOS.value = value!;
+                  },
+                  activeColor: Colors.orange,
+                  checkColor: Colors.black, // Fixed checkbox color
+                )),
+            SizedBox(height: 20),
+            Obx(() => ElevatedButton(
+                  onPressed: isAgreedToTOS.value ? () {} : null,
+                  child: Text('Deposit'),
+                  style: ElevatedButton.styleFrom(
+                    primary: Colors.orange,
+                    onPrimary: Colors.white,
+                    elevation: 6.0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                )),
           ],
         ),
       ),
