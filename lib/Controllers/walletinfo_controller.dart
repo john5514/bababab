@@ -193,12 +193,13 @@ class WalletInfoController extends GetxController {
 
   void constructAndPostDepositPayload(Map<String, dynamic> payload,
       String walletIdentifier, String methodId) async {
-    payload['wallet'] = walletIdentifier;
-    payload['methodId'] = methodId;
+    payload['wallet'] = walletIdentifier.toString();
+    payload['methodId'] = methodId.toString();
     payload['total'] = double.tryParse(payload['amount']) ?? 0;
 
     // Add formatted custom_data to the payload
     payload['custom_data'] = formatCustomData();
+    print("Final Payload: $payload");
 
     await walletService.postFiatDepositMethod(payload);
     Get.snackbar('Success', 'Deposit successful',

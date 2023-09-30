@@ -116,10 +116,15 @@ class SelectedMethodPage extends StatelessWidget {
                           final payload = {
                             'amount': amountController.text,
                             'transactionId': transactionIdController.text,
-                            'walletId': walletInfo[
-                                'id'], // assuming the identifier is stored with the key 'id'
-                            'methodId': selectedMethod[
-                                'id'], // assuming the method ID is stored with the key 'id'
+                            'wallet': walletInfo['id'].toString(),
+                            'methodId': selectedMethod['id'],
+                            'custom_data': [
+                              {
+                                'type': 'input',
+                                'title': 'Transaction ID',
+                                'value': transactionIdController.text,
+                              },
+                            ],
                           };
 
                           // Call the controller method to post the deposit
