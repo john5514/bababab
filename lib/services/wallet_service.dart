@@ -392,57 +392,68 @@ class WalletService {
     }
   }
 
-  Future<List<dynamic>> fetchWalletTransactions() async {
+  Future<List<dynamic>> fetchWalletTransactionsForUserID35() async {
     await loadHeaders();
     final response = await HttpClientHelper.get(
       Uri.parse('${baseUrl}/transactions'),
       headers: headers,
     );
+
     if (response?.statusCode == 200) {
-      print(
-          "Transaction Response: ${response!.body}"); // Print the raw response
-      var decodedResponse = jsonDecode(response.body);
-      //print(
-      // "Decoded Transactions: $decodedResponse"); // Print the decoded response
+      var decodedResponse = jsonDecode(response!.body);
 
-      // Extract the result field from the decoded response
+      // Extract the result field from the decoded response and filter for User ID 35
       List<dynamic> transactions = decodedResponse['data']['result'];
+      List<dynamic> userTransactions = transactions
+          .where((transaction) => transaction['user_id'] == 35)
+          .toList();
 
-      return transactions;
+      // Debug: Print each transaction's user ID to confirm
+      for (var transaction in userTransactions) {
+        print("Filtered Transaction User ID: ${transaction['user_id']}");
+      }
+
+      return userTransactions;
     } else {
       throw Exception('Failed to fetch wallet transactions');
     }
   }
 
   Future<Map<String, dynamic>> getWeeklySummary() async {
-    final List<dynamic> transactions = await fetchWalletTransactions();
+    final List<dynamic> transactions =
+        await fetchWalletTransactionsForUserID35();
     final DateTime now = DateTime.now();
     final DateTime lastWeek = now.subtract(Duration(days: 7));
 
     List<dynamic> weeklyTransactions = transactions.where((transaction) {
-      // Check if the timestamp field is not null before parsing
-      String? timestamp = transaction['timestamp'];
-      if (timestamp != null) {
+      String? createdAt = transaction['created_at'];
+      if (createdAt != null) {
         DateTime transactionDate =
-            DateFormat('yyyy-MM-ddTHH:mm:ss').parse(timestamp);
+            DateFormat('yyyy-MM-ddTHH:mm:ss').parse(createdAt);
         return transactionDate.isAfter(lastWeek);
       }
       return false;
     }).toList();
 
-    //print(
-    //"Weekly Transactions: $weeklyTransactions"); // Print the weekly transactions
+    // Separate the weekly transactions into deposits and withdrawals
+    List<dynamic> deposits = weeklyTransactions
+        .where((transaction) => transaction['type'] == 'DEPOSIT')
+        .toList();
+    List<dynamic> withdrawals = weeklyTransactions
+        .where((transaction) => transaction['type'] == 'WITHDRAWAL')
+        .toList();
 
-    // Summarize the weekly transactions here
-    double totalAmount = weeklyTransactions.fold(
-        0, (sum, transaction) => sum + transaction['amount']);
+    // Sum up the amounts for deposits and withdrawals
+    double totalDeposits = deposits.fold(
+        0, (sum, transaction) => sum + (transaction['amount'] ?? 0.0));
+    double totalWithdrawals = withdrawals.fold(
+        0, (sum, transaction) => sum + (transaction['amount'] ?? 0.0));
 
     Map<String, dynamic> summary = {
-      'totalAmount': totalAmount,
+      'totalDeposits': totalDeposits,
+      'totalWithdrawals': totalWithdrawals,
       'numberOfTransactions': weeklyTransactions.length,
     };
-
-    //print("Weekly Summary: $summary"); // Print the weekly summary
 
     return summary;
   }

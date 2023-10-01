@@ -1,3 +1,4 @@
+import 'package:bicrypto/Controllers/walletinfo_controller.dart';
 import 'package:bicrypto/services/api_service.dart';
 import 'package:get/get.dart';
 import 'package:bicrypto/services/wallet_service.dart';
@@ -36,19 +37,61 @@ class WalletController extends GetxController {
     fetchWeeklySummary();
   }
 
-  double calculateIncome() {
-    // Calculate and return the total income based on the transaction data
-    //print("Fiat Transactions: $fiatTransactions");
-    return fiatTransactions
-        .where((trx) => trx['amount'] > 0)
+  Map<String, double> calculateBalanceForCurrency(String currency) {
+    print("All Transactions: $fiatTransactions");
+    print("Currency being checked: $currency");
+
+    // Additional debugging
+    print(
+        "Transactions with type DEPOSIT: ${fiatTransactions.where((trx) => trx['type'] == 'DEPOSIT').toList()}");
+    print(
+        "Transactions with currency $currency: ${fiatTransactions.where((trx) => trx['wallet']['currency'] == currency).toList()}");
+
+    double income = fiatTransactions
+        .where((trx) =>
+            trx['type'] == 'DEPOSIT' && trx['wallet']['currency'] == currency)
         .fold(0.0, (sum, trx) => sum + trx['amount']);
+
+    List<dynamic> incomeTransactions = fiatTransactions
+        .where((trx) =>
+            trx['type'] == 'DEPOSIT' && trx['wallet']['currency'] == currency)
+        .toList();
+
+    // Calculate expense and create the expenseTransactions list
+    double expense = fiatTransactions
+        .where((trx) =>
+            trx['type'] != 'DEPOSIT' && trx['wallet']['currency'] == currency)
+        .fold(0.0, (sum, trx) => sum + trx['amount']);
+
+    List<dynamic> expenseTransactions = fiatTransactions
+        .where((trx) =>
+            trx['type'] != 'DEPOSIT' && trx['wallet']['currency'] == currency)
+        .toList();
+
+    print("Income Transactions: $incomeTransactions");
+    print("Expense Transactions: $expenseTransactions");
+
+    return {
+      'income': income,
+      'expense': expense,
+    };
   }
 
-  double calculateExpense() {
-    // Calculate and return the total expense based on the transaction data
-    return fiatTransactions
-        .where((trx) => trx['amount'] < 0)
-        .fold(0.0, (sum, trx) => sum + trx['amount']);
+  List<String> extractUniqueCurrencies() {
+    Set<String> currencies = Set<String>();
+    for (var trx in fiatTransactions) {
+      currencies.add(trx['wallet']['currency']);
+    }
+    return currencies.toList();
+  }
+
+  void calculateBalancesForAllCurrencies() {
+    List<String> uniqueCurrencies = extractUniqueCurrencies();
+    for (String currency in uniqueCurrencies) {
+      Map<String, double> balance = calculateBalanceForCurrency(currency);
+      print(
+          "Balance for $currency: ${balance['income']} - ${balance['expense']}");
+    }
   }
 
   Future<void> fetchWeeklySummary() async {
@@ -112,13 +155,13 @@ class WalletController extends GetxController {
   Future<void> fetchFiatTransactions() async {
     try {
       isLoading(true);
-      // Fetch transactions from API
       List<dynamic> transactions =
-          await walletService.fetchWalletTransactions();
+          await walletService.fetchWalletTransactionsForUserID35();
       fiatTransactions.assignAll(transactions);
+      print("Fetched Transactions: $transactions"); // Debugging line
+      calculateBalancesForAllCurrencies();
     } catch (e) {
       print("Error fetching fiat transactions: $e");
-      // Handle the error appropriately, e.g., show an error message to the user
     } finally {
       isLoading(false);
     }

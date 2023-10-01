@@ -47,19 +47,29 @@ class WalletInfoView extends StatelessWidget {
                   children: [
                     Icon(Icons.arrow_upward,
                         color: Colors.green), // Income Icon
-                    Text(
-                      '+${walletController.calculateIncome()}', // Display calculated income
-                      style: appTheme.textTheme.bodyLarge
-                          ?.copyWith(color: Colors.green),
-                    ),
+                    Obx(() {
+                      Map<String, double> balance =
+                          walletController.calculateBalanceForCurrency(
+                              walletInfoController.walletName.value);
+                      return Text(
+                        '+${balance['income']?.toStringAsFixed(2)}',
+                        style: appTheme.textTheme.bodyLarge
+                            ?.copyWith(color: Colors.green),
+                      );
+                    }),
                     SizedBox(width: 20),
                     Icon(Icons.arrow_downward,
                         color: Colors.red), // Expense Icon
-                    Text(
-                      '-${walletController.calculateExpense()}', // Display calculated expense
-                      style: appTheme.textTheme.bodyLarge
-                          ?.copyWith(color: Colors.red),
-                    ),
+                    Obx(() {
+                      Map<String, double> balance =
+                          walletController.calculateBalanceForCurrency(
+                              walletInfoController.walletName.value);
+                      return Text(
+                        '${balance['expense']?.toStringAsFixed(2)}',
+                        style: appTheme.textTheme.bodyLarge
+                            ?.copyWith(color: Colors.red),
+                      );
+                    }),
                   ],
                 ),
                 SizedBox(height: 20),
