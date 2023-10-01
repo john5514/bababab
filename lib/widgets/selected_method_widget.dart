@@ -112,19 +112,15 @@ class SelectedMethodPage extends StatelessWidget {
             Obx(() => ElevatedButton(
                   onPressed: isAgreedToTOS.value
                       ? () async {
+                          // Store the transactionIdController.text value in customFieldInputs
+                          controller.customFieldInputs[transactionIdController
+                              .text] = 'test@gmail.com'; // This line is changed
+
                           // Construct the payload with necessary parameters
                           final payload = {
                             'amount': amountController.text,
-                            'transactionId': transactionIdController.text,
                             'wallet': walletInfo['id'].toString(),
                             'methodId': selectedMethod['id'],
-                            'custom_data': [
-                              {
-                                'type': 'input',
-                                'title': 'Transaction ID',
-                                'value': transactionIdController.text,
-                              },
-                            ],
                           };
 
                           // Call the controller method to post the deposit

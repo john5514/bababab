@@ -177,7 +177,7 @@ class WalletInfoController extends GetxController {
     if (customFields != null) {
       for (var field in customFields) {
         String type = field['type'];
-        String title = field['title'];
+        String title = customFieldInputs.keys.first; // This line is changed
         dynamic value = customFieldInputs[title];
 
         result.add({
@@ -193,9 +193,20 @@ class WalletInfoController extends GetxController {
 
   void constructAndPostDepositPayload(Map<String, dynamic> payload,
       String walletIdentifier, String methodId) async {
-    payload['wallet'] = walletIdentifier.toString();
-    payload['methodId'] = methodId.toString();
-    payload['total'] = double.tryParse(payload['amount']) ?? 0;
+    // Use the 'uuid' from the walletInfo
+    payload['wallet'] = walletInfo.value['uuid'].toString();
+
+    // Parse the methodId as an integer
+    payload['methodId'] = int.parse(methodId);
+
+    double amount = double.tryParse(payload['amount']) ?? 0;
+    double fixedFee =
+        (selectedMethod.value?['fixed_fee'] as num?)?.toDouble() ?? 0;
+    double percentageFee =
+        (selectedMethod.value?['percentage_fee'] as num?)?.toDouble() ?? 0;
+
+    // Correctly calculate the total
+    payload['total'] = amount + fixedFee + (amount * (percentageFee / 100));
 
     // Add formatted custom_data to the payload
     payload['custom_data'] = formatCustomData();
