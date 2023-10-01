@@ -9,29 +9,6 @@ class FiatWalletView extends StatelessWidget {
 
   FiatWalletView({super.key});
 
-  String getCurrencySymbol(String currencyCode) {
-    // Mapping of currency codes to correct symbols
-    Map<String, String> correctSymbols = {
-      'ANG': 'ƒ',
-      'AWG': 'ƒ',
-      'AFN': '؋',
-      'AZN': '₼',
-    };
-
-    var currency = walletController.currencies
-        .firstWhere((c) => c['code'] == currencyCode, orElse: () => null);
-
-    // If the currency code is in the mapping, return the correct symbol, otherwise return the symbol from the API
-    if (currency != null) {
-      String apiSymbol = currency['symbol'];
-      return correctSymbols.containsKey(currencyCode)
-          ? correctSymbols[currencyCode]!
-          : apiSymbol;
-    } else {
-      return currencyCode;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -62,7 +39,7 @@ class FiatWalletView extends StatelessWidget {
               itemBuilder: (context, index) {
                 var walletInfo = walletController.fiatWalletInfo[index];
                 String currencySymbol =
-                    getCurrencySymbol(walletInfo['currency']);
+                    walletController.getCurrencySymbol(walletInfo['currency']);
 
                 // Define a list of gradients to be used for the cards
                 List<LinearGradient> gradients = [

@@ -31,17 +31,20 @@ class WalletInfoView extends StatelessWidget {
             Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                // Display wallet name
                 SizedBox(height: 20),
                 Text(
                   'Wallet Name: ${walletInfoController.walletName.value}',
                   style: appTheme.textTheme.bodyLarge,
                 ),
                 SizedBox(height: 20),
+                // Display wallet balance
                 Text(
                   'Wallet Balance: ${walletInfoController.walletBalance.value}',
                   style: appTheme.textTheme.bodyLarge,
                 ),
                 SizedBox(height: 20),
+                // Display income and expense with icons
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -51,8 +54,11 @@ class WalletInfoView extends StatelessWidget {
                       Map<String, double> balance =
                           walletController.calculateBalanceForCurrency(
                               walletInfoController.walletName.value);
+                      String currencySymbol = walletController
+                          .getCurrencySymbol(walletInfoController.walletName
+                              .value); // Function to get the currency symbol
                       return Text(
-                        '+${balance['income']?.toStringAsFixed(2)}',
+                        '+$currencySymbol${balance['income']?.toStringAsFixed(2)}',
                         style: appTheme.textTheme.bodyLarge
                             ?.copyWith(color: Colors.green),
                       );
@@ -64,8 +70,11 @@ class WalletInfoView extends StatelessWidget {
                       Map<String, double> balance =
                           walletController.calculateBalanceForCurrency(
                               walletInfoController.walletName.value);
+                      String currencySymbol = walletController
+                          .getCurrencySymbol(walletInfoController.walletName
+                              .value); // Function to get the currency symbol
                       return Text(
-                        '${balance['expense']?.toStringAsFixed(2)}',
+                        '-$currencySymbol${balance['expense']?.toStringAsFixed(2)}',
                         style: appTheme.textTheme.bodyLarge
                             ?.copyWith(color: Colors.red),
                       );
