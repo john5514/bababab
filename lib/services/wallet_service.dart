@@ -420,9 +420,16 @@ class WalletService {
     }
   }
 
-  Future<List<WeeklySummary>> getWeeklySummary() async {
-    final List<dynamic> transactions =
+  Future<List<WeeklySummary>> getWeeklySummary({String? currency}) async {
+    final List<dynamic> allTransactions =
         await fetchWalletTransactionsForUserID35();
+
+    // Filter transactions for the specified currency if provided
+    final List<dynamic> transactions = (currency == null)
+        ? allTransactions
+        : allTransactions
+            .where((trx) => trx['wallet']['currency'] == currency)
+            .toList();
 
     // Initialize a list to store the summaries
     List<WeeklySummary> weeklyData = [];

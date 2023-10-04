@@ -1,5 +1,6 @@
 import 'package:bicrypto/Controllers/walletinfo_controller.dart';
 import 'package:bicrypto/services/api_service.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart';
 import 'package:bicrypto/services/wallet_service.dart';
 
@@ -117,12 +118,15 @@ class WalletController extends GetxController {
     }
   }
 
-  Future<void> fetchWeeklySummary() async {
+  Future<void> fetchWeeklySummary({String? currency}) async {
     try {
-      isLoading(true);
+      SchedulerBinding.instance?.addPostFrameCallback((_) {
+        isLoading(true);
+      });
 
-      // Fetch the weekly summary from the service
-      List<WeeklySummary> weeklyData = await walletService.getWeeklySummary();
+      // Fetch the weekly summary from the service using the updated method
+      List<WeeklySummary> weeklyData =
+          await walletService.getWeeklySummary(currency: currency);
 
       // Clear the previous summaries
       weeklySummaries.clear();

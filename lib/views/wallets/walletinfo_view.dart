@@ -14,7 +14,10 @@ class WalletInfoView extends StatelessWidget {
   final Color rightBarColor = Colors.red;
   final double barWidth = 14;
 
-  WalletInfoView({super.key});
+  WalletInfoView({super.key}) {
+    walletController.fetchWeeklySummary(
+        currency: walletInfoController.walletName.value);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,23 +37,23 @@ class WalletInfoView extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 // Display wallet name
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 Text(
                   'Wallet Name: ${walletInfoController.walletName.value}',
                   style: appTheme.textTheme.bodyLarge,
                 ),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 // Display wallet balance
                 Text(
                   'Wallet Balance: ${walletInfoController.walletBalance.value}',
                   style: appTheme.textTheme.bodyLarge,
                 ),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 // Display income and expense with icons
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.arrow_upward,
+                    const Icon(Icons.arrow_upward,
                         color: Colors.green), // Income Icon
                     Obx(() {
                       Map<String, double> balance =
@@ -65,8 +68,8 @@ class WalletInfoView extends StatelessWidget {
                             ?.copyWith(color: Colors.green),
                       );
                     }),
-                    SizedBox(width: 20),
-                    Icon(Icons.arrow_downward,
+                    const SizedBox(width: 20),
+                    const Icon(Icons.arrow_downward,
                         color: Colors.red), // Expense Icon
                     Obx(() {
                       Map<String, double> balance =
@@ -83,28 +86,29 @@ class WalletInfoView extends StatelessWidget {
                     }),
                   ],
                 ),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 Text(
                   'Weekly Summary (Last 7 Days)',
                   style: appTheme.textTheme.bodyLarge,
                 ),
+
                 AspectRatio(
                   aspectRatio: 1,
                   child: Padding(
                     padding: const EdgeInsets.all(16),
                     child: Container(
                       height: 300,
-                      color:
-                          Color.fromARGB(255, 17, 1, 39), // Twilight background
+                      color: const Color.fromARGB(
+                          255, 17, 1, 39), // Twilight background
                       child: BarChart(
                         BarChartData(
-                          maxY:
-                              20, // We'll normalize data to show in thousands, so maxY is 20
+                          maxY: getMaxY(), // <-- Use the dynamic maxY
                           barTouchData: BarTouchData(
-                              touchTooltipData: BarTouchTooltipData(
-                            tooltipBgColor: Colors.grey,
-                            getTooltipItem: (a, b, c, d) => null,
-                          )),
+                            touchTooltipData: BarTouchTooltipData(
+                              tooltipBgColor: Colors.grey,
+                              getTooltipItem: (a, b, c, d) => null,
+                            ),
+                          ),
                           titlesData: FlTitlesData(
                             show: true,
                             leftTitles: AxisTitles(
@@ -115,32 +119,32 @@ class WalletInfoView extends StatelessWidget {
                                     (double value, TitleMeta meta) {
                                   switch (value.toInt()) {
                                     case 0:
-                                      return Text('0k',
+                                      return const Text('0k',
                                           style: TextStyle(
                                               color: Colors.grey,
                                               fontSize: 14));
                                     case 5:
-                                      return Text('5k',
+                                      return const Text('5k',
                                           style: TextStyle(
                                               color: Colors.grey,
                                               fontSize: 14));
                                     case 10:
-                                      return Text('10k',
+                                      return const Text('10k',
                                           style: TextStyle(
                                               color: Colors.grey,
                                               fontSize: 14));
                                     case 15:
-                                      return Text('15k',
+                                      return const Text('15k',
                                           style: TextStyle(
                                               color: Colors.grey,
                                               fontSize: 14));
                                     case 20:
-                                      return Text('20k',
+                                      return const Text('20k',
                                           style: TextStyle(
                                               color: Colors.grey,
                                               fontSize: 14));
                                     default:
-                                      return Text(
+                                      return const Text(
                                           ''); // Return empty string for other values
                                   }
                                 },
@@ -162,12 +166,12 @@ class WalletInfoView extends StatelessWidget {
                                     'Su'
                                   ];
                                   return Padding(
-                                    padding: EdgeInsets.only(
+                                    padding: const EdgeInsets.only(
                                         top:
                                             20), // Adjust this value to your liking
                                     child: Text(
                                       titles[value.toInt()],
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                           color: Colors.grey, fontSize: 14),
                                     ),
                                   );
@@ -218,14 +222,14 @@ class WalletInfoView extends StatelessWidget {
 
                           borderData:
                               FlBorderData(show: false), // Remove border
-                          gridData: FlGridData(show: false),
+                          gridData: const FlGridData(show: false),
                         ),
                       ),
                     ),
                   ),
                 ),
 
-                SizedBox(height: 40),
+                const SizedBox(height: 40),
               ],
             ),
             Padding(
@@ -243,26 +247,26 @@ class WalletInfoView extends StatelessWidget {
                         });
                       },
                       style: OutlinedButton.styleFrom(
-                        side: BorderSide(color: Colors.green),
-                        padding: EdgeInsets.all(15),
+                        side: const BorderSide(color: Colors.green),
+                        padding: const EdgeInsets.all(15),
                       ),
-                      child: Text(
+                      child: const Text(
                         'Deposit',
                         style: TextStyle(color: Colors.green),
                       ),
                     ),
                   ),
-                  SizedBox(width: 10),
+                  const SizedBox(width: 10),
                   Expanded(
                     child: OutlinedButton(
                       onPressed: () {
                         Get.toNamed('/withdraw');
                       },
                       style: OutlinedButton.styleFrom(
-                        side: BorderSide(color: Colors.red),
-                        padding: EdgeInsets.all(15),
+                        side: const BorderSide(color: Colors.red),
+                        padding: const EdgeInsets.all(15),
                       ),
-                      child: Text(
+                      child: const Text(
                         'Withdraw',
                         style: TextStyle(color: Colors.red),
                       ),
@@ -276,5 +280,21 @@ class WalletInfoView extends StatelessWidget {
       ),
       backgroundColor: appTheme.scaffoldBackgroundColor,
     );
+  }
+
+  double getMaxY() {
+    double maxIncome = walletController.weeklySummaries.fold(
+        0,
+        (prevMax, summary) =>
+            summary.income > prevMax ? summary.income : prevMax);
+    double maxExpense = walletController.weeklySummaries.fold(
+        0,
+        (prevMax, summary) =>
+            summary.expense > prevMax ? summary.expense : prevMax);
+
+    double overallMax = maxIncome > maxExpense ? maxIncome : maxExpense;
+    return (overallMax / 1000)
+        .ceil()
+        .toDouble(); // Convert to 'k' representation and round up
   }
 }
