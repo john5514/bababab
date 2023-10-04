@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:bicrypto/Controllers/wallet_controller.dart';
 import 'package:bicrypto/services/api_service.dart';
 import 'package:http_client_helper/http_client_helper.dart';
 import 'package:intl/intl.dart';
@@ -419,42 +420,44 @@ class WalletService {
     }
   }
 
-  Future<Map<String, dynamic>> getWeeklySummary() async {
+  Future<List<WeeklySummary>> getWeeklySummary() async {
     final List<dynamic> transactions =
         await fetchWalletTransactionsForUserID35();
-    final DateTime now = DateTime.now();
-    final DateTime lastWeek = now.subtract(Duration(days: 7));
 
-    List<dynamic> weeklyTransactions = transactions.where((transaction) {
-      String? createdAt = transaction['created_at'];
-      if (createdAt != null) {
-        DateTime transactionDate =
-            DateFormat('yyyy-MM-ddTHH:mm:ss').parse(createdAt);
-        return transactionDate.isAfter(lastWeek);
-      }
-      return false;
-    }).toList();
+    // Initialize a list to store the summaries
+    List<WeeklySummary> weeklyData = [];
 
-    // Separate the weekly transactions into deposits and withdrawals
-    List<dynamic> deposits = weeklyTransactions
-        .where((transaction) => transaction['type'] == 'DEPOSIT')
-        .toList();
-    List<dynamic> withdrawals = weeklyTransactions
-        .where((transaction) => transaction['type'] == 'WITHDRAWAL')
-        .toList();
+    for (int i = 6; i >= 0; i--) {
+      DateTime targetDate = DateTime.now().subtract(Duration(days: i));
+      List<dynamic> dailyTransactions = transactions.where((transaction) {
+        String? createdAt = transaction['created_at'];
+        if (createdAt != null) {
+          DateTime transactionDate =
+              DateFormat('yyyy-MM-ddTHH:mm:ss').parse(createdAt);
+          return transactionDate.year == targetDate.year &&
+              transactionDate.month == targetDate.month &&
+              transactionDate.day == targetDate.day;
+        }
+        return false;
+      }).toList();
 
-    // Sum up the amounts for deposits and withdrawals
-    double totalDeposits = deposits.fold(
-        0, (sum, transaction) => sum + (transaction['amount'] ?? 0.0));
-    double totalWithdrawals = withdrawals.fold(
-        0, (sum, transaction) => sum + (transaction['amount'] ?? 0.0));
+      List<dynamic> deposits = dailyTransactions
+          .where((transaction) => transaction['type'] == 'DEPOSIT')
+          .toList();
+      List<dynamic> withdrawals = dailyTransactions
+          .where((transaction) => transaction['type'] == 'WITHDRAWAL')
+          .toList();
 
-    Map<String, dynamic> summary = {
-      'totalDeposits': totalDeposits,
-      'totalWithdrawals': totalWithdrawals,
-      'numberOfTransactions': weeklyTransactions.length,
-    };
+      double totalDeposits = deposits.fold(
+          0, (sum, transaction) => sum + (transaction['amount'] ?? 0.0));
+      double totalWithdrawals = withdrawals.fold(
+          0, (sum, transaction) => sum + (transaction['amount'] ?? 0.0));
 
-    return summary;
+      // Add the day's summary to the list
+      weeklyData.add(WeeklySummary(
+          DateFormat('E').format(targetDate), totalDeposits, totalWithdrawals));
+    }
+
+    return weeklyData;
   }
 }

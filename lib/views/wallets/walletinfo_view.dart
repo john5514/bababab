@@ -14,6 +14,8 @@ class WalletInfoView extends StatelessWidget {
   final Color rightBarColor = Colors.red;
   final double barWidth = 14;
 
+  WalletInfoView({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -90,76 +92,115 @@ class WalletInfoView extends StatelessWidget {
                   aspectRatio: 1,
                   child: Padding(
                     padding: const EdgeInsets.all(16),
-                    child: BarChart(
-                      BarChartData(
-                        maxY: 20,
-                        barGroups:
-                            walletController.weeklySummaries.map((summary) {
-                          int index =
-                              walletController.weeklySummaries.indexOf(summary);
-                          return BarChartGroupData(
-                            x: index,
-                            barRods: [
-                              BarChartRodData(
-                                fromY: 0,
-                                toY: summary.income,
-                                color: leftBarColor,
-                                width: barWidth,
-                                borderRadius: BorderRadius.circular(6),
-                              ),
-                              BarChartRodData(
-                                fromY: 0,
-                                toY: summary.expense,
-                                color: rightBarColor,
-                                width: barWidth,
-                                borderRadius: BorderRadius.circular(6),
-                              ),
-                            ],
-                          );
-                        }).toList(),
-                        titlesData: FlTitlesData(
-                          show: true,
-                          leftTitles: AxisTitles(
-                            sideTitles: SideTitles(
-                              showTitles: true,
-                              reservedSize: 28,
-                              interval: 1,
-                              getTitlesWidget: (value, meta) {
-                                return Text('$value');
-                              },
-                            ),
-                          ),
-                          bottomTitles: AxisTitles(
-                            sideTitles: SideTitles(
-                              showTitles: true,
-                              reservedSize: 42,
-                              getTitlesWidget: (double value, TitleMeta meta) {
-                                int index = value.toInt();
-                                if (index >= 0 &&
-                                    index <
-                                        walletController
-                                            .weeklySummaries.length) {
+                    child: Container(
+                      height: 300,
+                      color:
+                          Color.fromARGB(255, 17, 1, 39), // Twilight background
+                      child: BarChart(
+                        BarChartData(
+                          maxY:
+                              20, // We'll normalize data to show in thousands, so maxY is 20
+                          barTouchData: BarTouchData(
+                              touchTooltipData: BarTouchTooltipData(
+                            tooltipBgColor: Colors.grey,
+                            getTooltipItem: (a, b, c, d) => null,
+                          )),
+                          titlesData: FlTitlesData(
+                            show: true,
+                            leftTitles: AxisTitles(
+                              sideTitles: SideTitles(
+                                showTitles: true,
+                                reservedSize: 38, // Increase size for padding
+                                interval: 1,
+                                getTitlesWidget:
+                                    (double value, TitleMeta meta) {
                                   return Text(
-                                    walletController
-                                        .weeklySummaries[index].week,
+                                    '${(value * 1000).toInt()}k', // Display as 0k, 1k, 2k, etc.
                                     style: TextStyle(
-                                        color: Colors.white, fontSize: 22),
+                                      color: Colors
+                                          .grey, // Gray color for Y-axis labels
+                                      fontSize: 14,
+                                    ),
                                   );
-                                }
-                                return Text('');
-                              },
+                                },
+                              ),
+                            ),
+                            bottomTitles: AxisTitles(
+                              sideTitles: SideTitles(
+                                showTitles: true,
+                                reservedSize: 60,
+                                getTitlesWidget:
+                                    (double value, TitleMeta meta) {
+                                  final titles = [
+                                    'Mn',
+                                    'Te',
+                                    'Wd',
+                                    'Tu',
+                                    'Fr',
+                                    'St',
+                                    'Su'
+                                  ];
+                                  return Text(
+                                    titles[value.toInt()],
+                                    style: TextStyle(
+                                      color: Colors
+                                          .grey, // Gray color for X-axis labels
+                                      fontSize: 14,
+                                    ),
+                                  );
+                                },
+                              ),
                             ),
                           ),
+                          barGroups:
+                              walletController.weeklySummaries.map((summary) {
+                            int index = walletController.weeklySummaries
+                                .indexOf(summary);
+
+                            double incomeHeight = (summary.income > 20000
+                                    ? 20000
+                                    : summary.income) /
+                                1000; // Normalize and cap at 20,000
+                            double expenseHeight = (summary.expense > 20000
+                                    ? 20000
+                                    : summary.expense) /
+                                1000; // Normalize and cap at 20,000
+
+                            Color incomeColor = summary.income > 20000
+                                ? Colors.yellow
+                                : leftBarColor; // Set to yellow if exceeds limit
+                            Color expenseColor = summary.expense > 20000
+                                ? Colors.yellow
+                                : rightBarColor; // Set to yellow if exceeds limit
+
+                            return BarChartGroupData(
+                              x: index,
+                              barRods: [
+                                BarChartRodData(
+                                  toY: incomeHeight,
+                                  color: incomeColor,
+                                  width: barWidth,
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
+                                BarChartRodData(
+                                  toY: expenseHeight,
+                                  color: expenseColor,
+                                  width: barWidth,
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
+                              ],
+                            );
+                          }).toList(),
+
+                          borderData:
+                              FlBorderData(show: false), // Remove border
+                          gridData: FlGridData(show: false),
                         ),
-                        borderData: FlBorderData(
-                          show: true,
-                          border: Border.all(color: Colors.grey, width: 1),
-                        ),
-                        groupsSpace: 10,
                       ),
                     ),
                   ),
                 ),
+
                 SizedBox(height: 40),
               ],
             ),

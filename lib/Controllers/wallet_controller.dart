@@ -120,24 +120,18 @@ class WalletController extends GetxController {
   Future<void> fetchWeeklySummary() async {
     try {
       isLoading(true);
-      Map<String, dynamic> weeklySummary =
-          await walletService.getWeeklySummary();
 
-      // Create a WeeklySummary object from the obtained summary
-      WeeklySummary lastWeekSummary = WeeklySummary(
-        'Last 7 Days',
-        weeklySummary['totalAmount'] > 0 ? weeklySummary['totalAmount'] : 0,
-        weeklySummary['totalAmount'] < 0
-            ? weeklySummary['totalAmount'].abs()
-            : 0,
-      );
+      // Fetch the weekly summary from the service
+      List<WeeklySummary> weeklyData = await walletService.getWeeklySummary();
 
-      // Clear the previous summaries and add the new summary
+      // Clear the previous summaries
       weeklySummaries.clear();
-      weeklySummaries.add(lastWeekSummary);
-      // print("Weekly Summaries: $weeklySummaries");
+
+      // Update the list with the fetched data
+      weeklySummaries.addAll(weeklyData);
     } catch (e) {
-      // print("Error fetching weekly summary: $e");
+      // Handle the error by printing it for now
+      print("Error in fetchWeeklySummary: $e");
     } finally {
       isLoading(false);
     }
