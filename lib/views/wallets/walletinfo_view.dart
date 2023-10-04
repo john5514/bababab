@@ -110,25 +110,46 @@ class WalletInfoView extends StatelessWidget {
                             leftTitles: AxisTitles(
                               sideTitles: SideTitles(
                                 showTitles: true,
-                                reservedSize: 38, // Increase size for padding
-                                interval: 1,
+                                reservedSize: 38,
                                 getTitlesWidget:
                                     (double value, TitleMeta meta) {
-                                  return Text(
-                                    '${(value * 1000).toInt()}k', // Display as 0k, 1k, 2k, etc.
-                                    style: TextStyle(
-                                      color: Colors
-                                          .grey, // Gray color for Y-axis labels
-                                      fontSize: 14,
-                                    ),
-                                  );
+                                  switch (value.toInt()) {
+                                    case 0:
+                                      return Text('0k',
+                                          style: TextStyle(
+                                              color: Colors.grey,
+                                              fontSize: 14));
+                                    case 5:
+                                      return Text('5k',
+                                          style: TextStyle(
+                                              color: Colors.grey,
+                                              fontSize: 14));
+                                    case 10:
+                                      return Text('10k',
+                                          style: TextStyle(
+                                              color: Colors.grey,
+                                              fontSize: 14));
+                                    case 15:
+                                      return Text('15k',
+                                          style: TextStyle(
+                                              color: Colors.grey,
+                                              fontSize: 14));
+                                    case 20:
+                                      return Text('20k',
+                                          style: TextStyle(
+                                              color: Colors.grey,
+                                              fontSize: 14));
+                                    default:
+                                      return Text(
+                                          ''); // Return empty string for other values
+                                  }
                                 },
                               ),
                             ),
                             bottomTitles: AxisTitles(
                               sideTitles: SideTitles(
                                 showTitles: true,
-                                reservedSize: 60,
+                                reservedSize: 80,
                                 getTitlesWidget:
                                     (double value, TitleMeta meta) {
                                   final titles = [
@@ -140,18 +161,21 @@ class WalletInfoView extends StatelessWidget {
                                     'St',
                                     'Su'
                                   ];
-                                  return Text(
-                                    titles[value.toInt()],
-                                    style: TextStyle(
-                                      color: Colors
-                                          .grey, // Gray color for X-axis labels
-                                      fontSize: 14,
+                                  return Padding(
+                                    padding: EdgeInsets.only(
+                                        top:
+                                            20), // Adjust this value to your liking
+                                    child: Text(
+                                      titles[value.toInt()],
+                                      style: TextStyle(
+                                          color: Colors.grey, fontSize: 14),
                                     ),
                                   );
                                 },
                               ),
                             ),
                           ),
+
                           barGroups:
                               walletController.weeklySummaries.map((summary) {
                             int index = walletController.weeklySummaries
