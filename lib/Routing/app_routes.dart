@@ -1,4 +1,3 @@
-import 'package:bicrypto/Controllers/walletinfo_controller.dart';
 import 'package:bicrypto/views/Auth/login_view.dart';
 import 'package:bicrypto/views/Auth/register_view.dart';
 import 'package:bicrypto/views/Auth/resetpassword_view.dart';
@@ -8,9 +7,10 @@ import 'package:bicrypto/views/wallets/completedepositview.dart';
 import 'package:bicrypto/views/wallets/depositview.dart';
 import 'package:bicrypto/views/wallets/walletinfo_view.dart';
 import 'package:bicrypto/views/wallets/withdrowview.dart';
+import 'package:bicrypto/widgets/stripe_method_widget.dart';
 import 'package:get/get.dart';
 
-import '../widgets/selected_method_widget.dart';
+import '../widgets/payoneer_method_widget.dart';
 
 class AppRoutes {
   static final routes = [
@@ -41,5 +41,6 @@ class AppRoutes {
         );
       },
     ),
+    GetPage(name: '/stripe_method', page: () => StripeMethodWidget()),
   ];
 }
