@@ -14,6 +14,7 @@ class DepositView extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text('Deposit', style: TextStyle(color: Colors.white)),
+        backgroundColor: Colors.orange,
       ),
       body: Obx(() {
         if (controller.isLoading.value) {

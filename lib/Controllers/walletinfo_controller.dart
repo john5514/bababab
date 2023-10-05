@@ -7,6 +7,7 @@ class WalletInfoController extends GetxController {
   var fiatDepositMethods = [].obs;
   var fiatWithdrawMethods = [].obs;
   var fiatDepositGateways = [].obs;
+  var depositAmount = 0.0.obs;
   var isLoading = false.obs;
   var selectedMethod = Rx<Map<String, dynamic>?>(null);
   var walletInfo = <String, dynamic>{}.obs;
