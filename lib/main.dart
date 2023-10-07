@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'Style/styles.dart'; // Your global styles
 import 'package:bicrypto/Controllers/Auth/login_controller.dart';
+import 'package:flutter_stripe/flutter_stripe.dart';
 
 void main() async {
   // Create an instance of ApiService
@@ -12,9 +13,12 @@ void main() async {
 
   // Pass the ApiService instance when creating WalletService
   Get.put(WalletService(apiService));
+  Get.put(ApiService());
 
   final LoginController loginController = Get.put(LoginController());
   await loginController.init(); // Wait for initialization to complete
+  Stripe.publishableKey =
+      'pk_test_51LzmB6LGS76IduW6INDwhlf4Y55MHvFL6ldhq51gUkbZPO5l7Itfz8w2vvdzSfXR628ls9eJC8M5IcbI2092oazU00OcA3sfeD';
 
   runApp(MyApp());
 }

@@ -1,3 +1,5 @@
+import 'package:bicrypto/services/api_service.dart';
+import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:get/get.dart';
 import 'package:bicrypto/services/wallet_service.dart';
 
@@ -22,8 +24,8 @@ class WalletInfoController extends GetxController {
     selectedMethod.value = method; // set selectedMethod
 
     // Debugging: Print walletInfo and selectedMethod
-    print("Debugging: walletInfo = $info");
-    print("Debugging: selectedMethod = $method");
+    // print("Debugging: walletInfo = $info");
+    // print("Debugging: selectedMethod = $method");
 
     fetchAllDepositOptions(); // Call the modified method here
   }
@@ -44,6 +46,28 @@ class WalletInfoController extends GetxController {
     super.onInit();
     fetchAllDepositOptions(); // Call the new method to fetch and combine deposit options
     fetchFiatWithdrawMethods();
+  }
+
+  Future<void> initiateStripePayment(double amount, String currency) async {
+    try {
+      final response = await WalletService(ApiService())
+          .callStripeIpnEndpoint(amount, currency, amount * 0.05);
+      print('Response from Stripe IPN: $response');
+      if (response != null && response['id'] != null) {
+        await Stripe.instance.initPaymentSheet(
+          paymentSheetParameters: SetupPaymentSheetParameters(
+            paymentIntentClientSecret: response['id'],
+            merchantDisplayName: 'Your Business Name',
+          ),
+        );
+        await Stripe.instance.presentPaymentSheet();
+        print('Stripe payment completed.');
+      }
+    } catch (e) {
+      print('Error: $e');
+      Get.snackbar('Error', 'Stripe payment failed: $e',
+          snackPosition: SnackPosition.BOTTOM);
+    }
   }
 
   Future<void> fetchAllDepositOptions() async {
@@ -92,7 +116,7 @@ class WalletInfoController extends GetxController {
       var methods = await walletService.fetchFiatWithdrawMethods();
       fiatWithdrawMethods.assignAll(methods);
     } catch (e) {
-      print("Error fetching fiat withdraw methods: $e");
+      // print("Error fetching fiat withdraw methods: $e");
     } finally {
       isLoading(false);
     }
@@ -141,8 +165,8 @@ class WalletInfoController extends GetxController {
       String methodId = selectedMethod.value?['id']?.toString() ?? '';
 
 // Debugging: Print the values of walletIdentifier and methodId
-      print("Debugging: walletIdentifier = $walletIdentifier");
-      print("Debugging: methodId = $methodId");
+      // print("Debugging: walletIdentifier = $walletIdentifier");
+      // print("Debugging: methodId = $methodId");
 
       if (walletIdentifier.isEmpty || methodId.isEmpty) {
         throw Exception('Wallet identifier or method ID is missing');
@@ -151,7 +175,7 @@ class WalletInfoController extends GetxController {
       // Construct and post the deposit payload
       constructAndPostDepositPayload(payload, walletIdentifier, methodId);
     } catch (e) {
-      print("Failed to post fiat deposit method: $e");
+      // print("Failed to post fiat deposit method: $e");
       Get.snackbar('Error', 'Failed to perform deposit: $e',
           snackPosition: SnackPosition.BOTTOM);
     } finally {
@@ -211,7 +235,7 @@ class WalletInfoController extends GetxController {
 
     // Add formatted custom_data to the payload
     payload['custom_data'] = formatCustomData();
-    print("Final Payload: $payload");
+    // print("Final Payload: $payload");
 
     await walletService.postFiatDepositMethod(payload);
     Get.snackbar('Success', 'Deposit successful',
@@ -224,7 +248,7 @@ class WalletInfoController extends GetxController {
       var method = await walletService.fetchFiatDepositMethodById(id);
       return method;
     } catch (e) {
-      print("Failed to fetch fiat deposit method by id: $e");
+      // print("Failed to fetch fiat deposit method by id: $e");
       rethrow;
     } finally {
       isLoading(false);
@@ -237,7 +261,7 @@ class WalletInfoController extends GetxController {
       var method = await walletService.fetchFiatWithdrawMethodById(id);
       return method;
     } catch (e) {
-      print("Failed to fetch fiat withdraw method by id: $e");
+      // print("Failed to fetch fiat withdraw method by id: $e");
       rethrow;
     } finally {
       isLoading(false);

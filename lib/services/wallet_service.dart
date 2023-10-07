@@ -24,14 +24,47 @@ class WalletService {
 
   Map<String, String> headers = {};
 
+  Future<dynamic> callStripeIpnEndpoint(
+      double amount, String currency, double taxAmount) async {
+    try {
+      await loadHeaders();
+
+      final Uri url = Uri.parse('https://v3.mash3div.com/api/ipn/stripe/');
+      final response = await HttpClientHelper.post(
+        url,
+        headers: headers,
+        body: jsonEncode({
+          'amount': (amount * 100)
+              .toInt(), // Convert to integer since Stripe expects amount in smallest currency unit
+          'currency': currency.toLowerCase(),
+          'taxAmount': (taxAmount * 100).toInt(), // Convert to integer
+        }),
+      );
+      print('Loaded Headers: $headers');
+
+      print(
+          'Response Status Code from Stripe IPN============: ${response?.statusCode}');
+      print('Response Body from Stripe IPN===============: ${response?.body}');
+
+      if (response?.statusCode == 200) {
+        return jsonDecode(response!.body);
+      } else {
+        throw Exception('Failed to call Stripe IPN endpoint');
+      }
+    } catch (e) {
+      print('Error in callStripeIpnEndpoint: $e');
+      throw e; // Re-throwing the error so that any external caller can handle it if needed.
+    }
+  }
+
   Future<void> createWallet(String currency) async {
     await loadHeaders();
 
-    print("Headers before API call: $headers");
-    print("Attempting to create wallet with currency: $currency");
+    // print("Headers before API call: $headers");
+    // print("Attempting to create wallet with currency: $currency");
 
     final payload = jsonEncode({'currency': currency, 'type': 'FIAT'});
-    print("Payload: $payload");
+    // print("Payload: $payload");
 
     final response = await HttpClientHelper.post(
       Uri.parse('${baseUrl}'),
@@ -39,28 +72,28 @@ class WalletService {
       body: payload,
     );
 
-    print("Response Status Code: ${response?.statusCode}");
-    print("Response Headers: ${response?.headers}");
-    print("Response Body: ${response?.body}");
+    // print("Response Status Code: ${response?.statusCode}");
+    // print("Response Headers: ${response?.headers}");
+    // print("Response Body: ${response?.body}");
 
     if (response?.statusCode == 200 || response?.statusCode == 201) {
       var responseBody = jsonDecode(response!.body);
       if (responseBody['status'] == 'success') {
-        print("Wallet created successfully");
+        // print("Wallet created successfully");
       } else {
-        print("Failed to create wallet: ${responseBody['error']['message']}");
+        // print("Failed to create wallet: ${responseBody['error']['message']}");
         throw Exception('Failed to create wallet');
       }
     } else if (response?.statusCode == 400) {
-      print("Bad Request - Session issue");
+      // print("Bad Request - Session issue");
       // Handle session issue here
     } else if (response?.statusCode == 401) {
-      print("Unauthorized - Invalid refresh token");
+      // print("Unauthorized - Invalid refresh token");
       // Handle reauthentication or token refresh here
     } else {
-      print(
-          "Failed to create wallet with status code: ${response?.statusCode}");
-      print("Failure response: ${response?.body}");
+      // print(
+      //     "Failed to create wallet with status code: ${response?.statusCode}");
+      // print("Failure response: ${response?.body}");
       throw Exception('Failed to create wallet');
     }
   }
@@ -76,8 +109,8 @@ class WalletService {
     if (response?.statusCode == 200) {
       return jsonDecode(response!.body);
     } else {
-      print(
-          "Error fetching currencies: ${response?.statusCode}, ${response?.body}");
+      // print(
+      //     "Error fetching currencies: ${response?.statusCode}, ${response?.body}");
       throw Exception('Failed to load currencies');
     }
   }
@@ -91,12 +124,12 @@ class WalletService {
     if (response?.statusCode == 200) {
       var responseBody = jsonDecode(response!.body);
       double balance = responseBody['balance'] ?? 0.0;
-      print("WalletService - Fetched Wallet Balance: $balance");
+      // print("WalletService - Fetched Wallet Balance: $balance");
       return balance;
     } else {
-      print(
-          "Failed to fetch wallet balance with status code: ${response?.statusCode}");
-      print("Failure response: ${response?.body}");
+      // print(
+      //     "Failed to fetch wallet balance with status code: ${response?.statusCode}");
+      // print("Failure response: ${response?.body}");
       throw Exception('Failed to fetch wallet balance');
     }
   }
@@ -223,7 +256,7 @@ class WalletService {
       await loadHeaders();
 
       // Print the payload for debugging
-      print("Debugging: Sending payload = $payload");
+      // print("Debugging: Sending payload = $payload");
 
       final response = await HttpClientHelper.post(
         Uri.parse('${baseUrl}/fiat/deposit/method'),
@@ -231,13 +264,13 @@ class WalletService {
         body: jsonEncode(payload),
       );
       if (response?.statusCode != 200 && response?.statusCode != 201) {
-        print('Response Body: ${response?.body}');
+        // print('Response Body: ${response?.body}');
         throw Exception('Failed to post fiat deposit method');
       } else {
-        print('Deposit Method Successful. Response Body: ${response?.body}');
+        // print('Deposit Method Successful. Response Body: ${response?.body}');
       }
     } catch (e) {
-      print("Error in postFiatDepositMethod: $e");
+      // print("Error in postFiatDepositMethod: $e");
       rethrow;
     }
   }
@@ -411,7 +444,7 @@ class WalletService {
 
       // Debug: Print each transaction's user ID to confirm
       for (var transaction in userTransactions) {
-        print("Filtered Transaction User ID: ${transaction['user_id']}");
+        // print("Filtered Transaction User ID: ${transaction['user_id']}");
       }
 
       return userTransactions;

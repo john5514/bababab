@@ -62,14 +62,14 @@ class WalletController extends GetxController {
   }
 
   Map<String, double> calculateBalanceForCurrency(String currency) {
-    print("All Transactions: $fiatTransactions");
-    print("Currency being checked: $currency");
+    // print("All Transactions: $fiatTransactions");
+    // print("Currency being checked: $currency");
 
-    // Additional debugging
-    print(
-        "Transactions with type DEPOSIT: ${fiatTransactions.where((trx) => trx['type'] == 'DEPOSIT').toList()}");
-    print(
-        "Transactions with currency $currency: ${fiatTransactions.where((trx) => trx['wallet']['currency'] == currency).toList()}");
+    // // Additional debugging
+    // print(
+    //     "Transactions with type DEPOSIT: ${fiatTransactions.where((trx) => trx['type'] == 'DEPOSIT').toList()}");
+    // print(
+    //     "Transactions with currency $currency: ${fiatTransactions.where((trx) => trx['wallet']['currency'] == currency).toList()}");
 
     double income = fiatTransactions
         .where((trx) =>
@@ -92,8 +92,8 @@ class WalletController extends GetxController {
             trx['type'] != 'DEPOSIT' && trx['wallet']['currency'] == currency)
         .toList();
 
-    print("Income Transactions: $incomeTransactions");
-    print("Expense Transactions: $expenseTransactions");
+    // print("Income Transactions: $incomeTransactions");
+    // print("Expense Transactions: $expenseTransactions");
 
     return {
       'income': income,
@@ -113,8 +113,8 @@ class WalletController extends GetxController {
     List<String> uniqueCurrencies = extractUniqueCurrencies();
     for (String currency in uniqueCurrencies) {
       Map<String, double> balance = calculateBalanceForCurrency(currency);
-      print(
-          "Balance for $currency: ${balance['income']} - ${balance['expense']}");
+      // print(
+      //     "Balance for $currency: ${balance['income']} - ${balance['expense']}");
     }
   }
 
@@ -135,7 +135,7 @@ class WalletController extends GetxController {
       weeklySummaries.addAll(weeklyData);
     } catch (e) {
       // Handle the error by printing it for now
-      print("Error in fetchWeeklySummary: $e");
+      // print("Error in fetchWeeklySummary: $e");
     } finally {
       isLoading(false);
     }
@@ -153,10 +153,10 @@ class WalletController extends GetxController {
             response.where((wallet) => wallet['type'] == 'FIAT').toList();
         fiatWalletInfo.assignAll(fiatWallets);
       } else {
-        print("Unexpected response format: $response");
+        // print("Unexpected response format: $response");
       }
     } catch (e) {
-      print("Error fetching fiat wallet info: $e");
+      // print("Error fetching fiat wallet info: $e");
     } finally {
       isLoading(false);
     }
@@ -179,18 +179,18 @@ class WalletController extends GetxController {
       List<dynamic> transactions =
           await walletService.fetchWalletTransactionsForUserID35();
       fiatTransactions.assignAll(transactions);
-      print("Fetched Transactions: $transactions"); // Debugging line
+      // print("Fetched Transactions: $transactions"); // Debugging line
       calculateBalancesForAllCurrencies();
     } catch (e) {
-      print("Error fetching fiat transactions: $e");
+      // print("Error fetching fiat transactions: $e");
     } finally {
       isLoading(false);
     }
   }
 
   Future<void> createWallet(String currency) async {
-    print(
-        "Attempting to create wallet with currency: $currency"); // Debugging line
+    // print(
+    //     "Attempting to create wallet with currency: $currency"); // Debugging line
     try {
       isLoading(true);
       await walletService.createWallet(currency);
@@ -201,10 +201,10 @@ class WalletController extends GetxController {
       // Show a success message
       Get.snackbar('Success', 'Wallet created successfully',
           snackPosition: SnackPosition.BOTTOM);
-      print("Wallet created successfully"); // Debugging line
+      // print("Wallet created successfully"); // Debugging line
     } catch (e) {
       // Handle error
-      print("Error creating wallet: $e"); // Debugging line
+      // print("Error creating wallet: $e"); // Debugging line
       // Show an error message
       Get.snackbar('Error', 'Failed to create wallet',
           snackPosition: SnackPosition.BOTTOM);
@@ -218,9 +218,9 @@ class WalletController extends GetxController {
       isLoading(true);
       double balance = await walletService.fetchWalletBalance();
       walletBalance.value = balance;
-      print("Fetched Wallet Balance: $balance");
+      // print("Fetched Wallet Balance: $balance");
     } catch (e) {
-      print("Error fetching wallet balance: $e");
+      // print("Error fetching wallet balance: $e");
     } finally {
       isLoading(false);
     }

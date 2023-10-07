@@ -45,6 +45,7 @@ dependencies:
   currency_symbols: ^0.0.1+2
   fl_chart: ^0.63.0
   intl: ^0.18.1
+  flutter_stripe: ^9.4.0
 
 dev_dependencies:
   flutter_test:
