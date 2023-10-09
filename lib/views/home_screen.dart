@@ -1,5 +1,6 @@
 import 'package:bicrypto/Controllers/Auth/login_controller.dart';
 import 'package:bicrypto/Controllers/home_controller.dart'; // <-- Import HomeController
+import 'package:bicrypto/views/market/markethome.dart';
 import 'package:bicrypto/views/wallet_view.dart'; // <-- Import WalletView
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
@@ -12,12 +13,14 @@ class HomeView extends StatelessWidget {
       Get.put(HomeController()); // <-- Initialize HomeController
 
   final List<Widget> _children = [
-    Center(child: Text('Home')),
-    Center(child: Text('Markets')),
-    Center(child: Text('Trade')),
-    Center(child: Text('Futures')),
+    const Center(child: Text('Home')),
+    MarketScreen(),
+    const Center(child: Text('Trade')),
+    const Center(child: Text('Futures')),
     WalletView(),
   ];
+
+  HomeView({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +37,7 @@ class HomeView extends StatelessWidget {
       bottomNavigationBar: Obx(
         () => CurvedNavigationBar(
           height: 50.0,
-          animationDuration: Duration(milliseconds: 300),
+          animationDuration: const Duration(milliseconds: 300),
           animationCurve: Curves.easeInOut,
           index: homeController.currentTabIndex.value, // <-- Use HomeController
           backgroundColor: appTheme.scaffoldBackgroundColor,

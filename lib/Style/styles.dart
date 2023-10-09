@@ -11,15 +11,16 @@ final ThemeData appTheme = ThemeData(
   ),
   textTheme: Typography.material2021().black.copyWith(
         displayLarge: const TextStyle(
-          fontSize: 32,
+          fontSize: 24, // Reduced from 32
           fontWeight: FontWeight.bold,
           color: Colors.white,
         ),
         bodyLarge: const TextStyle(
-          fontSize: 18,
+          fontSize: 14, // Reduced from 18
           color: Colors.white,
         ),
       ),
+
   inputDecorationTheme: const InputDecorationTheme(
     labelStyle: TextStyle(color: Colors.white),
     focusedBorder: OutlineInputBorder(
