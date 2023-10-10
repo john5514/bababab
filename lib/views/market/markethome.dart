@@ -48,9 +48,19 @@ class MarketScreen extends StatelessWidget {
             )),
         backgroundColor: Colors.black87,
       ),
-      body: Obx(() => _marketController.isLoading.value
-          ? Center(child: CircularProgressIndicator())
-          : _buildMarketListView(_marketController.markets.value)),
+      body: Obx(() {
+        List<Market> sortedMarkets = List.from(_marketController.markets.value);
+        if (_marketController.showGainers.value) {
+          sortedMarkets.sort((a, b) => b.change
+              .compareTo(a.change)); // For gainers: Highest change at the top
+        } else {
+          sortedMarkets.sort((a, b) => a.change
+              .compareTo(b.change)); // For losers: Lowest change at the top
+        }
+        return _marketController.isLoading.value
+            ? Center(child: CircularProgressIndicator())
+            : _buildMarketListView(sortedMarkets);
+      }),
     );
   }
 
@@ -85,7 +95,8 @@ class MarketScreen extends StatelessWidget {
               return ListTile(
                 tileColor: index.isEven ? Colors.grey[850] : Colors.grey[900],
                 onTap: () {
-                  // Navigate to pair details
+                  Get.toNamed('/chart',
+                      arguments: '${market.symbol}/${market.pair}');
                 },
                 title: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -114,7 +125,7 @@ class MarketScreen extends StatelessWidget {
                           ),
                         ),
                         Text(
-                          'Vol ${market.volume.toStringAsFixed(2)} M',
+                          'Vol ${(market.volume / 1000000).toStringAsFixed(2)} M',
                           style: const TextStyle(
                             fontSize: 12,
                             color: Colors.grey,

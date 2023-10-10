@@ -30,19 +30,18 @@ class MarketService {
         (data) {
           if (_webSocket == null || _webSocket!.readyState != WebSocket.open) {
             // If WebSocket is not open, just return and don't process data
-
             return;
           }
           try {
             final decoded = json.decode(data);
 
-            final tickersData = decoded.containsKey('watchTickers')
-                ? decoded['watchTickers']
-                : decoded;
+            final tickersData = decoded['watchTickers'];
 
             if (tickersData is Map<String, dynamic>) {
-              final markets =
-                  tickersData.values.map((m) => Market.fromJson(m)).toList();
+              final markets = tickersData.entries.map((e) {
+                // Pass both the key (e.g., "BTC/USDT") and the associated data to Market.fromJson
+                return Market.fromJson(e.key, e.value);
+              }).toList();
               _controller.add(markets);
             } else {
               print("Unexpected data structure received.");
@@ -143,18 +142,24 @@ class Market {
 
   // Factory constructor to create a Market object from a map
   // Factory constructor to create a Market object from a map
-  factory Market.fromJson(Map<String, dynamic> json) {
+  factory Market.fromJson(String marketName, Map<String, dynamic> json) {
+    final splitMarketName = marketName.split('/');
+    final symbol = splitMarketName[0];
+    final pair = splitMarketName.length > 1 ? splitMarketName[1] : '';
+
     return Market(
-      id: json['id'] ?? 0,
-      symbol: json['symbol'] ?? '',
-      pair: json['pair'] ?? '',
-      isTrending: json['is_trending'] ?? false,
-      isHot: json['is_hot'] ?? false,
-      metadata: MarketMetadata.fromJson(json['metadata'] ?? {}),
-      status: json['status'] ?? false,
-      price: (json['price'] ?? 0.0).toDouble(),
+      id: 0, // Not present in the data; using 0 as a default value
+      symbol: symbol,
+      pair: pair,
+      isTrending:
+          false, // Not present in the data; using false as a default value
+      isHot: false, // Not present in the data; using false as a default value
+      metadata: MarketMetadata.fromJson(
+          {}), // No metadata in the data; using an empty map
+      status: true, // Not present in the data; using true as a default value
+      price: (json['last'] ?? 0.0).toDouble(),
       change: (json['change'] ?? 0.0).toDouble(),
-      volume: (json['volume'] ?? 0.0).toDouble(),
+      volume: (json['baseVolume'] ?? 0.0).toDouble(),
     );
   }
 }

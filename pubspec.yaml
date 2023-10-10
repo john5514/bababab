@@ -46,6 +46,7 @@ dependencies:
   fl_chart: ^0.63.0
   intl: ^0.18.1
   flutter_stripe: ^9.4.0
+  syncfusion_flutter_charts: ^23.1.40
 
 dev_dependencies:
   flutter_test:

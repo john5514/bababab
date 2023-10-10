@@ -2,6 +2,7 @@ import 'package:bicrypto/views/Auth/login_view.dart';
 import 'package:bicrypto/views/Auth/register_view.dart';
 import 'package:bicrypto/views/Auth/resetpassword_view.dart';
 import 'package:bicrypto/views/home_screen.dart';
+import 'package:bicrypto/views/market/pairchart.dart';
 import 'package:bicrypto/views/wallet_view.dart';
 import 'package:bicrypto/views/wallets/completedepositview.dart';
 import 'package:bicrypto/views/wallets/depositview.dart';
@@ -42,5 +43,9 @@ class AppRoutes {
       },
     ),
     GetPage(name: '/stripe_method', page: () => StripeMethodWidget()),
+    GetPage(
+      name: '/chart',
+      page: () => ChartPage(pair: Get.arguments as String),
+    ),
   ];
 }
