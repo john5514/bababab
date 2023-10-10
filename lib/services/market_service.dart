@@ -1,32 +1,117 @@
 import 'dart:convert';
-import 'package:http/http.dart' as http;
+import 'dart:async';
+import 'dart:io';
 
 class MarketService {
-  final String baseUrl = "https://v3.mash3div.com/api/exchange/";
+  final String _wsBaseUrl = "wss://v3.mash3div.com/exchange/";
+  WebSocket? _webSocket; // Made it nullable
+  final _controller = StreamController<List<Market>>.broadcast();
 
-  // Fetches the list of markets
-  Future<List<Market>> getMarkets() async {
+  Stream<List<Market>> get marketUpdates => _controller.stream;
+
+  // This is the new getter to check if the StreamController is closed
+  bool get isControllerClosed => _controller.isClosed;
+  bool _wasClosedIntentionally = false;
+  void dispose() {
+    _wasClosedIntentionally = true; // set to true when disposing
+    if (_webSocket != null) {
+      _webSocket!.close();
+    }
+    _controller.close();
+  }
+
+  // Initialize the WebSocket connection
+  void connect(String link) async {
+    final fullUrl = "$_wsBaseUrl$link";
+
     try {
-      final response = await http.get(Uri.parse('${baseUrl}markets'));
+      _webSocket = await WebSocket.connect(fullUrl);
+      _webSocket!.listen(
+        (data) {
+          if (_webSocket == null || _webSocket!.readyState != WebSocket.open) {
+            // If WebSocket is not open, just return and don't process data
 
-      if (response.statusCode == 200) {
-        final Map<String, dynamic> responseBody = json.decode(response.body);
+            return;
+          }
+          try {
+            final decoded = json.decode(data);
 
-        if (responseBody['status'] == 'success') {
-          List<dynamic> marketList = responseBody['data']['result'];
+            final tickersData = decoded.containsKey('watchTickers')
+                ? decoded['watchTickers']
+                : decoded;
 
-          // Convert the list of maps to a list of Market objects
-          return marketList.map((m) => Market.fromJson(m)).toList();
-        } else {
-          throw Exception(responseBody['error']['message']);
-        }
-      } else {
-        throw Exception(
-            'Failed to fetch markets with status code: ${response.statusCode}');
-      }
+            if (tickersData is Map<String, dynamic>) {
+              final markets =
+                  tickersData.values.map((m) => Market.fromJson(m)).toList();
+              _controller.add(markets);
+            } else {
+              print("Unexpected data structure received.");
+            }
+          } catch (e) {
+            print("Error processing WebSocket data: $e");
+          }
+        },
+        onError: (error) {
+          print("WebSocket error: $error");
+          // Trying to reconnect
+          if (_webSocket == null || _webSocket!.readyState != WebSocket.open) {
+            Future.delayed(Duration(seconds: 5), () {
+              print("Attempting to reconnect...");
+              connect(link);
+            });
+          }
+        },
+        onDone: () {
+          print("WebSocket closed for $link");
+          if (!_wasClosedIntentionally &&
+              (_webSocket == null ||
+                  _webSocket!.readyState != WebSocket.open)) {
+            Future.delayed(Duration(seconds: 5), () {
+              print("Attempting to reconnect...");
+              connect(link);
+            });
+          }
+        },
+      );
     } catch (e) {
-      print('Error occurred: $e');
-      throw e;
+      print("Error connecting to WebSocket: $e");
+      // Trying to reconnect after a delay
+      Future.delayed(Duration(seconds: 5), () {
+        print("Attempting to reconnect...");
+        connect(link);
+      });
+    }
+  }
+
+  void subscribeToTradeData(String symbol, String type,
+      {int? limit, String? interval}) {
+    if (_webSocket != null && _webSocket!.readyState == WebSocket.open) {
+      final data = {
+        "method": "SUBSCRIBE",
+        "params": {
+          "symbol": symbol,
+          "type": type,
+          if (limit != null) "limit": limit,
+          if (interval != null) "interval": interval
+        }
+      };
+      _webSocket!.add(json.encode(data)); // Added null assertion
+    } else {
+      print("WebSocket not initialized or not open.");
+      // Optionally: reconnect logic here
+    }
+  }
+
+  void unsubscribeFromTradeData(String symbol, String type) {
+    if (_webSocket != null && _webSocket!.readyState == WebSocket.open) {
+      final data = {
+        "method": "UNSUBSCRIBE",
+        "params": {"symbol": symbol, "type": type}
+      };
+      _webSocket!.add(json.encode(data)); // Added null assertion
+    } else {
+      print("WebSocket not initialized or not open.");
+      // Optionally: reconnect logic here
     }
   }
 }
@@ -60,18 +145,16 @@ class Market {
   // Factory constructor to create a Market object from a map
   factory Market.fromJson(Map<String, dynamic> json) {
     return Market(
-      id: json['id'],
-      symbol: json['symbol'],
-      pair: json['pair'],
-      isTrending: json['is_trending'],
-      isHot: json['is_hot'],
-      metadata: MarketMetadata.fromJson(json['metadata']),
-      status: json['status'],
-      price: (json['price'] ?? 0.0).toDouble(), // Provide default value if null
-      change:
-          (json['change'] ?? 0.0).toDouble(), // Provide default value if null
-      volume:
-          (json['volume'] ?? 0.0).toDouble(), // Provide default value if null
+      id: json['id'] ?? 0,
+      symbol: json['symbol'] ?? '',
+      pair: json['pair'] ?? '',
+      isTrending: json['is_trending'] ?? false,
+      isHot: json['is_hot'] ?? false,
+      metadata: MarketMetadata.fromJson(json['metadata'] ?? {}),
+      status: json['status'] ?? false,
+      price: (json['price'] ?? 0.0).toDouble(),
+      change: (json['change'] ?? 0.0).toDouble(),
+      volume: (json['volume'] ?? 0.0).toDouble(),
     );
   }
 }
@@ -98,13 +181,13 @@ class MarketMetadata {
   // Factory constructor to create a MarketMetadata object from a map
   factory MarketMetadata.fromJson(Map<String, dynamic> json) {
     return MarketMetadata(
-      symbol: json['symbol'],
-      base: json['base'],
-      quote: json['quote'],
-      precision: json['precision'],
-      limits: json['limits'],
-      taker: json['taker'],
-      maker: json['maker'],
+      symbol: json['symbol'] ?? '',
+      base: json['base'] ?? '',
+      quote: json['quote'] ?? '',
+      precision: json['precision'] ?? {},
+      limits: json['limits'] ?? {},
+      taker: (json['taker'] ?? 0.0).toDouble(),
+      maker: (json['maker'] ?? 0.0).toDouble(),
     );
   }
 }
