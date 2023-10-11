@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:math';
 import 'package:bicrypto/services/market_service.dart';
 import 'package:get/get.dart';
-import 'package:collection/collection.dart';
 
 class ChartController extends GetxController {
   final String pair;
@@ -13,12 +12,14 @@ class ChartController extends GetxController {
 
   CandleData? _currentCandle;
 
+  final RxString currentTimeFrame = '1d'.obs;
+
   ChartController(this.pair);
 
   @override
   void onInit() {
     super.onInit();
-    _loadHistoricalData();
+    _loadHistoricalData(currentTimeFrame.value);
     _initializeWebSocket();
     _startTimer();
   }
@@ -31,13 +32,19 @@ class ChartController extends GetxController {
     super.onClose();
   }
 
-  Future<void> _loadHistoricalData() async {
+  void updateChartData(String timeframe) {
+    currentTimeFrame.value = timeframe;
+    _loadHistoricalData(timeframe);
+  }
+
+  Future<void> _loadHistoricalData([String timeframe = '1d']) async {
     try {
-      final historicalData = await _marketService.fetchHistoricalData(
-          pair, "1d"); // "1d" is used as an example interval
+      final historicalData =
+          await _marketService.fetchHistoricalData(pair, timeframe);
       if (historicalData.isEmpty) {
         print("Received empty historical data for $pair");
       } else {
+        candleData.clear(); // Clear existing data
         candleData.addAll(historicalData);
         print("Received historical data: $historicalData");
       }

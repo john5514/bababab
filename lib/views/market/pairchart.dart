@@ -18,12 +18,32 @@ class ChartPage extends StatelessWidget {
       appBar: AppBar(title: Text("Chart for $pair")),
       body: Obx(
         () => ListView(
-          // <-- Added for vertical scrolling
           children: [
+            // Timeframe selector
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: DropdownButtonHideUnderline(
+                child: DropdownButton<String>(
+                  value: _chartController.currentTimeFrame.value,
+                  dropdownColor: Colors.grey[800],
+                  style: TextStyle(color: Colors.white),
+                  items: ['1m', '5m', '15m', '1h', '4h', '8h', '12h', '1d']
+                      .map((String timeframe) {
+                    return DropdownMenuItem<String>(
+                      value: timeframe,
+                      child: Text(timeframe),
+                    );
+                  }).toList(),
+                  onChanged: (String? newValue) {
+                    if (newValue != null) {
+                      _chartController.updateChartData(newValue);
+                    }
+                  },
+                ),
+              ),
+            ),
             Container(
-              // <-- Wrap chart with a container to give a fixed height
-              height:
-                  MediaQuery.of(context).size.height * 0.7, // Example height
+              height: MediaQuery.of(context).size.height * 0.7,
               child: SfCartesianChart(
                 plotAreaBorderColor: Colors.white,
                 plotAreaBackgroundColor: Colors.black,
@@ -57,6 +77,13 @@ class ChartPage extends StatelessWidget {
                   minorGridLines: MinorGridLines(color: Colors.grey[800]!),
                   axisLine: AxisLine(color: Colors.grey[700]!),
                   labelStyle: TextStyle(color: Colors.white),
+                  visibleMinimum: _chartController.candleData.length > 30
+                      ? _chartController
+                          .candleData[_chartController.candleData.length - 30].x
+                      : null,
+                  visibleMaximum: _chartController.candleData.isNotEmpty
+                      ? _chartController.candleData.last.x
+                      : null,
                 ),
                 primaryYAxis: NumericAxis(
                   numberFormat: NumberFormat.simpleCurrency(),
@@ -70,7 +97,6 @@ class ChartPage extends StatelessWidget {
                 ),
               ),
             ),
-            // You can add more widgets below the chart here if required.
           ],
         ),
       ),
