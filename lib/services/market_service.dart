@@ -102,27 +102,44 @@ class MarketService {
   }
 
   Future<List<CandleData>> fetchHistoricalData(String symbol, String interval,
-      {int durationDays = 30}) async {
+      {int durationDays = 7}) async {
     print("Starting fetchHistoricalData for $symbol...");
 
-    // Load tokens from shared preferences
     await loadTokens();
     print("Loaded tokens: $tokens");
 
-    // Define a start date for historical data based on the duration and end date as today
-    final DateTime fromDate =
-        DateTime.now().subtract(Duration(days: durationDays));
-    final int fromTimestamp = fromDate.millisecondsSinceEpoch;
-
     final DateTime toDate = DateTime.now();
-    final int toTimestamp = toDate.millisecondsSinceEpoch;
+    final int toTimestamp = (toDate.millisecondsSinceEpoch / 1000).toInt();
+    print("To Timestamp: $toTimestamp");
 
-    print("Fetching data from: $fromDate to: $toDate");
+    final DateTime fromDate = toDate.subtract(Duration(days: durationDays));
+    final int fromTimestamp = (fromDate.millisecondsSinceEpoch / 1000).toInt();
+    print("From Timestamp: $fromTimestamp");
+
+    // Update the 'since' parameter as per the backend's logic for the provider.
+    // You should define the 'provider' somewhere. For now, I'll assume it's 'binance'. Update as required.
+    final String provider = 'binance';
+    int durationMilliseconds = durationDays * 24 * 60 * 60 * 1000;
+    int sinceTimestamp;
+    switch (provider) {
+      case 'binance':
+        sinceTimestamp = toTimestamp - (durationMilliseconds ~/ 3) ~/ 1000;
+        break;
+      case 'kucoin':
+        sinceTimestamp = toTimestamp - durationMilliseconds ~/ 1000;
+        break;
+      case 'bitget':
+        sinceTimestamp = toTimestamp - (durationMilliseconds ~/ 1.5) ~/ 1000;
+        break;
+      default:
+        sinceTimestamp = toTimestamp - durationMilliseconds ~/ 1000;
+        break;
+    }
 
     final String requestUrl =
-        'https://v3.mash3div.com/api/exchange/chart/historical?symbol=$symbol&interval=$interval&from=$fromTimestamp&to=$toTimestamp&duration=$durationDays';
+        'https://v3.mash3div.com/api/exchange/chart/historical?symbol=$symbol&interval=$interval&from=$sinceTimestamp&to=$toTimestamp&duration=$durationMilliseconds';
 
-    print("Making request to: $requestUrl"); // Log the request URL
+    print("Making request to: $requestUrl");
 
     // Add the tokens to the headers
     final headers = {
@@ -139,28 +156,34 @@ class MarketService {
 
     print("Received response status: ${response.statusCode}");
     print("Received response headers: ${response.headers}");
-    print(
-        "Received response body: ${response.body}"); // Log the received response
+    print("Received response body: ${response.body}");
 
     if (response.statusCode == 200) {
       final body = json.decode(response.body);
 
-      // Check if status is success
       if (body['status'] == "success") {
-        // Assuming 'result' contains the list of candles. Adjust this if the structure is different.
+        // Add the empty data check here
+        if (body['data']['result'] is List &&
+            (body['data']['result'] as List).isEmpty) {
+          final noDataMessage =
+              "No data available for $symbol during the specified time interval.";
+          print(noDataMessage);
+          throw Exception(noDataMessage);
+        }
+
+        // Adjust this if the structure is different.
         if (body['data']['result'] is List) {
           final candles = (body['data']['result'] as List)
               .map((e) => CandleData(
-                    x: DateTime.fromMillisecondsSinceEpoch(e['timestamp']),
-                    open: e['open'].toDouble(),
-                    high: e['high'].toDouble(),
-                    low: e['low'].toDouble(),
-                    close: e['close'].toDouble(),
+                    x: DateTime.fromMillisecondsSinceEpoch(e[0].toInt()),
+                    open: e[1].toDouble(),
+                    high: e[2].toDouble(),
+                    low: e[3].toDouble(),
+                    close: e[4].toDouble(),
                   ))
               .toList();
 
           print("Returning ${candles.length} candles.");
-
           return candles;
         } else {
           final error = "Unexpected data format in result";
@@ -170,8 +193,7 @@ class MarketService {
       } else {
         final errorMessage = body['error']?['message'] ?? 'Unknown error';
         print("API Error: $errorMessage");
-        throw Exception(
-            'API returned status: ${body['status']}. Message: $errorMessage');
+        throw Exception('API returned an error: $errorMessage');
       }
     } else {
       final error =
