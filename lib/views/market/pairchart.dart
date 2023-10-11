@@ -13,33 +13,175 @@ class ChartPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    double? currentPrice = _chartController.currentMarket.value?.price;
+    double? last24hPrice = _chartController.lastMarket.value?.price;
+    double percentageChange = 0;
+    if (currentPrice != null && last24hPrice != null && last24hPrice != 0) {
+      percentageChange = ((currentPrice - last24hPrice) / last24hPrice) * 100;
+    }
+
+    String formatVolume(double volume) {
+      return 'Vol ${(volume / 1000000).toStringAsFixed(2)} M';
+    }
+
     return Scaffold(
       backgroundColor: Colors.black,
-      appBar: AppBar(title: Text("Chart for $pair")),
+      appBar: AppBar(
+        backgroundColor: Colors.black,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+        ),
+        title: Row(
+          children: [
+            Icon(Icons.sync), // The arrow icons
+            SizedBox(width: 8),
+            Text(pair),
+          ],
+        ),
+      ),
       body: Obx(
         () => ListView(
           children: [
             // Timeframe selector
             Padding(
               padding: const EdgeInsets.all(16.0),
-              child: DropdownButtonHideUnderline(
-                child: DropdownButton<String>(
-                  value: _chartController.currentTimeFrame.value,
-                  dropdownColor: Colors.grey[800],
-                  style: TextStyle(color: Colors.white),
-                  items: ['1m', '5m', '15m', '1h', '4h', '8h', '12h', '1d']
-                      .map((String timeframe) {
-                    return DropdownMenuItem<String>(
-                      value: timeframe,
-                      child: Text(timeframe),
-                    );
-                  }).toList(),
-                  onChanged: (String? newValue) {
-                    if (newValue != null) {
-                      _chartController.updateChartData(newValue);
-                    }
-                  },
-                ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment
+                        .start, // This line will align the left column to the top
+                    children: [
+                      // Left content: Current price and 24h change
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "${_chartController.currentMarket.value?.price ?? 0.0}",
+                            style: TextStyle(
+                              fontSize: 32,
+                              color:
+                                  (_chartController.lastMarket.value?.price ??
+                                              0) <
+                                          (_chartController
+                                                  .currentMarket.value?.price ??
+                                              1)
+                                      ? Colors.green
+                                      : Colors.red,
+                            ),
+                          ),
+                          RichText(
+                            text: TextSpan(
+                              children: [
+                                TextSpan(
+                                    text:
+                                        "≈ ${_chartController.currentMarket.value?.price ?? 0.0}  ",
+                                    style: TextStyle(
+                                        fontSize: 14, color: Colors.white)),
+                                TextSpan(
+                                    text:
+                                        "${_chartController.currentMarket.value?.change.toStringAsFixed(2) ?? '+0.00'}%",
+                                    style: TextStyle(
+                                        fontSize: 14,
+                                        color: (_chartController.currentMarket
+                                                        .value?.change ??
+                                                    0) >
+                                                0
+                                            ? Colors.green
+                                            : (_chartController.currentMarket
+                                                            .value?.change ??
+                                                        0) <
+                                                    0
+                                                ? Colors.red
+                                                : Colors.white)),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      // Right content: 24h High, 24h Low, and 24h Vol
+                      Column(
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: [
+                              Column(
+                                children: [
+                                  Text(
+                                    "24h High",
+                                    style: TextStyle(
+                                        fontSize: 14, color: Colors.grey),
+                                  ),
+                                  Text(
+                                    "${_chartController.currentMarket.value?.high24h ?? 0.0}",
+                                    style: TextStyle(
+                                        fontSize: 14, color: Colors.white),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(
+                                  width:
+                                      20), // Added spacing between the columns
+                              Column(
+                                children: [
+                                  Text(
+                                    "24h Low",
+                                    style: TextStyle(
+                                        fontSize: 14, color: Colors.grey),
+                                  ),
+                                  Text(
+                                    "${_chartController.currentMarket.value?.low24h ?? 0.0}",
+                                    style: TextStyle(
+                                        fontSize: 14, color: Colors.white),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                          SizedBox(
+                              height: 10), // Existing spacing between the rows
+                          Column(
+                            children: [
+                              Text(
+                                "24h Vol(USDT)",
+                                style:
+                                    TextStyle(fontSize: 14, color: Colors.grey),
+                              ),
+                              Text(
+                                "${formatVolume(_chartController.currentMarket.value?.volume ?? 0)}",
+                                style: TextStyle(
+                                    fontSize: 14, color: Colors.white),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  DropdownButtonHideUnderline(
+                    child: DropdownButton<String>(
+                      value: _chartController.currentTimeFrame.value,
+                      dropdownColor: Colors.grey[800],
+                      style: TextStyle(color: Colors.white),
+                      items: ['1m', '5m', '15m', '1h', '4h', '8h', '12h', '1d']
+                          .map((String timeframe) {
+                        return DropdownMenuItem<String>(
+                          value: timeframe,
+                          child: Text(timeframe),
+                        );
+                      }).toList(),
+                      onChanged: (String? newValue) {
+                        if (newValue != null) {
+                          _chartController.updateChartData(newValue);
+                        }
+                      },
+                    ),
+                  ),
+                ],
               ),
             ),
             Container(

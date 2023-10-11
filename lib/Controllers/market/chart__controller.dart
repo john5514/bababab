@@ -4,6 +4,9 @@ import 'package:bicrypto/services/market_service.dart';
 import 'package:get/get.dart';
 
 class ChartController extends GetxController {
+  final Rx<Market?> currentMarket = Rx<Market?>(null);
+  final Rx<Market?> lastMarket = Rx<Market?>(null);
+
   final String pair;
   final MarketService _marketService = MarketService();
   var candleData = <CandleData>[].obs;
@@ -75,6 +78,9 @@ class ChartController extends GetxController {
     );
 
     if (specificMarket != null) {
+      lastMarket.value = currentMarket.value;
+      currentMarket.value = specificMarket;
+
       if (_currentCandle == null) {
         _currentCandle = CandleData(
           x: DateTime.now(),

@@ -247,6 +247,8 @@ class Market {
   final double price; // <-- Add this line
   final double change; // <-- Add this line
   final double volume; // <-- Add this line
+  final double high24h;
+  final double low24h;
 
   Market({
     required this.id,
@@ -259,6 +261,8 @@ class Market {
     required this.price, // <-- Add this line
     required this.change, // <-- Add this line
     required this.volume, // <-- Add this line
+    required this.high24h,
+    required this.low24h,
   });
 
   // Factory constructor to create a Market object from a map
@@ -281,6 +285,8 @@ class Market {
       price: (json['last'] ?? 0.0).toDouble(),
       change: (json['change'] ?? 0.0).toDouble(),
       volume: (json['baseVolume'] ?? 0.0).toDouble(),
+      high24h: (json['high24h'] ?? 0.0).toDouble(),
+      low24h: (json['low24h'] ?? 0.0).toDouble(),
     );
   }
 }
