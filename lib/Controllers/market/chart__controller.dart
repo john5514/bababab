@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 import 'package:bicrypto/services/market_service.dart';
 import 'package:get/get.dart';
 import 'package:collection/collection.dart';
@@ -8,20 +9,42 @@ class ChartController extends GetxController {
   final MarketService _marketService = MarketService();
   var candleData = <CandleData>[].obs;
   StreamSubscription? _marketSubscription;
+  Timer? _timer;
+
+  CandleData? _currentCandle;
 
   ChartController(this.pair);
 
   @override
   void onInit() {
     super.onInit();
+    _loadHistoricalData();
     _initializeWebSocket();
+    _startTimer();
   }
 
   @override
   void onClose() {
     _marketSubscription?.cancel();
     _marketService.dispose();
+    _timer?.cancel();
     super.onClose();
+  }
+
+  Future<void> _loadHistoricalData() async {
+    try {
+      final historicalData = await _marketService.fetchHistoricalData(
+          pair, "1d"); // "1d" is used as an example interval
+      if (historicalData.isEmpty) {
+        print("Received empty historical data for $pair");
+      } else {
+        candleData.addAll(historicalData);
+        print("Received historical data: $historicalData");
+      }
+    } catch (e) {
+      print("Error loading historical data: $e");
+      // Handle the error accordingly
+    }
   }
 
   void _initializeWebSocket() {
@@ -30,21 +53,35 @@ class ChartController extends GetxController {
         _marketService.marketUpdates.listen(_processMarketUpdate);
   }
 
+  void _startTimer() {
+    _timer = Timer.periodic(Duration(minutes: 1), (timer) {
+      if (_currentCandle != null) {
+        candleData.add(_currentCandle!);
+        _currentCandle = null;
+      }
+    });
+  }
+
   void _processMarketUpdate(List<Market> updatedMarkets) {
     final Market? specificMarket = updatedMarkets.firstWhereOrNull(
       (market) => '${market.symbol}/${market.pair}' == pair,
     );
 
     if (specificMarket != null) {
-      final newData = CandleData(
-        x: DateTime.now(),
-        open: specificMarket.price,
-        high: specificMarket.price + specificMarket.change,
-        low: specificMarket.price - specificMarket.change,
-        close: specificMarket.price,
-      );
-
-      candleData.add(newData);
+      if (_currentCandle == null) {
+        _currentCandle = CandleData(
+          x: DateTime.now(),
+          open: specificMarket.price,
+          high: specificMarket.price,
+          low: specificMarket.price,
+          close: specificMarket.price,
+        );
+      } else {
+        _currentCandle!.high = max(_currentCandle!.high, specificMarket.price);
+        _currentCandle!.low = min(_currentCandle!.low, specificMarket.price);
+        _currentCandle!.close = specificMarket.price;
+      }
+      update();
     }
   }
 }
@@ -52,9 +89,9 @@ class ChartController extends GetxController {
 class CandleData {
   final DateTime x;
   final double open;
-  final double high;
-  final double low;
-  final double close;
+  double high;
+  double low;
+  double close;
 
   CandleData({
     required this.x,
