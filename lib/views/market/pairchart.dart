@@ -21,7 +21,11 @@ class ChartPage extends StatelessWidget {
     }
 
     String formatVolume(double volume) {
-      return 'Vol ${(volume / 1000000).toStringAsFixed(2)} M';
+      return ' ${(volume / 1000000).toStringAsFixed(2)} M';
+    }
+
+    String getPrimarySymbol(String pair) {
+      return pair.split('/').first;
     }
 
     return Scaffold(
@@ -29,15 +33,15 @@ class ChartPage extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.black,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back),
           onPressed: () {
             Navigator.of(context).pop();
           },
         ),
         title: Row(
           children: [
-            Icon(Icons.sync), // The arrow icons
-            SizedBox(width: 8),
+            const Icon(Icons.sync), // The arrow icons
+            const SizedBox(width: 8),
             Text(pair),
           ],
         ),
@@ -80,8 +84,8 @@ class ChartPage extends StatelessWidget {
                                 TextSpan(
                                     text:
                                         "≈ ${_chartController.currentMarket.value?.price ?? 0.0}  ",
-                                    style: TextStyle(
-                                        fontSize: 14, color: Colors.white)),
+                                    style: const TextStyle(
+                                        fontSize: 12, color: Colors.white)),
                                 TextSpan(
                                     text:
                                         "${_chartController.currentMarket.value?.change.toStringAsFixed(2) ?? '+0.00'}%",
@@ -111,51 +115,65 @@ class ChartPage extends StatelessWidget {
                             children: [
                               Column(
                                 children: [
-                                  Text(
+                                  const Text(
                                     "24h High",
                                     style: TextStyle(
-                                        fontSize: 14, color: Colors.grey),
+                                        fontSize: 12, color: Colors.grey),
                                   ),
-                                  Text(
-                                    "${_chartController.currentMarket.value?.high24h ?? 0.0}",
-                                    style: TextStyle(
-                                        fontSize: 14, color: Colors.white),
-                                  ),
+                                  Obx(() => Text(
+                                        "${_chartController.high24h.value.toStringAsFixed(2)}",
+                                        style: const TextStyle(
+                                            fontSize: 12, color: Colors.white),
+                                      )),
                                 ],
                               ),
-                              SizedBox(
+                              const SizedBox(
                                   width:
                                       20), // Added spacing between the columns
                               Column(
                                 children: [
-                                  Text(
+                                  const Text(
                                     "24h Low",
                                     style: TextStyle(
-                                        fontSize: 14, color: Colors.grey),
+                                        fontSize: 12, color: Colors.grey),
                                   ),
-                                  Text(
-                                    "${_chartController.currentMarket.value?.low24h ?? 0.0}",
-                                    style: TextStyle(
-                                        fontSize: 14, color: Colors.white),
-                                  ),
+                                  Obx(() => Text(
+                                        "${_chartController.low24h.value.toStringAsFixed(2)}",
+                                        style: const TextStyle(
+                                            fontSize: 12, color: Colors.white),
+                                      )),
                                 ],
                               ),
                             ],
                           ),
-                          SizedBox(
-                              height: 10), // Existing spacing between the rows
+                          const SizedBox(
+                              height: 5), // Existing spacing between the rows
                           Column(
                             children: [
                               Text(
-                                "24h Vol(USDT)",
+                                "24h Vol(${getPrimarySymbol(pair)})",
                                 style:
-                                    TextStyle(fontSize: 14, color: Colors.grey),
+                                    TextStyle(fontSize: 12, color: Colors.grey),
                               ),
                               Text(
                                 "${formatVolume(_chartController.currentMarket.value?.volume ?? 0)}",
-                                style: TextStyle(
-                                    fontSize: 14, color: Colors.white),
+                                style: const TextStyle(
+                                    fontSize: 12, color: Colors.white),
                               ),
+                            ],
+                          ),
+                          Column(
+                            children: [
+                              Text(
+                                "24h Vol USDT",
+                                style:
+                                    TextStyle(fontSize: 12, color: Colors.grey),
+                              ),
+                              Obx(() => Text(
+                                    "${_chartController.volume24hUSDT.value.toStringAsFixed(2)} USDT",
+                                    style: const TextStyle(
+                                        fontSize: 12, color: Colors.white),
+                                  )),
                             ],
                           ),
                         ],
@@ -166,7 +184,7 @@ class ChartPage extends StatelessWidget {
                     child: DropdownButton<String>(
                       value: _chartController.currentTimeFrame.value,
                       dropdownColor: Colors.grey[800],
-                      style: TextStyle(color: Colors.white),
+                      style: const TextStyle(color: Colors.white),
                       items: ['1m', '5m', '15m', '1h', '4h', '8h', '12h', '1d']
                           .map((String timeframe) {
                         return DropdownMenuItem<String>(
@@ -198,9 +216,9 @@ class ChartPage extends StatelessWidget {
                 ),
                 title: ChartTitle(
                   text: '$pair Chart',
-                  textStyle: TextStyle(color: Colors.white, fontSize: 20),
+                  textStyle: const TextStyle(color: Colors.white, fontSize: 20),
                 ),
-                legend: Legend(isVisible: false),
+                legend: const Legend(isVisible: false),
                 series: <ChartSeries>[
                   CandleSeries<CandleData, DateTime>(
                     dataSource: _chartController.candleData.toList(),
@@ -218,7 +236,7 @@ class ChartPage extends StatelessWidget {
                   majorGridLines: MajorGridLines(color: Colors.grey[800]!),
                   minorGridLines: MinorGridLines(color: Colors.grey[800]!),
                   axisLine: AxisLine(color: Colors.grey[700]!),
-                  labelStyle: TextStyle(color: Colors.white),
+                  labelStyle: const TextStyle(color: Colors.white),
                   visibleMinimum: _chartController.candleData.length > 30
                       ? _chartController
                           .candleData[_chartController.candleData.length - 30].x
@@ -230,10 +248,12 @@ class ChartPage extends StatelessWidget {
                 primaryYAxis: NumericAxis(
                   numberFormat: NumberFormat.simpleCurrency(),
                   opposedPosition: true,
-                  majorTickLines: MajorTickLines(color: Colors.transparent),
-                  minorTickLines: MinorTickLines(color: Colors.transparent),
-                  axisLine: AxisLine(width: 0),
-                  labelStyle: TextStyle(color: Colors.white),
+                  majorTickLines:
+                      const MajorTickLines(color: Colors.transparent),
+                  minorTickLines:
+                      const MinorTickLines(color: Colors.transparent),
+                  axisLine: const AxisLine(width: 0),
+                  labelStyle: const TextStyle(color: Colors.white),
                   majorGridLines: MajorGridLines(color: Colors.grey[800]!),
                   minorGridLines: MinorGridLines(color: Colors.grey[800]!),
                 ),
