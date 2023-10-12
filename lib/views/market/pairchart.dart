@@ -11,23 +11,16 @@ class ChartPage extends StatelessWidget {
   ChartPage({required this.pair})
       : _chartController = Get.put(ChartController(pair));
 
+  String formatVolume(double volume) {
+    return ' ${(volume / 1000000).toStringAsFixed(2)} M';
+  }
+
+  String getPrimarySymbol(String pair) {
+    return pair.split('/').first;
+  }
+
   @override
   Widget build(BuildContext context) {
-    double? currentPrice = _chartController.currentMarket.value?.price;
-    double? last24hPrice = _chartController.lastMarket.value?.price;
-    double percentageChange = 0;
-    if (currentPrice != null && last24hPrice != null && last24hPrice != 0) {
-      percentageChange = ((currentPrice - last24hPrice) / last24hPrice) * 100;
-    }
-
-    String formatVolume(double volume) {
-      return ' ${(volume / 1000000).toStringAsFixed(2)} M';
-    }
-
-    String getPrimarySymbol(String pair) {
-      return pair.split('/').first;
-    }
-
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
@@ -40,7 +33,7 @@ class ChartPage extends StatelessWidget {
         ),
         title: Row(
           children: [
-            const Icon(Icons.sync), // The arrow icons
+            const Icon(Icons.sync),
             const SizedBox(width: 8),
             Text(pair),
           ],
@@ -49,7 +42,6 @@ class ChartPage extends StatelessWidget {
       body: Obx(
         () => ListView(
           children: [
-            // Timeframe selector
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
@@ -57,10 +49,8 @@ class ChartPage extends StatelessWidget {
                 children: [
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment
-                        .start, // This line will align the left column to the top
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Left content: Current price and 24h change
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -82,98 +72,92 @@ class ChartPage extends StatelessWidget {
                             text: TextSpan(
                               children: [
                                 TextSpan(
-                                    text:
-                                        "≈ ${_chartController.currentMarket.value?.price ?? 0.0}  ",
-                                    style: const TextStyle(
-                                        fontSize: 12, color: Colors.white)),
+                                  text:
+                                      "≈ ${_chartController.currentMarket.value?.price ?? 0.0}  ",
+                                  style: const TextStyle(
+                                      fontSize: 12, color: Colors.white),
+                                ),
                                 TextSpan(
-                                    text:
-                                        "${_chartController.currentMarket.value?.change.toStringAsFixed(2) ?? '+0.00'}%",
-                                    style: TextStyle(
-                                        fontSize: 14,
-                                        color: (_chartController.currentMarket
-                                                        .value?.change ??
-                                                    0) >
+                                  text:
+                                      "${_chartController.currentMarket.value?.change.toStringAsFixed(2) ?? '+0.00'}%",
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: (_chartController.currentMarket.value
+                                                    ?.change ??
+                                                0) >
+                                            0
+                                        ? Colors.green
+                                        : (_chartController.currentMarket.value
+                                                        ?.change ??
+                                                    0) <
                                                 0
-                                            ? Colors.green
-                                            : (_chartController.currentMarket
-                                                            .value?.change ??
-                                                        0) <
-                                                    0
-                                                ? Colors.red
-                                                : Colors.white)),
+                                            ? Colors.red
+                                            : Colors.white,
+                                  ),
+                                ),
                               ],
                             ),
                           ),
                         ],
                       ),
-                      // Right content: 24h High, 24h Low, and 24h Vol
                       Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceAround,
                             children: [
                               Column(
                                 children: [
-                                  const Text(
-                                    "24h High",
-                                    style: TextStyle(
-                                        fontSize: 12, color: Colors.grey),
-                                  ),
+                                  const Text("24h High",
+                                      style: TextStyle(
+                                          fontSize: 12, color: Colors.grey)),
                                   Obx(() => Text(
-                                        "${_chartController.high24h.value.toStringAsFixed(2)}",
-                                        style: const TextStyle(
-                                            fontSize: 12, color: Colors.white),
-                                      )),
+                                      "${_chartController.high24h.value.toStringAsFixed(2)}",
+                                      style: const TextStyle(
+                                          fontSize: 12, color: Colors.white))),
                                 ],
                               ),
-                              const SizedBox(
-                                  width:
-                                      20), // Added spacing between the columns
+                              const SizedBox(width: 20),
                               Column(
                                 children: [
-                                  const Text(
-                                    "24h Low",
-                                    style: TextStyle(
-                                        fontSize: 12, color: Colors.grey),
-                                  ),
-                                  Obx(() => Text(
-                                        "${_chartController.low24h.value.toStringAsFixed(2)}",
-                                        style: const TextStyle(
-                                            fontSize: 12, color: Colors.white),
-                                      )),
+                                  Text("24h Vol(${getPrimarySymbol(pair)})",
+                                      style: TextStyle(
+                                          fontSize: 12, color: Colors.grey)),
+                                  Text(
+                                      "${formatVolume(_chartController.currentMarket.value?.volume ?? 0)}",
+                                      style: const TextStyle(
+                                          fontSize: 12, color: Colors.white)),
                                 ],
                               ),
                             ],
                           ),
-                          const SizedBox(
-                              height: 5), // Existing spacing between the rows
-                          Column(
+                          const SizedBox(height: 5),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
                             children: [
-                              Text(
-                                "24h Vol(${getPrimarySymbol(pair)})",
-                                style:
-                                    TextStyle(fontSize: 12, color: Colors.grey),
+                              Column(
+                                children: [
+                                  const Text("24h Low",
+                                      style: TextStyle(
+                                          fontSize: 12, color: Colors.grey)),
+                                  Obx(() => Text(
+                                      "${_chartController.low24h.value.toStringAsFixed(2)}",
+                                      style: const TextStyle(
+                                          fontSize: 12, color: Colors.white))),
+                                ],
                               ),
-                              Text(
-                                "${formatVolume(_chartController.currentMarket.value?.volume ?? 0)}",
-                                style: const TextStyle(
-                                    fontSize: 12, color: Colors.white),
+                              const SizedBox(width: 20),
+                              Column(
+                                children: [
+                                  const Text("24h Vol(USDT)",
+                                      style: TextStyle(
+                                          fontSize: 12, color: Colors.grey)),
+                                  Obx(() => Text(
+                                      "${formatVolume(_chartController.volume24hUSDT.value)}",
+                                      style: const TextStyle(
+                                          fontSize: 12, color: Colors.white))),
+                                ],
                               ),
-                            ],
-                          ),
-                          Column(
-                            children: [
-                              Text(
-                                "24h Vol USDT",
-                                style:
-                                    TextStyle(fontSize: 12, color: Colors.grey),
-                              ),
-                              Obx(() => Text(
-                                    "${_chartController.volume24hUSDT.value.toStringAsFixed(2)} USDT",
-                                    style: const TextStyle(
-                                        fontSize: 12, color: Colors.white),
-                                  )),
                             ],
                           ),
                         ],
