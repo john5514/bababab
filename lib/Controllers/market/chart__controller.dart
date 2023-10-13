@@ -29,7 +29,7 @@ class ChartController extends GetxController {
     _loadHistoricalData(currentTimeFrame.value);
     fetch24hVolume();
     _initializeWebSocket();
-    _startTimer();
+    _startTimer(_getUpdateInterval(currentTimeFrame.value));
   }
 
   @override
@@ -44,6 +44,7 @@ class ChartController extends GetxController {
     try {
       final List<CandleData> candles =
           await _marketService.fetchHistoricalData(pair, '1d', durationDays: 1);
+      print("Fetched 24h volume data: $candles"); // Enhanced Debugging
       if (candles.isNotEmpty) {
         volume24hUSDT.value = candles.last.close * candles.last.volume;
       } else {
@@ -51,36 +52,46 @@ class ChartController extends GetxController {
       }
     } catch (e) {
       print("Error fetching 24h volume: $e");
-      // Handle the error accordingly, maybe update the UI to show an error state
     }
   }
 
   void updateChartData(String timeframe) {
+    print("Switching to timeframe: $timeframe"); // Enhanced Debugging
+    print(
+        "Candle data before switching: ${candleData.toList()}"); // Enhanced Debugging
     currentTimeFrame.value = timeframe;
     _loadHistoricalData(timeframe);
+
+    if (_timer != null) {
+      _timer!.cancel();
+      _startTimer(_getUpdateInterval(timeframe));
+    }
   }
 
-  Future<void> _loadHistoricalData([String timeframe = '1d']) async {
+  void _loadHistoricalData([String timeframe = '1d']) async {
     try {
       final historicalData =
           await _marketService.fetchHistoricalData(pair, timeframe);
+      print(
+          "Received historical data for $timeframe: $historicalData"); // Enhanced Debugging
       if (historicalData.isEmpty) {
         print("Received empty historical data for $pair");
       } else {
-        candleData.clear(); // Clear existing data
-        candleData.addAll(historicalData);
+        print(
+            "Clearing existing candles. Previous data: ${candleData.toList()}"); // Enhanced Debugging
+        candleData.clear();
+        print(
+            "Adding new historical data: $historicalData"); // Enhanced Debugging
+        candleData
+            .addAll(historicalData.skip(max(0, historicalData.length - 500)));
 
-        // Calculate and set the 24-hour high and low from the fetched data.
         high24h.value =
             historicalData.map((e) => e.high).reduce((a, b) => a > b ? a : b);
         low24h.value =
             historicalData.map((e) => e.low).reduce((a, b) => a < b ? a : b);
-
-        print("Received historical data: $historicalData");
       }
     } catch (e) {
       print("Error loading historical data: $e");
-      // Handle the error accordingly
     }
   }
 
@@ -90,21 +101,30 @@ class ChartController extends GetxController {
         _marketService.marketUpdates.listen(_processMarketUpdate);
   }
 
-  void _startTimer() {
-    _timer = Timer.periodic(Duration(minutes: 1), (timer) {
+  void _startTimer(Duration duration) {
+    _timer = Timer.periodic(duration, (timer) {
+      print(
+          "=====Timer triggered with duration: $duration"); // Enhanced Debugging
       if (_currentCandle != null) {
+        if (candleData.length >= 500) {
+          print("Removing the oldest candle to accommodate the new one.");
+          candleData.removeAt(0);
+        }
+        print("Appending current candle to candleData.");
         candleData.add(_currentCandle!);
-        _currentCandle = null;
+        _currentCandle = null; // Reset the current candle after appending
+        update();
       }
     });
   }
 
   void _processMarketUpdate(List<Market> updatedMarkets) {
+    print("========Processing WebSocket update..."); // Debugging
     final Market? specificMarket = updatedMarkets.firstWhereOrNull(
-      (market) => '${market.symbol}/${market.pair}' == pair,
-    );
+        (market) => '${market.symbol}/${market.pair}' == pair);
 
     if (specificMarket != null) {
+      print("Received market update: $specificMarket"); // Enhanced Debugging
       lastMarket.value = currentMarket.value;
       currentMarket.value = specificMarket;
 
@@ -122,7 +142,40 @@ class ChartController extends GetxController {
         _currentCandle!.low = min(_currentCandle!.low, specificMarket.price);
         _currentCandle!.close = specificMarket.price;
       }
-      update();
+      print("Updated current candle: $_currentCandle"); // Enhanced Debugging
+    }
+  }
+
+  Duration _getUpdateInterval(String timeframe) {
+    switch (timeframe) {
+      case '1s':
+        return Duration(seconds: 1);
+      case '1m':
+        return Duration(minutes: 1);
+      case '3m':
+        return Duration(minutes: 3);
+      case '15m':
+        return Duration(minutes: 15);
+      case '30m':
+        return Duration(minutes: 30);
+      case '1h':
+        return Duration(hours: 1);
+      case '2h':
+        return Duration(hours: 2);
+      case '4h':
+        return Duration(hours: 4);
+      case '6h':
+        return Duration(hours: 6);
+      case '8h':
+        return Duration(hours: 8);
+      case '12h':
+        return Duration(hours: 12);
+      case '1d':
+        return Duration(days: 1);
+      case '3d':
+        return Duration(days: 3);
+      default:
+        return Duration(minutes: 1); // Default to 1 minute if none matches
     }
   }
 }
@@ -143,4 +196,9 @@ class CandleData {
     required this.close,
     required this.volume,
   });
+
+  // @override
+  // String toString() {
+  //   return '================CandleData(x: $x, open: $open, high: $high, low: $low, close: $close, volume: $volume)';
+  // }
 }
