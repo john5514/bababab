@@ -1,3 +1,4 @@
+import 'package:bicrypto/widgets/market/timeframe.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:bicrypto/Controllers/market/chart__controller.dart';
@@ -140,24 +141,10 @@ class ChartHeader extends StatelessWidget {
                   ),
                 ],
               ),
-              DropdownButtonHideUnderline(
-                child: DropdownButton<String>(
-                  value: _chartController.currentTimeFrame.value,
-                  dropdownColor: Colors.grey[800],
-                  style: const TextStyle(color: Colors.white),
-                  items: ['1m', '5m', '15m', '1h', '4h', '8h', '12h', '1d']
-                      .map((String timeframe) {
-                    return DropdownMenuItem<String>(
-                      value: timeframe,
-                      child: Text(timeframe),
-                    );
-                  }).toList(),
-                  onChanged: (String? newValue) {
-                    if (newValue != null) {
-                      _chartController.updateChartData(newValue);
-                    }
-                  },
-                ),
+              TimeFrameSelector(),
+              const Divider(
+                color: Colors.grey,
+                height: 1,
               ),
             ],
           ),
