@@ -2,7 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:bicrypto/Controllers/market/chart__controller.dart';
 
-class TimeFrameSelector extends GetView<ChartController> {
+class TimeFrameSelector extends StatelessWidget {
+  final ChartController controller;
+
+  TimeFrameSelector(this.controller);
+
   final List<String> _mainTimeframes = ['15m', '1h', '4h', '1d', 'More'];
   final List<String> _moreTimeframes = [
     '1s',

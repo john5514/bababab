@@ -142,7 +142,7 @@ class ChartHeader extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 10),
-              TimeFrameSelector(),
+              TimeFrameSelector(_chartController),
               const Divider(
                 color: Colors.grey,
                 height: 1,
