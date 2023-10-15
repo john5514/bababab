@@ -98,7 +98,17 @@ class ChartController extends GetxController {
         if (kLineData.length >= 500) {
           kLineData.removeAt(0);
         }
-        kLineData.add(_currentKLineEntity! as CustomKLineEntity);
+
+        CustomKLineEntity customEntity = CustomKLineEntity(
+          time: _currentKLineEntity?.time ?? 0,
+          open: _currentKLineEntity!.open,
+          high: _currentKLineEntity!.high,
+          low: _currentKLineEntity!.low,
+          close: _currentKLineEntity!.close,
+          vol: _currentKLineEntity!.vol,
+        );
+
+        kLineData.add(customEntity);
         _currentKLineEntity = null;
         update();
       }
