@@ -10,9 +10,16 @@ class ChartPage extends StatelessWidget {
 
   ChartPage({required this.pair})
       : _chartController = Get.put(ChartController(pair));
-
   String formatVolume(double volume) {
-    return ' ${(volume / 1000000).toStringAsFixed(2)} M';
+    if (volume >= 1e9) {
+      return '${(volume / 1e9).toStringAsFixed(2)} B';
+    } else if (volume >= 1e6) {
+      return '${(volume / 1e6).toStringAsFixed(2)} M';
+    } else if (volume >= 1e3) {
+      return '${(volume / 1e3).toStringAsFixed(2)} K';
+    } else {
+      return volume.toStringAsFixed(2);
+    }
   }
 
   String getPrimarySymbol(String pair) {
@@ -65,8 +72,8 @@ class ChartPage extends StatelessWidget {
           'low': e.low,
           'close': e.close,
           'vol': e.vol,
-          'amount': 0, // You might need to adjust this value
-          'count': 0, // You might need to adjust this value
+          'amount': 0,
+          'count': 0,
         });
       }).toList();
 
@@ -74,21 +81,35 @@ class ChartPage extends StatelessWidget {
       ChartStyle chartStyle = ChartStyle();
       ChartColors chartColors = ChartColors();
 
-      return KChartWidget(
-        kChartData, // This is the datas parameter
-        chartStyle, // This is the chartStyle parameter
-        chartColors, // This is the chartColors parameter
-        isLine: false,
-        isTrendLine: false,
-        mainState: MainState.MA,
-        secondaryState: SecondaryState.MACD,
-        onLoadMore: (bool isRight) {
-          // Handle load more data if needed
-        },
+      return KeyedSubtree(
+        key: _chartController.chartKey.value, // <-- Added this line
+        child: KChartWidget(
+          kChartData, // This is the datas parameter
+          chartStyle, // This is the chartStyle parameter
+          chartColors, // This is the chartColors parameter
+          isLine: false,
+          isTrendLine: false,
+          mainState: MainState.MA,
+          secondaryState: SecondaryState.MACD,
+          onLoadMore: (bool isRight) {
+            // Handle load more data if needed
+          },
+        ),
       );
     } catch (e) {
       print("Error rendering the chart: $e");
-      return Center(child: Text("Error rendering chart: $e"));
+      return Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.error, color: Colors.red, size: 48),
+            SizedBox(height: 16),
+            Text("Error rendering chart", style: TextStyle(color: Colors.red)),
+            Text("$e"),
+          ],
+        ),
+      );
     }
   }
 }
