@@ -101,9 +101,42 @@ class MarketService {
     }
   }
 
+  int intervalToMilliseconds(String interval) {
+    switch (interval) {
+      case '1s':
+        return 1000;
+      case '1m':
+        return 60 * 1000;
+      case '3m':
+        return 3 * 60 * 1000;
+      case '15m':
+        return 15 * 60 * 1000;
+      case '30m':
+        return 30 * 60 * 1000;
+      case '1h':
+        return 60 * 60 * 1000;
+      case '2h':
+        return 2 * 60 * 60 * 1000;
+      case '4h':
+        return 4 * 60 * 60 * 1000;
+      case '6h':
+        return 6 * 60 * 60 * 1000;
+      case '8h':
+        return 8 * 60 * 60 * 1000;
+      case '12h':
+        return 12 * 60 * 60 * 1000;
+      case '1d':
+        return 24 * 60 * 60 * 1000;
+      case '3d':
+        return 3 * 24 * 60 * 60 * 1000;
+      default:
+        throw ArgumentError('Invalid interval: $interval');
+    }
+  }
+
   Future<List<CustomKLineEntity>> fetchHistoricalData(
       String symbol, String interval,
-      {int durationDays = 7}) async {
+      {int numCandles = 500}) async {
     print("Starting fetchHistoricalData for $symbol...");
 
     await loadTokens();
@@ -113,14 +146,13 @@ class MarketService {
     final int toTimestamp = (toDate.millisecondsSinceEpoch / 1000).toInt();
     print("To Timestamp: $toTimestamp");
 
-    final DateTime fromDate = toDate.subtract(Duration(days: durationDays));
-    final int fromTimestamp = (fromDate.millisecondsSinceEpoch / 1000).toInt();
-    print("From Timestamp: $fromTimestamp");
+    // Convert interval into milliseconds using the intervalToMilliseconds function.
+    int intervalMilliseconds = intervalToMilliseconds(interval);
 
-    // Update the 'since' parameter as per the backend's logic for the provider.
-    // You should define the 'provider' somewhere. For now, I'll assume it's 'binance'. Update as required.
-    final String provider = 'binance';
-    int durationMilliseconds = durationDays * 24 * 60 * 60 * 1000;
+    // Calculate total duration in milliseconds based on the number of candles and interval.
+    final int durationMilliseconds = numCandles * intervalMilliseconds;
+
+    String provider = 'binance'; // Define the provider, update as required.
     int sinceTimestamp;
     switch (provider) {
       case 'binance':
@@ -139,7 +171,6 @@ class MarketService {
 
     final String requestUrl =
         'https://v3.mash3div.com/api/exchange/chart/historical?symbol=$symbol&interval=$interval&from=$sinceTimestamp&to=$toTimestamp&duration=$durationMilliseconds';
-
     print("Making request to: $requestUrl");
 
     // Add the tokens to the headers

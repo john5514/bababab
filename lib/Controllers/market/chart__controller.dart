@@ -49,7 +49,7 @@ class ChartController extends GetxController {
   Future<void> fetch24hVolume() async {
     try {
       final List<CustomKLineEntity> candles =
-          await _marketService.fetchHistoricalData(pair, '1d', durationDays: 1);
+          await _marketService.fetchHistoricalData(pair, '1d', numCandles: 1);
 
       if (candles.isNotEmpty) {
         volume24hUSDT.value = candles.last.close * candles.last.vol;
@@ -74,7 +74,8 @@ class ChartController extends GetxController {
   void _loadHistoricalData([String timeframe = '1d']) async {
     try {
       final historicalData = await _marketService
-          .fetchHistoricalData(pair, timeframe, durationDays: 1);
+          .fetchHistoricalData(pair, timeframe, numCandles: 1);
+
       kLineData.clear();
       kLineData.addAll(historicalData);
 
@@ -135,7 +136,12 @@ class ChartController extends GetxController {
       lastMarket.value = currentMarket.value;
       currentMarket.value = specificMarket;
 
+      if (kLineData.isEmpty) {
+        print("kLineData is empty! Cannot access last element.");
+        return; // exit the function if the list is empty
+      }
       double previousClose = kLineData.last.close;
+
       CustomKLineEntity newEntry = CustomKLineEntity(
         time: DateTime.now().toUtc().millisecondsSinceEpoch, // Convert to UTC
         open: previousClose,
@@ -144,7 +150,6 @@ class ChartController extends GetxController {
         close: specificMarket.price,
         vol: specificMarket.volume,
       );
-
       if (kLineData.isEmpty) {
         kLineData.add(newEntry);
       } else {
@@ -173,9 +178,8 @@ class ChartController extends GetxController {
   }
 
   bool _isWithinCurrentInterval(int timestamp) {
-    DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(timestamp)
-        .toUtc(); // Convert to UTC
-    DateTime now = DateTime.now().toUtc(); // Convert to UTC
+    DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(timestamp);
+    DateTime now = DateTime.now();
     switch (currentTimeFrame.value) {
       case '1d':
         return dateTime.day == now.day;
