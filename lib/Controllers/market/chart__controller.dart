@@ -26,6 +26,8 @@ class ChartController extends GetxController {
   final RxString currentTimeFrame = '1d'.obs;
 
   ChartController(this.pair);
+  int?
+      _lastHistoricalTimestamp; // To store the last timestamp of historical data
 
   @override
   void onInit() {
@@ -71,16 +73,15 @@ class ChartController extends GetxController {
 
   void _loadHistoricalData([String timeframe = '1d']) async {
     try {
-      final historicalData =
-          await _marketService.fetchHistoricalData(pair, timeframe);
+      final historicalData = await _marketService
+          .fetchHistoricalData(pair, timeframe, durationDays: 1);
       kLineData.clear();
-      // Commented out the next line as it might not work with the custom entity.
-      // DataUtil.calculate(historicalData);
-      kLineData.addAll(historicalData as Iterable<CustomKLineEntity>);
-      print(
-          "===Loaded ${historicalData.length} historical data entries for $timeframe");
+      kLineData.addAll(historicalData);
 
       if (historicalData.isNotEmpty) {
+        _lastHistoricalTimestamp =
+            historicalData.last.time; // Store the last timestamp
+
         high24h.value =
             historicalData.map((e) => e.high).reduce((a, b) => a > b ? a : b);
         low24h.value =
@@ -134,49 +135,47 @@ class ChartController extends GetxController {
       lastMarket.value = currentMarket.value;
       currentMarket.value = specificMarket;
 
+      double previousClose = kLineData.last.close;
       CustomKLineEntity newEntry = CustomKLineEntity(
-        time: DateTime.now().millisecondsSinceEpoch,
-        open: specificMarket.price,
+        time: DateTime.now().toUtc().millisecondsSinceEpoch, // Convert to UTC
+        open: previousClose,
         high: specificMarket.price,
         low: specificMarket.price,
         close: specificMarket.price,
         vol: specificMarket.volume,
       );
 
-      // If there's no data, create a new entry
       if (kLineData.isEmpty) {
         kLineData.add(newEntry);
       } else {
-        // Check if the WebSocket data is for the current interval
         bool isCurrentInterval = _isWithinCurrentInterval(kLineData.last.time);
-        print("Is current interval? $isCurrentInterval");
+
+        if (_lastHistoricalTimestamp != null &&
+            _lastHistoricalTimestamp == kLineData.last.time) {
+          isCurrentInterval = true;
+          _lastHistoricalTimestamp = null;
+        }
 
         if (isCurrentInterval) {
-          // Update the last entry by replacing it with a new entry
           CustomKLineEntity lastEntry = kLineData.last;
-          kLineData.last = CustomKLineEntity(
-            time: lastEntry.time,
-            open: lastEntry.open,
-            high: max(lastEntry.high, specificMarket.price),
-            low: min(lastEntry.low, specificMarket.price),
-            close: specificMarket.price,
-            vol: lastEntry.vol + specificMarket.volume,
-          );
+          lastEntry.high = max(lastEntry.high, specificMarket.price);
+          lastEntry.low = min(lastEntry.low, specificMarket.price);
+          lastEntry.close = specificMarket.price;
+          lastEntry.vol = specificMarket.volume;
         } else {
-          // Add the new entry for the new interval
           kLineData.add(newEntry);
         }
       }
 
-      // Notify listeners of the change
       update();
-      refreshChart(); // <-- Added this line
+      refreshChart();
     }
   }
 
   bool _isWithinCurrentInterval(int timestamp) {
-    DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(timestamp);
-    DateTime now = DateTime.now();
+    DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(timestamp)
+        .toUtc(); // Convert to UTC
+    DateTime now = DateTime.now().toUtc(); // Convert to UTC
     switch (currentTimeFrame.value) {
       case '1d':
         return dateTime.day == now.day;
