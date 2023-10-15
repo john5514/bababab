@@ -101,7 +101,8 @@ class MarketService {
     }
   }
 
-  Future<List<CandleData>> fetchHistoricalData(String symbol, String interval,
+  Future<List<CustomKLineEntity>> fetchHistoricalData(
+      String symbol, String interval,
       {int durationDays = 7}) async {
     print("Starting fetchHistoricalData for $symbol...");
 
@@ -162,7 +163,6 @@ class MarketService {
       final body = json.decode(response.body);
 
       if (body['status'] == "success") {
-        // Add the empty data check here
         if (body['data']['result'] is List &&
             (body['data']['result'] as List).isEmpty) {
           final noDataMessage =
@@ -174,13 +174,13 @@ class MarketService {
         // Adjust this if the structure is different.
         if (body['data']['result'] is List) {
           final candles = (body['data']['result'] as List)
-              .map((e) => CandleData(
-                    x: DateTime.fromMillisecondsSinceEpoch(e[0].toInt()),
+              .map((e) => CustomKLineEntity(
+                    time: e[0].toInt(),
                     open: e[1].toDouble(),
                     high: e[2].toDouble(),
                     low: e[3].toDouble(),
                     close: e[4].toDouble(),
-                    volume: e[5].toDouble(),
+                    vol: e[5].toDouble(),
                   ))
               .toList();
 
@@ -266,7 +266,6 @@ class Market {
     required this.low24h,
   });
 
-  // Factory constructor to create a Market object from a map
   // Factory constructor to create a Market object from a map
   factory Market.fromJson(String marketName, Map<String, dynamic> json) {
     final splitMarketName = marketName.split('/');

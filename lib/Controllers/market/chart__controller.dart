@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math';
 import 'package:bicrypto/services/market_service.dart';
 import 'package:get/get.dart';
+import 'package:k_chart/flutter_k_chart.dart';
 
 class ChartController extends GetxController {
   final Rx<Market?> currentMarket = Rx<Market?>(null);
@@ -13,11 +14,11 @@ class ChartController extends GetxController {
 
   final String pair;
   final MarketService _marketService = MarketService();
-  var candleData = <CandleData>[].obs;
+  var kLineData = <CustomKLineEntity>[].obs;
   StreamSubscription? _marketSubscription;
   Timer? _timer;
 
-  CandleData? _currentCandle;
+  KLineEntity? _currentKLineEntity;
 
   final RxString currentTimeFrame = '1d'.obs;
 
@@ -42,11 +43,11 @@ class ChartController extends GetxController {
 
   Future<void> fetch24hVolume() async {
     try {
-      final List<CandleData> candles =
+      final List<CustomKLineEntity> candles =
           await _marketService.fetchHistoricalData(pair, '1d', durationDays: 1);
-      print("Fetched 24h volume data: $candles"); // Enhanced Debugging
+
       if (candles.isNotEmpty) {
-        volume24hUSDT.value = candles.last.close * candles.last.volume;
+        volume24hUSDT.value = candles.last.close * candles.last.vol;
       } else {
         throw Exception('No data available for the past 24 hours');
       }
@@ -56,9 +57,6 @@ class ChartController extends GetxController {
   }
 
   void updateChartData(String timeframe) {
-    print("Switching to timeframe: $timeframe"); // Enhanced Debugging
-    print(
-        "Candle data before switching: ${candleData.toList()}"); // Enhanced Debugging
     currentTimeFrame.value = timeframe;
     _loadHistoricalData(timeframe);
 
@@ -72,19 +70,12 @@ class ChartController extends GetxController {
     try {
       final historicalData =
           await _marketService.fetchHistoricalData(pair, timeframe);
-      print(
-          "Received historical data for $timeframe: $historicalData"); // Enhanced Debugging
-      if (historicalData.isEmpty) {
-        print("Received empty historical data for $pair");
-      } else {
-        print(
-            "Clearing existing candles. Previous data: ${candleData.toList()}"); // Enhanced Debugging
-        candleData.clear();
-        print(
-            "Adding new historical data: $historicalData"); // Enhanced Debugging
-        candleData
-            .addAll(historicalData.skip(max(0, historicalData.length - 500)));
+      kLineData.clear();
+      // Commented out the next line as it might not work with the custom entity.
+      // DataUtil.calculate(historicalData);
+      kLineData.addAll(historicalData as Iterable<CustomKLineEntity>);
 
+      if (historicalData.isNotEmpty) {
         high24h.value =
             historicalData.map((e) => e.high).reduce((a, b) => a > b ? a : b);
         low24h.value =
@@ -103,46 +94,41 @@ class ChartController extends GetxController {
 
   void _startTimer(Duration duration) {
     _timer = Timer.periodic(duration, (timer) {
-      print(
-          "=====Timer triggered with duration: $duration"); // Enhanced Debugging
-      if (_currentCandle != null) {
-        if (candleData.length >= 500) {
-          print("Removing the oldest candle to accommodate the new one.");
-          candleData.removeAt(0);
+      if (_currentKLineEntity != null) {
+        if (kLineData.length >= 500) {
+          kLineData.removeAt(0);
         }
-        print("Appending current candle to candleData.");
-        candleData.add(_currentCandle!);
-        _currentCandle = null; // Reset the current candle after appending
+        kLineData.add(_currentKLineEntity! as CustomKLineEntity);
+        _currentKLineEntity = null;
         update();
       }
     });
   }
 
   void _processMarketUpdate(List<Market> updatedMarkets) {
-    print("========Processing WebSocket update..."); // Debugging
     final Market? specificMarket = updatedMarkets.firstWhereOrNull(
         (market) => '${market.symbol}/${market.pair}' == pair);
 
     if (specificMarket != null) {
-      print("Received market update: $specificMarket"); // Enhanced Debugging
       lastMarket.value = currentMarket.value;
       currentMarket.value = specificMarket;
 
-      if (_currentCandle == null) {
-        _currentCandle = CandleData(
-          x: DateTime.now(),
-          open: specificMarket.price,
-          high: specificMarket.price,
-          low: specificMarket.price,
-          close: specificMarket.price,
-          volume: specificMarket.volume,
-        );
+      if (_currentKLineEntity == null) {
+        _currentKLineEntity = KLineEntity.fromJson({
+          'time': DateTime.now().millisecondsSinceEpoch,
+          'open': specificMarket.price,
+          'high': specificMarket.price,
+          'low': specificMarket.price,
+          'close': specificMarket.price,
+          'vol': specificMarket.volume,
+        });
       } else {
-        _currentCandle!.high = max(_currentCandle!.high, specificMarket.price);
-        _currentCandle!.low = min(_currentCandle!.low, specificMarket.price);
-        _currentCandle!.close = specificMarket.price;
+        _currentKLineEntity!.high =
+            max(_currentKLineEntity!.high, specificMarket.price);
+        _currentKLineEntity!.low =
+            min(_currentKLineEntity!.low, specificMarket.price);
+        _currentKLineEntity!.close = specificMarket.price;
       }
-      print("Updated current candle: $_currentCandle"); // Enhanced Debugging
     }
   }
 
@@ -180,25 +166,20 @@ class ChartController extends GetxController {
   }
 }
 
-class CandleData {
-  final DateTime x;
+class CustomKLineEntity {
+  final int time;
   final double open;
-  double high;
-  double low;
-  double close;
-  final double volume;
+  double high; // Removed 'final'
+  double low; // Removed 'final'
+  double close; // Removed 'final'
+  final double vol;
 
-  CandleData({
-    required this.x,
+  CustomKLineEntity({
+    required this.time,
     required this.open,
     required this.high,
     required this.low,
     required this.close,
-    required this.volume,
+    required this.vol,
   });
-
-  // @override
-  // String toString() {
-  //   return '================CandleData(x: $x, open: $open, high: $high, low: $low, close: $close, volume: $volume)';
-  // }
 }

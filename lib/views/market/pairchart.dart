@@ -1,8 +1,7 @@
 import 'package:bicrypto/widgets/market/chart_header.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:intl/intl.dart';
-import 'package:syncfusion_flutter_charts/charts.dart';
+import 'package:k_chart/flutter_k_chart.dart';
 import 'package:bicrypto/Controllers/market/chart__controller.dart';
 
 class ChartPage extends StatelessWidget {
@@ -42,10 +41,6 @@ class ChartPage extends StatelessWidget {
       ),
       body: Obx(
         () {
-          // Debugging: Verify Data Source
-          print(
-              "DataSource for Chart: ${_chartController.candleData.toList()}");
-
           return ListView(
             children: [
               ChartHeader(_chartController, pair),
@@ -62,59 +57,34 @@ class ChartPage extends StatelessWidget {
 
   Widget tryRenderChart() {
     try {
-      return SfCartesianChart(
-        key: UniqueKey(), // Use a new UniqueKey here
-        plotAreaBorderColor: Colors.white,
-        plotAreaBackgroundColor: Colors.black,
-        borderWidth: 0.5,
-        zoomPanBehavior: ZoomPanBehavior(
-          enablePanning: true,
-          enablePinching: true,
-          zoomMode: ZoomMode.x,
-          enableDoubleTapZooming: true,
-        ),
-        title: ChartTitle(
-          text: '$pair Chart',
-          textStyle: const TextStyle(color: Colors.white, fontSize: 20),
-        ),
-        legend: const Legend(isVisible: false),
-        series: <ChartSeries>[
-          CandleSeries<CandleData, DateTime>(
-            dataSource: _chartController.candleData.toList(),
-            xValueMapper: (datum, _) => datum.x,
-            lowValueMapper: (datum, _) => datum.low,
-            highValueMapper: (datum, _) => datum.high,
-            openValueMapper: (datum, _) => datum.open,
-            closeValueMapper: (datum, _) => datum.close,
-            bearColor: Colors.red,
-            bullColor: Colors.green,
-            enableTooltip: true,
-          ),
-        ],
-        primaryXAxis: DateTimeAxis(
-          majorGridLines: MajorGridLines(color: Colors.grey[800]!),
-          minorGridLines: MinorGridLines(color: Colors.grey[800]!),
-          axisLine: AxisLine(color: Colors.grey[700]!),
-          labelStyle: const TextStyle(color: Colors.white),
-          visibleMinimum: _chartController.candleData.length > 60
-              ? _chartController
-                  .candleData[_chartController.candleData.length - 60].x
-              : null,
-          visibleMaximum: _chartController.candleData.isNotEmpty
-              ? _chartController.candleData.last.x
-              : null,
-        ),
+      List<KLineEntity> kChartData = _chartController.kLineData.map((e) {
+        return KLineEntity.fromJson({
+          'id': e.time,
+          'open': e.open,
+          'high': e.high,
+          'low': e.low,
+          'close': e.close,
+          'vol': e.vol,
+          'amount': 0, // You might need to adjust this value
+          'count': 0, // You might need to adjust this value
+        });
+      }).toList();
 
-        primaryYAxis: NumericAxis(
-          numberFormat: NumberFormat.simpleCurrency(),
-          opposedPosition: true,
-          majorTickLines: const MajorTickLines(color: Colors.transparent),
-          minorTickLines: const MinorTickLines(color: Colors.transparent),
-          axisLine: const AxisLine(width: 0),
-          labelStyle: const TextStyle(color: Colors.white),
-          majorGridLines: MajorGridLines(color: Colors.grey[800]!),
-          minorGridLines: MinorGridLines(color: Colors.grey[800]!),
-        ),
+      // Initialize your chartStyle and chartColors here if they are not already.
+      ChartStyle chartStyle = ChartStyle();
+      ChartColors chartColors = ChartColors();
+
+      return KChartWidget(
+        kChartData, // This is the datas parameter
+        chartStyle, // This is the chartStyle parameter
+        chartColors, // This is the chartColors parameter
+        isLine: false,
+        isTrendLine: false,
+        mainState: MainState.MA,
+        secondaryState: SecondaryState.MACD,
+        onLoadMore: (bool isRight) {
+          // Handle load more data if needed
+        },
       );
     } catch (e) {
       print("Error rendering the chart: $e");
