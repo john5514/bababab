@@ -62,6 +62,8 @@ class ChartController extends GetxController {
   }
 
   void updateChartData(String timeframe) {
+    print(
+        "++++++++++++++++++++++++++++++Called updateChartData with timeframe: $timeframe");
     currentTimeFrame.value = timeframe;
     _loadHistoricalData(timeframe);
 
@@ -72,6 +74,9 @@ class ChartController extends GetxController {
   }
 
   void _loadHistoricalData([String timeframe = '1d']) async {
+    print(
+        "+++++++++++++++++++++++++Called _loadHistoricalData with timeframe: $timeframe");
+
     try {
       final historicalData = await _marketService
           .fetchHistoricalData(pair, timeframe, numCandles: 1);
@@ -80,6 +85,10 @@ class ChartController extends GetxController {
       kLineData.addAll(historicalData);
 
       if (historicalData.isNotEmpty) {
+        _lastHistoricalTimestamp =
+            historicalData.last.time; // Store the last timestamp
+        print(
+            "Last historical candle: ${historicalData.last}"); // Add this line
         _lastHistoricalTimestamp =
             historicalData.last.time; // Store the last timestamp
 
@@ -104,9 +113,10 @@ class ChartController extends GetxController {
     print("Starting timer with duration: $duration");
     _timer = Timer.periodic(duration, (timer) {
       if (_currentKLineEntity != null) {
-        if (kLineData.length >= 500) {
-          kLineData.removeAt(0);
-        }
+        // Remove this block to not limit kLineData to 500
+        // if (kLineData.length >= 500) {
+        //   kLineData.removeAt(0);
+        // }
 
         CustomKLineEntity customEntity = CustomKLineEntity(
           time: _currentKLineEntity?.time ?? 0,
@@ -150,6 +160,8 @@ class ChartController extends GetxController {
         close: specificMarket.price,
         vol: specificMarket.volume,
       );
+      print("New WebSocket candle: $newEntry"); // Add this line
+
       if (kLineData.isEmpty) {
         kLineData.add(newEntry);
       } else {
@@ -178,8 +190,11 @@ class ChartController extends GetxController {
   }
 
   bool _isWithinCurrentInterval(int timestamp) {
-    DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(timestamp);
-    DateTime now = DateTime.now();
+    DateTime dateTime =
+        DateTime.fromMillisecondsSinceEpoch(timestamp, isUtc: true);
+
+    DateTime now = DateTime.now().toUtc();
+
     switch (currentTimeFrame.value) {
       case '1d':
         return dateTime.day == now.day;
@@ -273,4 +288,8 @@ class CustomKLineEntity {
     required this.close,
     required this.vol,
   });
+  @override
+  String toString() {
+    return 'Time: $time, Open: $open, High: $high, Low: $low, Close: $close, Vol: $vol';
+  }
 }

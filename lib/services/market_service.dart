@@ -156,16 +156,18 @@ class MarketService {
     int sinceTimestamp;
     switch (provider) {
       case 'binance':
-        sinceTimestamp = toTimestamp - (durationMilliseconds ~/ 3) ~/ 1000;
+        sinceTimestamp =
+            toTimestamp - (durationMilliseconds / 3 / 1000).round();
         break;
       case 'kucoin':
-        sinceTimestamp = toTimestamp - durationMilliseconds ~/ 1000;
+        sinceTimestamp = toTimestamp - (durationMilliseconds / 1000).round();
         break;
       case 'bitget':
-        sinceTimestamp = toTimestamp - (durationMilliseconds ~/ 1.5) ~/ 1000;
+        sinceTimestamp =
+            toTimestamp - (durationMilliseconds / 1.5 / 1000).round();
         break;
       default:
-        sinceTimestamp = toTimestamp - durationMilliseconds ~/ 1000;
+        sinceTimestamp = toTimestamp - (durationMilliseconds / 1000).round();
         break;
     }
 
