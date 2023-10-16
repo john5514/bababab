@@ -143,34 +143,16 @@ class MarketService {
     print("Loaded tokens: $tokens");
 
     final DateTime toDate = DateTime.now();
-    final int toTimestamp = (toDate.millisecondsSinceEpoch).toInt();
+    final int toTimestamp = toDate.millisecondsSinceEpoch.toInt();
     print("To Timestamp: $toTimestamp");
 
-    // Using the intervalDurations dictionary to get the duration for the provided interval.
-    final Map<String, int> intervalDurations = {
-      '1': 86400000,
-      '3': 259200000,
-      '5': 432000000,
-      '15': 1296000000,
-      '30': 2592000000,
-      '60': 5184000000,
-      '120': 10368000000,
-      '240': 20736000000,
-      '360': 31104000000,
-      '480': 41472000000,
-      '720': 62208000000,
-      '1D': 124416000000,
-    };
+    // Calculate the 'since' value
+    final int since = numCandles * intervalToMilliseconds(interval);
 
-    // Calculate total duration in milliseconds based on the number of candles and interval.
-    final int durationMilliseconds = numCandles * 60 * 60 * 1000;
-    final int since = 5184000000;
-
-    int sinceTimestamp = toTimestamp -
-        durationMilliseconds; // Convert duration from ms to seconds for timestamp calculation.
+    int sinceTimestamp = toTimestamp - since;
 
     final String requestUrl =
-        'https://v3.mash3div.com/api/exchange/chart/historical?symbol=$symbol&interval=1h&from=$sinceTimestamp&to=$toTimestamp&duration=$since';
+        'https://v3.mash3div.com/api/exchange/chart/historical?symbol=$symbol&interval=$interval&from=$sinceTimestamp&to=$toTimestamp&duration=$since';
     print("Making request to: $requestUrl");
     // Add the tokens to the headers
     final headers = {

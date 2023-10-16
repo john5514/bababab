@@ -79,7 +79,7 @@ class ChartController extends GetxController {
 
     try {
       final historicalData = await _marketService
-          .fetchHistoricalData(pair, timeframe, numCandles: 1);
+          .fetchHistoricalData(pair, timeframe, numCandles: 500);
 
       kLineData.clear();
       kLineData.addAll(historicalData);
