@@ -290,6 +290,6 @@ class CustomKLineEntity {
   });
   @override
   String toString() {
-    return 'Time: $time, Open: $open, High: $high, Low: $low, Close: $close, Vol: $vol';
+    return '=================------==========Time: $time, Open: $open, High: $high, Low: $low, Close: $close, Vol: $vol';
   }
 }

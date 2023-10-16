@@ -156,15 +156,13 @@ class MarketService {
     int sinceTimestamp;
     switch (provider) {
       case 'binance':
-        sinceTimestamp =
-            toTimestamp - (durationMilliseconds / 3 / 1000).round();
+        sinceTimestamp = toTimestamp - (durationMilliseconds / 3000).round();
         break;
       case 'kucoin':
         sinceTimestamp = toTimestamp - (durationMilliseconds / 1000).round();
         break;
       case 'bitget':
-        sinceTimestamp =
-            toTimestamp - (durationMilliseconds / 1.5 / 1000).round();
+        sinceTimestamp = toTimestamp - (durationMilliseconds / 1500).round();
         break;
       default:
         sinceTimestamp = toTimestamp - (durationMilliseconds / 1000).round();
@@ -174,7 +172,6 @@ class MarketService {
     final String requestUrl =
         'https://v3.mash3div.com/api/exchange/chart/historical?symbol=$symbol&interval=$interval&from=$sinceTimestamp&to=$toTimestamp&duration=$durationMilliseconds';
     print("Making request to: $requestUrl");
-
     // Add the tokens to the headers
     final headers = {
       'accept': 'application/json',
