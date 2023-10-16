@@ -24,6 +24,7 @@ class ChartController extends GetxController {
   KLineEntity? _currentKLineEntity;
 
   final RxString currentTimeFrame = '1h'.obs;
+  double _previous24hVolume = 0; // To store the previous 24-hour volume
 
   ChartController(this.pair);
   int?
@@ -150,7 +151,11 @@ class ChartController extends GetxController {
         print("kLineData is empty! Cannot access last element.");
         return; // exit the function if the list is empty
       }
+
       double previousClose = kLineData.last.close;
+      double adjustedVolume = specificMarket.volume - _previous24hVolume;
+      _previous24hVolume = specificMarket
+          .volume; // Store the current 24h volume for the next update
 
       CustomKLineEntity newEntry = CustomKLineEntity(
         time: DateTime.now().toUtc().millisecondsSinceEpoch, // Convert to UTC
@@ -158,7 +163,7 @@ class ChartController extends GetxController {
         high: specificMarket.price,
         low: specificMarket.price,
         close: specificMarket.price,
-        vol: specificMarket.volume,
+        vol: adjustedVolume,
       );
       print("New WebSocket candle: $newEntry"); // Add this line
 
@@ -167,18 +172,13 @@ class ChartController extends GetxController {
       } else {
         bool isCurrentInterval = _isWithinCurrentInterval(kLineData.last.time);
 
-        if (_lastHistoricalTimestamp != null &&
-            _lastHistoricalTimestamp == kLineData.last.time) {
-          isCurrentInterval = true;
-          _lastHistoricalTimestamp = null;
-        }
-
         if (isCurrentInterval) {
           CustomKLineEntity lastEntry = kLineData.last;
           lastEntry.high = max(lastEntry.high, specificMarket.price);
           lastEntry.low = min(lastEntry.low, specificMarket.price);
           lastEntry.close = specificMarket.price;
-          lastEntry.vol = specificMarket.volume;
+          lastEntry.vol +=
+              adjustedVolume; // Accumulate volume for the current interval
         } else {
           kLineData.add(newEntry);
         }
