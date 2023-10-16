@@ -136,41 +136,41 @@ class MarketService {
 
   Future<List<CustomKLineEntity>> fetchHistoricalData(
       String symbol, String interval,
-      {int numCandles = 500}) async {
+      {int numCandles = 72}) async {
     print("Starting fetchHistoricalData for $symbol...");
 
     await loadTokens();
     print("Loaded tokens: $tokens");
 
     final DateTime toDate = DateTime.now();
-    final int toTimestamp = (toDate.millisecondsSinceEpoch / 1000).toInt();
+    final int toTimestamp = (toDate.millisecondsSinceEpoch).toInt();
     print("To Timestamp: $toTimestamp");
 
-    // Convert interval into milliseconds using the intervalToMilliseconds function.
-    int intervalMilliseconds = intervalToMilliseconds(interval);
+    // Using the intervalDurations dictionary to get the duration for the provided interval.
+    final Map<String, int> intervalDurations = {
+      '1': 86400000,
+      '3': 259200000,
+      '5': 432000000,
+      '15': 1296000000,
+      '30': 2592000000,
+      '60': 5184000000,
+      '120': 10368000000,
+      '240': 20736000000,
+      '360': 31104000000,
+      '480': 41472000000,
+      '720': 62208000000,
+      '1D': 124416000000,
+    };
 
     // Calculate total duration in milliseconds based on the number of candles and interval.
-    final int durationMilliseconds = numCandles * intervalMilliseconds;
+    final int durationMilliseconds = numCandles * 60 * 60 * 1000;
+    final int since = 5184000000;
 
-    String provider = 'binance'; // Define the provider, update as required.
-    int sinceTimestamp;
-    switch (provider) {
-      case 'binance':
-        sinceTimestamp = toTimestamp - (durationMilliseconds / 3000).round();
-        break;
-      case 'kucoin':
-        sinceTimestamp = toTimestamp - (durationMilliseconds / 1000).round();
-        break;
-      case 'bitget':
-        sinceTimestamp = toTimestamp - (durationMilliseconds / 1500).round();
-        break;
-      default:
-        sinceTimestamp = toTimestamp - (durationMilliseconds / 1000).round();
-        break;
-    }
+    int sinceTimestamp = toTimestamp -
+        durationMilliseconds; // Convert duration from ms to seconds for timestamp calculation.
 
     final String requestUrl =
-        'https://v3.mash3div.com/api/exchange/chart/historical?symbol=$symbol&interval=$interval&from=$sinceTimestamp&to=$toTimestamp&duration=$durationMilliseconds';
+        'https://v3.mash3div.com/api/exchange/chart/historical?symbol=$symbol&interval=1h&from=$sinceTimestamp&to=$toTimestamp&duration=$since';
     print("Making request to: $requestUrl");
     // Add the tokens to the headers
     final headers = {

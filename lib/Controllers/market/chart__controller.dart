@@ -23,7 +23,7 @@ class ChartController extends GetxController {
 
   KLineEntity? _currentKLineEntity;
 
-  final RxString currentTimeFrame = '1d'.obs;
+  final RxString currentTimeFrame = '1h'.obs;
 
   ChartController(this.pair);
   int?
@@ -49,7 +49,7 @@ class ChartController extends GetxController {
   Future<void> fetch24hVolume() async {
     try {
       final List<CustomKLineEntity> candles =
-          await _marketService.fetchHistoricalData(pair, '1d', numCandles: 1);
+          await _marketService.fetchHistoricalData(pair, '1h', numCandles: 1);
 
       if (candles.isNotEmpty) {
         volume24hUSDT.value = candles.last.close * candles.last.vol;
@@ -73,7 +73,7 @@ class ChartController extends GetxController {
     }
   }
 
-  void _loadHistoricalData([String timeframe = '1d']) async {
+  void _loadHistoricalData([String timeframe = '1h']) async {
     print(
         "+++++++++++++++++++++++++Called _loadHistoricalData with timeframe: $timeframe");
 
