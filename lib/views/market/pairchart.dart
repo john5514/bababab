@@ -55,9 +55,55 @@ class ChartPage extends StatelessWidget {
                 height: MediaQuery.of(context).size.height * 0.7,
                 child: tryRenderChart(),
               ),
+              buildControlButtons(),
             ],
           );
         },
+      ),
+    );
+  }
+
+  // New control buttons widget
+  Widget buildControlButtons() {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Column(
+        children: [
+          ElevatedButton(
+            onPressed: () => _chartController.toggleVolumeVisibility(),
+            child: Text(_chartController.isVolumeVisible.value
+                ? "Hide Volume"
+                : "Show Volume"),
+          ),
+          ElevatedButton(
+            onPressed: () => _chartController.toggleChartMode(),
+            child: Text(_chartController.isLineMode.value
+                ? "Switch to K-Line Mode"
+                : "Switch to Time Mode"),
+          ),
+          DropdownButton<SecondaryChartState>(
+            value: _chartController.secondaryState.value,
+            onChanged: (value) => _chartController.setSecondaryState(value!),
+            items: SecondaryChartState.values.map((state) {
+              return DropdownMenuItem(
+                value: state,
+                child: Text(state.toString().split('.').last),
+              );
+            }).toList(),
+          ),
+          ElevatedButton(
+            onPressed: () => _chartController.toggleGridVisibility(),
+            child: Text(_chartController.isGridHidden.value
+                ? "Show Grid"
+                : "Hide Grid"),
+          ),
+          ElevatedButton(
+            onPressed: () => _chartController.toggleNowPriceVisibility(),
+            child: Text(_chartController.isNowPriceShown.value
+                ? "Hide Now Price"
+                : "Show Now Price"),
+          ),
+        ],
       ),
     );
   }
@@ -96,13 +142,22 @@ class ChartPage extends StatelessWidget {
           kChartData, // This is the datas parameter
           chartStyle, // This is the chartStyle parameter
           chartColors, // This is the chartColors parameter
-          isLine: false,
-          isTrendLine: false,
-          mainState: MainState.MA,
-          secondaryState: SecondaryState.MACD,
+          isLine:
+              _chartController.isLineMode.value, // Control Line or K-Line mode
+          isTrendLine: _chartController.isTrendLine.value, // Control Trend Line
+          mainState: MainState.MA, // This remains unchanged for now
+          secondaryState: _chartController
+              .mapToSecondaryState(_chartController.secondaryState.value),
+
           onLoadMore: (bool isRight) {
             // Handle load more data if needed
           },
+          volHidden: !_chartController
+              .isVolumeVisible.value, // Control volume visibility
+          hideGrid:
+              _chartController.isGridHidden.value, // Control grid visibility
+          showNowPrice: _chartController
+              .isNowPriceShown.value, // Control now price visibility
         ),
       );
     } catch (e) {
