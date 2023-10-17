@@ -1,4 +1,6 @@
+import 'package:bicrypto/Controllers/market/customizechart_controller.dart';
 import 'package:bicrypto/widgets/market/chart_header.dart';
+import 'package:bicrypto/widgets/market/costomize%20_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:k_chart/flutter_k_chart.dart';
@@ -7,6 +9,8 @@ import 'package:bicrypto/Controllers/market/chart__controller.dart';
 class ChartPage extends StatelessWidget {
   final String pair;
   final ChartController _chartController;
+  final CustomizeChartController _customizeChartController =
+      Get.put(CustomizeChartController());
 
   ChartPage({required this.pair})
       : _chartController = Get.put(ChartController(pair));
@@ -65,47 +69,7 @@ class ChartPage extends StatelessWidget {
 
   // New control buttons widget
   Widget buildControlButtons() {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Column(
-        children: [
-          ElevatedButton(
-            onPressed: () => _chartController.toggleVolumeVisibility(),
-            child: Text(_chartController.isVolumeVisible.value
-                ? "Hide Volume"
-                : "Show Volume"),
-          ),
-          ElevatedButton(
-            onPressed: () => _chartController.toggleChartMode(),
-            child: Text(_chartController.isLineMode.value
-                ? "Switch to K-Line Mode"
-                : "Switch to Time Mode"),
-          ),
-          DropdownButton<SecondaryChartState>(
-            value: _chartController.secondaryState.value,
-            onChanged: (value) => _chartController.setSecondaryState(value!),
-            items: SecondaryChartState.values.map((state) {
-              return DropdownMenuItem(
-                value: state,
-                child: Text(state.toString().split('.').last),
-              );
-            }).toList(),
-          ),
-          ElevatedButton(
-            onPressed: () => _chartController.toggleGridVisibility(),
-            child: Text(_chartController.isGridHidden.value
-                ? "Show Grid"
-                : "Hide Grid"),
-          ),
-          ElevatedButton(
-            onPressed: () => _chartController.toggleNowPriceVisibility(),
-            child: Text(_chartController.isNowPriceShown.value
-                ? "Hide Now Price"
-                : "Show Now Price"),
-          ),
-        ],
-      ),
-    );
+    return ChartCustomizationWidget();
   }
 
   Widget tryRenderChart() {
@@ -132,32 +96,30 @@ class ChartPage extends StatelessWidget {
         });
       }).toList();
 
-      // Initialize your chartStyle and chartColors here if they are not already.
-      ChartStyle chartStyle = ChartStyle();
-      ChartColors chartColors = ChartColors();
+      // Process the data using DataUtil
+      DataUtil.calculate(kChartData);
 
       return KeyedSubtree(
-        key: _chartController.chartKey.value, // <-- Added this line
+        key: _chartController.chartKey
+            .value, // we keep this from the original controller because it relates to the chart's data, not its appearance
         child: KChartWidget(
-          kChartData, // This is the datas parameter
-          chartStyle, // This is the chartStyle parameter
-          chartColors, // This is the chartColors parameter
-          isLine:
-              _chartController.isLineMode.value, // Control Line or K-Line mode
-          isTrendLine: _chartController.isTrendLine.value, // Control Trend Line
-          mainState: MainState.MA, // This remains unchanged for now
-          secondaryState: _chartController
-              .mapToSecondaryState(_chartController.secondaryState.value),
-
-          onLoadMore: (bool isRight) {
-            // Handle load more data if needed
-          },
-          volHidden: !_chartController
-              .isVolumeVisible.value, // Control volume visibility
-          hideGrid:
-              _chartController.isGridHidden.value, // Control grid visibility
-          showNowPrice: _chartController
-              .isNowPriceShown.value, // Control now price visibility
+          kChartData,
+          _customizeChartController.chartStyle,
+          _customizeChartController.chartColors,
+          isLine: _customizeChartController.isLineMode.value,
+          isTrendLine: _customizeChartController.isTrendLine.value,
+          mainState: _customizeChartController.mainState.value,
+          secondaryState: _customizeChartController.secondaryState.value,
+          fixedLength: 2,
+          timeFormat: TimeFormat.YEAR_MONTH_DAY,
+          onLoadMore: (bool isRight) {},
+          maDayList: [5, 10, 20],
+          volHidden: !_customizeChartController.isVolumeVisible.value,
+          hideGrid: _customizeChartController.isGridHidden.value,
+          showNowPrice: _customizeChartController.isNowPriceShown.value,
+          isOnDrag: _customizeChartController.handleDrag,
+          onSecondaryTap: _customizeChartController.cycleSecondaryState,
+          xFrontPadding: 100,
         ),
       );
     } catch (e) {

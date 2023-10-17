@@ -5,8 +5,6 @@ import 'package:get/get.dart';
 import 'package:k_chart/flutter_k_chart.dart';
 import 'package:flutter/material.dart'; // <-- Added this line for UniqueKey
 
-enum SecondaryChartState { NONE, MACD, KDJ, RSI, WR, CCI } // Move the enum here
-
 class ChartController extends GetxController {
   final Rx<Market?> currentMarket = Rx<Market?>(null);
   final Rx<Market?> lastMarket = Rx<Market?>(null);
@@ -40,12 +38,6 @@ class ChartController extends GetxController {
   int currentFallbackIndex = 0;
   final RxBool isLoading = true.obs; // <-- Added to track loading status
   final RxString errorMsg = ''.obs; // <-- Added to track error messages
-  final RxBool isVolumeVisible = true.obs;
-  final RxBool isLineMode = true.obs;
-  final Rx<SecondaryChartState> secondaryState = SecondaryChartState.MACD.obs;
-  final RxBool isGridHidden = false.obs;
-  final RxBool isNowPriceShown = true.obs;
-  final RxBool isTrendLine = false.obs;
 
   @override
   void onInit() {
@@ -64,53 +56,10 @@ class ChartController extends GetxController {
     super.onClose();
   }
 
-  SecondaryState mapToSecondaryState(SecondaryChartState state) {
-    switch (state) {
-      case SecondaryChartState.MACD:
-        return SecondaryState.MACD;
-      case SecondaryChartState.RSI:
-        return SecondaryState.RSI;
-      //please add other cases
-      case SecondaryChartState.KDJ:
-        return SecondaryState.KDJ;
-      case SecondaryChartState.WR:
-        return SecondaryState.WR;
-      case SecondaryChartState.CCI:
-        return SecondaryState.CCI;
-
-      default:
-        return SecondaryState.NONE;
-    }
-  }
-
-  void toggleTrendLine() {
-    isTrendLine.value = !isTrendLine.value;
-  }
-
-  void toggleVolumeVisibility() {
-    isVolumeVisible.value = !isVolumeVisible.value;
-  }
-
-  void toggleChartMode() {
-    isLineMode.value = !isLineMode.value;
-  }
-
-  void setSecondaryState(SecondaryChartState state) {
-    secondaryState.value = state;
-  }
-
-  void toggleGridVisibility() {
-    isGridHidden.value = !isGridHidden.value;
-  }
-
-  void toggleNowPriceVisibility() {
-    isNowPriceShown.value = !isNowPriceShown.value;
-  }
-
   Future<void> fetch24hVolume() async {
     try {
       final List<CustomKLineEntity> candles =
-          await _marketService.fetchHistoricalData(pair, '1h', numCandles: 1);
+          await _marketService.fetchHistoricalData(pair, '1h', numCandles: 30);
 
       if (candles.isNotEmpty) {
         volume24hUSDT.value = candles.last.close * candles.last.vol;
