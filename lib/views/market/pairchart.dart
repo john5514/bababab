@@ -63,6 +63,15 @@ class ChartPage extends StatelessWidget {
   }
 
   Widget tryRenderChart() {
+    if (_chartController.isLoading.value) {
+      return Center(
+          child: CircularProgressIndicator()); // Display a loading spinner
+    } else if (_chartController.errorMsg.value.isNotEmpty) {
+      return Center(
+          child: Text(_chartController.errorMsg.value,
+              style: TextStyle(color: Colors.red)));
+    }
+
     try {
       List<KLineEntity> kChartData = _chartController.kLineData.map((e) {
         return KLineEntity.fromJson({

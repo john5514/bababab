@@ -137,83 +137,103 @@ class MarketService {
   Future<List<CustomKLineEntity>> fetchHistoricalData(
       String symbol, String interval,
       {int numCandles = 72}) async {
-    print("Starting fetchHistoricalData for $symbol...");
+    const int maxRetries = 3;
+    const int delayBetweenRetries = 5; // in seconds
 
-    await loadTokens();
-    print("Loaded tokens: $tokens");
+    for (int attempt = 0; attempt < maxRetries; attempt++) {
+      try {
+        print("Starting fetchHistoricalData for $symbol...");
 
-    final DateTime toDate = DateTime.now();
-    final int toTimestamp = toDate.millisecondsSinceEpoch.toInt();
-    print("To Timestamp: $toTimestamp");
+        await loadTokens();
+        print("Loaded tokens: $tokens");
 
-    // Calculate the 'since' value
-    final int since = numCandles * intervalToMilliseconds(interval);
+        final DateTime toDate = DateTime.now();
+        final int toTimestamp = toDate.millisecondsSinceEpoch.toInt();
+        print("To Timestamp: $toTimestamp");
 
-    int sinceTimestamp = toTimestamp - since;
+        // Calculate the 'since' value
+        final int since = numCandles * intervalToMilliseconds(interval);
+        int sinceTimestamp = toTimestamp - since;
 
-    final String requestUrl =
-        'https://v3.mash3div.com/api/exchange/chart/historical?symbol=$symbol&interval=$interval&from=$sinceTimestamp&to=$toTimestamp&duration=$since';
-    print("Making request to: $requestUrl");
-    // Add the tokens to the headers
-    final headers = {
-      'accept': 'application/json',
-      'access-token': tokens['access-token'] ?? "",
-      'refresh-token': tokens['refresh-token'] ?? "",
-      'csrf-token': tokens['csrf-token'] ?? "",
-      'session-id': tokens['session-id'] ?? "",
-    };
+        final String requestUrl =
+            'https://v3.mash3div.com/api/exchange/chart/historical?symbol=$symbol&interval=$interval&from=$sinceTimestamp&to=$toTimestamp&duration=$since';
+        print("Making request to: $requestUrl");
 
-    print("Headers being used: $headers");
+        // Add the tokens to the headers
+        final headers = {
+          'accept': 'application/json',
+          'access-token': tokens['access-token'] ?? "",
+          'refresh-token': tokens['refresh-token'] ?? "",
+          'csrf-token': tokens['csrf-token'] ?? "",
+          'session-id': tokens['session-id'] ?? "",
+        };
 
-    final response = await http.get(Uri.parse(requestUrl), headers: headers);
+        print("Headers being used: $headers");
 
-    print("Received response status: ${response.statusCode}");
-    print("Received response headers: ${response.headers}");
-    print("Received response body: ${response.body}");
+        final response =
+            await http.get(Uri.parse(requestUrl), headers: headers);
 
-    if (response.statusCode == 200) {
-      final body = json.decode(response.body);
+        print("Received response status: ${response.statusCode}");
+        print("Received response headers: ${response.headers}");
+        print("Received response body: ${response.body}");
 
-      if (body['status'] == "success") {
-        if (body['data']['result'] is List &&
-            (body['data']['result'] as List).isEmpty) {
-          final noDataMessage =
-              "No data available for $symbol during the specified time interval.";
-          print(noDataMessage);
-          throw Exception(noDataMessage);
-        }
+        if (response.statusCode == 200) {
+          final body = json.decode(response.body);
 
-        // Adjust this if the structure is different.
-        if (body['data']['result'] is List) {
-          final candles = (body['data']['result'] as List)
-              .map((e) => CustomKLineEntity(
-                    time: e[0].toInt(),
-                    open: e[1].toDouble(),
-                    high: e[2].toDouble(),
-                    low: e[3].toDouble(),
-                    close: e[4].toDouble(),
-                    vol: e[5].toDouble(),
-                  ))
-              .toList();
+          if (body['status'] == "success") {
+            if (body['data']['result'] is List &&
+                (body['data']['result'] as List).isEmpty) {
+              final noDataMessage =
+                  "No data available for $symbol during the specified time interval.";
+              print(noDataMessage);
+              throw Exception(noDataMessage);
+            }
 
-          print("Returning ${candles.length} candles.");
-          return candles;
+            // Adjust this if the structure is different.
+            if (body['data']['result'] is List) {
+              final candles = (body['data']['result'] as List)
+                  .map((e) => CustomKLineEntity(
+                        time: e[0].toInt(),
+                        open: e[1].toDouble(),
+                        high: e[2].toDouble(),
+                        low: e[3].toDouble(),
+                        close: e[4].toDouble(),
+                        vol: e[5].toDouble(),
+                      ))
+                  .toList();
+
+              print("Returning ${candles.length} candles.");
+              return candles;
+            } else {
+              final error = "Unexpected data format in result";
+              print(error);
+              throw Exception(error);
+            }
+          } else {
+            final errorMessage = body['error']?['message'] ?? 'Unknown error';
+            print("API Error: $errorMessage");
+            throw Exception('API returned an error: $errorMessage');
+          }
         } else {
-          final error = "Unexpected data format in result";
+          final error =
+              'Failed to load historical data with status code: ${response.statusCode}';
           print(error);
           throw Exception(error);
         }
-      } else {
-        final errorMessage = body['error']?['message'] ?? 'Unknown error';
-        print("API Error: $errorMessage");
-        throw Exception('API returned an error: $errorMessage');
+      } catch (e) {
+        // If we've used all our retries, throw the exception
+        if (attempt == maxRetries - 1) {
+          throw Exception('Failed to fetch data after $maxRetries attempts');
+        }
+
+        // Print the error and wait before the next attempt
+        print('Attempt $attempt failed with error: $e');
+        await Future.delayed(Duration(seconds: delayBetweenRetries));
       }
-    } else {
-      final error =
-          'Failed to load historical data with status code: ${response.statusCode}';
-      print(error);
-      throw Exception(error);
     }
+
+    // This line should never be reached because we either return candles or throw an exception
+    throw Exception('Failed to fetch data');
   }
 
   void subscribeToTradeData(String symbol, String type,

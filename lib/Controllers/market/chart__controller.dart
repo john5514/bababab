@@ -27,8 +27,17 @@ class ChartController extends GetxController {
   double _previous24hVolume = 0; // To store the previous 24-hour volume
 
   ChartController(this.pair);
-  int?
-      _lastHistoricalTimestamp; // To store the last timestamp of historical data
+  bool _isInitialLoad = true;
+
+  List<String> fallbackTimeFrames = [
+    '1h',
+    '15m',
+    '1d',
+    '4h'
+  ]; // Add or remove as per your requirements
+  int currentFallbackIndex = 0;
+  final RxBool isLoading = true.obs; // <-- Added to track loading status
+  final RxString errorMsg = ''.obs; // <-- Added to track error messages
 
   @override
   void onInit() {
@@ -63,8 +72,10 @@ class ChartController extends GetxController {
   }
 
   void updateChartData(String timeframe) {
-    print(
-        "++++++++++++++++++++++++++++++Called updateChartData with timeframe: $timeframe");
+    print("Called updateChartData with timeframe: $timeframe");
+
+    errorMsg.value = ''; // Reset the error message on user-initiated update
+    _isInitialLoad = false; // Set to false as this is a manual update by user
     currentTimeFrame.value = timeframe;
     _loadHistoricalData(timeframe);
 
@@ -75,8 +86,9 @@ class ChartController extends GetxController {
   }
 
   void _loadHistoricalData([String timeframe = '1h']) async {
-    print(
-        "+++++++++++++++++++++++++Called _loadHistoricalData with timeframe: $timeframe");
+    errorMsg.value = ''; // Reset the error message at the start
+    isLoading.value = true; // Start the loading indicator
+    print("Called _loadHistoricalData with timeframe: $timeframe");
 
     try {
       final historicalData = await _marketService
@@ -86,20 +98,33 @@ class ChartController extends GetxController {
       kLineData.addAll(historicalData);
 
       if (historicalData.isNotEmpty) {
-        _lastHistoricalTimestamp =
-            historicalData.last.time; // Store the last timestamp
-        print(
-            "Last historical candle: ${historicalData.last}"); // Add this line
-        _lastHistoricalTimestamp =
-            historicalData.last.time; // Store the last timestamp
+        print("Last historical candle: ${historicalData.last}");
 
         high24h.value =
             historicalData.map((e) => e.high).reduce((a, b) => a > b ? a : b);
         low24h.value =
             historicalData.map((e) => e.low).reduce((a, b) => a < b ? a : b);
       }
+
+      isLoading.value = false; // Stop the loading indicator
     } catch (e) {
       print("Error loading historical data: $e");
+
+      if (_isInitialLoad) {
+        currentFallbackIndex++;
+        if (currentFallbackIndex < fallbackTimeFrames.length) {
+          await Future.delayed(Duration(seconds: 2)); // Delay for 2 seconds
+          currentTimeFrame.value = fallbackTimeFrames[currentFallbackIndex];
+          _loadHistoricalData(currentTimeFrame.value);
+        } else {
+          print("All timeframes failed!");
+          errorMsg.value = "Failed to fetch data for all timeframes.";
+          isLoading.value = false; // Stop the loading indicator
+        }
+      } else {
+        errorMsg.value = "Failed to fetch data for selected timeframe.";
+        isLoading.value = false; // Stop the loading indicator
+      }
     }
   }
 
