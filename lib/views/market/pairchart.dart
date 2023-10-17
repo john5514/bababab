@@ -56,7 +56,7 @@ class ChartPage extends StatelessWidget {
             children: [
               ChartHeader(_chartController, pair),
               Container(
-                height: MediaQuery.of(context).size.height * 0.7,
+                height: MediaQuery.of(context).size.height * 0.6,
                 child: tryRenderChart(),
               ),
               buildControlButtons(),
@@ -100,8 +100,7 @@ class ChartPage extends StatelessWidget {
       DataUtil.calculate(kChartData);
 
       return KeyedSubtree(
-        key: _chartController.chartKey
-            .value, // we keep this from the original controller because it relates to the chart's data, not its appearance
+        key: _chartController.chartKey.value,
         child: KChartWidget(
           kChartData,
           _customizeChartController.chartStyle,

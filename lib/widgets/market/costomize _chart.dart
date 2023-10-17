@@ -12,64 +12,85 @@ class ChartCustomizationWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Column(
-        children: [
-          ElevatedButton(
+      padding: const EdgeInsets.symmetric(horizontal: 4.0),
+      child: Wrap(
+        spacing: 4.0, // space between buttons
+        runSpacing: 2.0, // space between lines
+
+        alignment: WrapAlignment.center,
+
+        children: <Widget>[
+          _buildButton(
             onPressed: () => _customizeController.toggleVolumeVisibility(),
-            child: Obx(() => Text(_customizeController.isVolumeVisible.value
-                ? "Hide Volume"
-                : "Show Volume")),
+            child: Obx(() => Text(
+                _customizeController.isVolumeVisible.value ? "H V" : "S V")),
           ),
-          ElevatedButton(
+          _buildButton(
             onPressed: () => _customizeController.toggleChartMode(),
-            child: Obx(() => Text(_customizeController.isLineMode.value
-                ? "Switch to K-Line Mode"
-                : "Switch to Time Mode")),
+            child: Obx(() =>
+                Text(_customizeController.isLineMode.value ? "K-L" : "T-M")),
           ),
-          ElevatedButton(
+          _buildButton(
             onPressed: () => _customizeController.toggleCustomUI(),
-            child: Obx(() => Text(_customizeController.isCustomUI.value
-                ? "Default UI"
-                : "Customize UI")),
+            child: Obx(() =>
+                Text(_customizeController.isCustomUI.value ? "D UI" : "C UI")),
           ),
-          Obx(() => DropdownButton<SecondaryState>(
-                value: _customizeController.secondaryState.value,
-                onChanged: (value) =>
-                    _customizeController.secondaryState.value = value!,
-                items: SecondaryState.values.map((state) {
-                  return DropdownMenuItem(
-                    value: state,
-                    child: Text(state.toString().split('.').last),
-                  );
-                }).toList(),
-              )),
-          ElevatedButton(
+          _buildButton(
             onPressed: () => _customizeController.toggleGridVisibility(),
-            child: Obx(() => Text(_customizeController.isGridHidden.value
-                ? "Show Grid"
-                : "Hide Grid")),
+            child: Obx(() =>
+                Text(_customizeController.isGridHidden.value ? "S G" : "H G")),
           ),
-          ElevatedButton(
+          _buildButton(
             onPressed: () => _customizeController.toggleNowPriceVisibility(),
-            child: Obx(() => Text(_customizeController.isNowPriceShown.value
-                ? "Hide Now Price"
-                : "Show Now Price")),
+            child: Obx(() => Text(
+                _customizeController.isNowPriceShown.value ? "H NP" : "S NP")),
           ),
-          ElevatedButton(
+          _buildButton(
             onPressed: () => _customizeController.setMainState(MainState.MA),
-            child: Text("Line:MA"),
+            child: Text("MA"),
           ),
-          ElevatedButton(
+          _buildButton(
             onPressed: () => _customizeController.setMainState(MainState.BOLL),
-            child: Text("Line:BOLL"),
+            child: Text("BOLL"),
           ),
-          ElevatedButton(
+          _buildButton(
             onPressed: () => _customizeController.setMainState(MainState.NONE),
-            child: Text("Hide Line"),
+            child: Text("H L"),
           ),
+          _buildDropDown(),
         ],
       ),
     );
+  }
+
+  Widget _buildButton({required Widget child, VoidCallback? onPressed}) {
+    return ElevatedButton(
+      onPressed: onPressed,
+      style: ElevatedButton.styleFrom(
+        primary: Colors.grey[850], // button color
+        onPrimary: Colors.white, // button text color
+        padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        textStyle: TextStyle(fontSize: 12), // font size
+      ),
+      child: child,
+    );
+  }
+
+  Widget _buildDropDown() {
+    return Obx(() => DropdownButton<SecondaryState>(
+          value: _customizeController.secondaryState.value,
+          onChanged: (value) =>
+              _customizeController.secondaryState.value = value!,
+          items: SecondaryState.values.map((state) {
+            return DropdownMenuItem(
+              value: state,
+              child: Text(
+                state.toString().split('.').last,
+                style: TextStyle(color: Colors.white),
+              ),
+            );
+          }).toList(),
+          dropdownColor: Colors.grey[850],
+        ));
   }
 }

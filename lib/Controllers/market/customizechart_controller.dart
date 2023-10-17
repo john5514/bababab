@@ -13,7 +13,7 @@ class CustomizeChartController extends GetxController {
   final chartStyle = ChartStyle();
   var mainState = MainState.MA.obs;
   final isCustomUI = false.obs;
-  final isDragging = true.obs;
+  final isDragging = false.obs;
 
   void handleDrag(bool dragState) {
     isDragging.value = dragState;
@@ -34,10 +34,10 @@ class CustomizeChartController extends GetxController {
       chartColors.lineFillColor = Colors.red;
       chartColors.kLineColor = Colors.yellow;
     } else {
-      chartColors.selectBorderColor = const Color(0xff6C7A86);
-      chartColors.selectFillColor = const Color(0xff0D1722);
-      chartColors.lineFillColor = const Color(0x554C86CD);
-      chartColors.kLineColor = const Color(0xff4C86CD);
+      chartColors.selectBorderColor = Color(0xff6C7A86);
+      chartColors.selectFillColor = Color(0xff0D1722);
+      chartColors.lineFillColor = Color(0x554C86CD);
+      chartColors.kLineColor = Color(0xff4C86CD);
     }
     update(); // Notify listeners to rebuild
   }
