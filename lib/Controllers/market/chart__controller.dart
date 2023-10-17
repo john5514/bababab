@@ -86,6 +86,34 @@ class ChartController extends GetxController {
   }
 
   void _loadHistoricalData([String timeframe = '1h']) async {
+    // If timeframe is 1s, clear the kLineData, add an initial entry, and refresh the chart.
+    if (timeframe == '1s') {
+      print(
+          "Timeframe is 1s. Clearing kLineData, adding initial entry, and refreshing chart.");
+
+      // Clear the kLineData
+      kLineData.clear();
+
+      // Add an initial entry if currentMarket has data
+      if (currentMarket.value != null) {
+        CustomKLineEntity initialEntity = CustomKLineEntity(
+          time: DateTime.now().toUtc().millisecondsSinceEpoch,
+          open: currentMarket.value!.price,
+          high: currentMarket.value!.price,
+          low: currentMarket.value!.price,
+          close: currentMarket.value!.price,
+          vol: 0, // You can adjust this as necessary
+        );
+        kLineData.add(initialEntity);
+      }
+
+      // Refresh the chart
+      refreshChart();
+
+      isLoading.value = false; // Stop the loading indicator
+      return;
+    }
+
     errorMsg.value = ''; // Reset the error message at the start
     isLoading.value = true; // Start the loading indicator
     print("Called _loadHistoricalData with timeframe: $timeframe");
