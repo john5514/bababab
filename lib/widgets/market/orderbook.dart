@@ -1,55 +1,65 @@
 import 'package:bicrypto/Controllers/market/orederbook_controller.dart';
+import 'package:bicrypto/services/orderbook_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class OrderBookView extends StatelessWidget {
-  final OrderBookController _controller = Get.put(OrderBookController());
+class Order {
+  final double price;
+  final double quantity;
+
+  Order(this.price, this.quantity);
+}
+
+class OrderBookWidget extends StatelessWidget {
+  final String pair;
+  final OrderBookController _orderBookController;
+
+  OrderBookWidget({super.key, required this.pair})
+      : _orderBookController = Get.put(OrderBookController(pair));
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text('Order Book')),
-      body: Row(
-        children: [
-          // Bids (Buy orders)
-          Expanded(
-            child: Container(
-              color: Colors.green[100], // Light green background for bids
-              child: Obx(
-                () => ListView.builder(
-                  itemCount: _controller.bids.length,
-                  itemBuilder: (context, index) {
-                    final bid = _controller.bids[index];
-                    return ListTile(
-                      title: Text('${bid[0]}'), // Price
-                      trailing: Text('${bid[1]}'), // Quantity
-                    );
-                  },
-                ),
-              ),
-            ),
-          ),
+    return Column(
+      children: [
+        const SizedBox(height: 20),
+        const Text("Order Book", style: TextStyle(color: Colors.white)),
+        const SizedBox(height: 10),
+        Row(
+          children: [
+            Expanded(child: buildOrderBookSide("Bids", Colors.green, true)),
+            Expanded(child: buildOrderBookSide("Asks", Colors.red, false)),
+          ],
+        ),
+      ],
+    );
+  }
 
-          // Asks (Sell orders)
-          Expanded(
-            child: Container(
-              color: Colors.red[100], // Light red background for asks
-              child: Obx(
-                () => ListView.builder(
-                  itemCount: _controller.asks.length,
-                  itemBuilder: (context, index) {
-                    final ask = _controller.asks[index];
-                    return ListTile(
-                      title: Text('${ask[0]}'), // Price
-                      trailing: Text('${ask[1]}'), // Quantity
-                    );
-                  },
-                ),
-              ),
+  Widget buildOrderBookSide(String title, Color color, bool isBids) {
+    final OrderBook? orderBook = _orderBookController.currentOrderBook.value;
+    final List<Order> orders = (isBids ? orderBook?.bids : orderBook?.asks)
+            ?.map((e) => Order(e[0], e[1]))
+            .toList() ??
+        [];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(title, style: TextStyle(color: color)),
+        const SizedBox(height: 10),
+        ...orders.map((order) {
+          return Padding(
+            padding: const EdgeInsets.symmetric(vertical: 5),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(order.price.toString(), style: TextStyle(color: color)),
+                Text(order.quantity.toString(),
+                    style: const TextStyle(color: Colors.white)),
+              ],
             ),
-          ),
-        ],
-      ),
+          );
+        }).toList(),
+      ],
     );
   }
 }

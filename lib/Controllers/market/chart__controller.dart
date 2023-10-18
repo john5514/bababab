@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:math';
 import 'package:bicrypto/services/market_service.dart';
-import 'package:bicrypto/services/orderbook_service.dart';
 import 'package:get/get.dart';
 import 'package:k_chart/flutter_k_chart.dart';
 import 'package:flutter/material.dart'; // <-- Added this line for UniqueKey
@@ -39,9 +38,7 @@ class ChartController extends GetxController {
   int currentFallbackIndex = 0;
   final RxBool isLoading = true.obs; // <-- Added to track loading status
   final RxString errorMsg = ''.obs; // <-- Added to track error messages
-  final OrderBookService _orderBookService = OrderBookService();
-  StreamSubscription? _orderBookSubscription;
-  final Rx<OrderBook?> currentOrderBook = Rx<OrderBook?>(null);
+
   @override
   void onInit() {
     super.onInit();
@@ -49,26 +46,6 @@ class ChartController extends GetxController {
     fetch24hVolume();
     _initializeWebSocket();
     _startTimer(_getUpdateInterval(currentTimeFrame.value));
-    _initializeOrderBookWebSocket();
-  }
-
-  void _initializeOrderBookWebSocket() {
-    _orderBookService.connect();
-    _orderBookSubscription =
-        _orderBookService.orderBookUpdates.listen(_processOrderBookUpdate);
-
-    // Add a delay before subscribing
-    Future.delayed(Duration(seconds: 1), () {
-      // Subscribe to the order book updates for the current pair
-      _orderBookService.subscribeToOrderBook(pair);
-    });
-  }
-
-  void _processOrderBookUpdate(OrderBook updatedOrderBook) {
-    currentOrderBook.value = updatedOrderBook;
-    print(
-        "Received OrderBook Update: Bids: ${updatedOrderBook.bids.length}, Asks: ${updatedOrderBook.asks.length}");
-    update();
   }
 
   @override
@@ -77,8 +54,6 @@ class ChartController extends GetxController {
     _marketService.dispose();
     _timer?.cancel();
     super.onClose();
-    _orderBookSubscription?.cancel();
-    _orderBookService.dispose();
   }
 
   Future<void> fetch24hVolume() async {

@@ -1,40 +1,43 @@
+import 'dart:async';
 import 'package:bicrypto/services/orderbook_service.dart';
 import 'package:get/get.dart';
 
 class OrderBookController extends GetxController {
   final OrderBookService _orderBookService = OrderBookService();
+  final Rx<OrderBook?> currentOrderBook = Rx<OrderBook?>(null);
+  StreamSubscription? _orderBookSubscription;
+  final String pair;
 
-  // Reactive variables
-  final RxList<List<double>> bids = <List<double>>[].obs;
-  final RxList<List<double>> asks = <List<double>>[].obs;
+  OrderBookController(this.pair);
 
   @override
   void onInit() {
     super.onInit();
+    _initializeOrderBookWebSocket();
+  }
 
-    // Connect to the WebSocket
+  void _initializeOrderBookWebSocket() {
     _orderBookService.connect();
+    _orderBookSubscription =
+        _orderBookService.orderBookUpdates.listen(_processOrderBookUpdate);
 
-    // Listen to order book updates
-    _orderBookService.orderBookUpdates.listen((orderBook) {
-      bids.value = orderBook.bids;
-      asks.value = orderBook.asks;
+    // Add a delay before subscribing
+    Future.delayed(Duration(seconds: 1), () {
+      // Subscribe to the order book updates for the current pair
+      _orderBookService.subscribeToOrderBook(pair);
     });
   }
 
-  // Subscribe to order book updates for a symbol
-  void subscribeToOrderBook(String symbol, {int limit = 20}) {
-    _orderBookService.subscribeToOrderBook(symbol, limit: limit);
-  }
-
-  // Unsubscribe from order book updates for a symbol
-  void unsubscribeFromOrderBook(String symbol) {
-    _orderBookService.unsubscribeFromOrderBook(symbol);
+  void _processOrderBookUpdate(OrderBook updatedOrderBook) {
+    currentOrderBook.value = updatedOrderBook;
+    print(
+        "Received OrderBook Update: Bids: ${updatedOrderBook.bids.length}, Asks: ${updatedOrderBook.asks.length}");
+    update();
   }
 
   @override
   void onClose() {
-    // Dispose the order book service when the controller is closed
+    _orderBookSubscription?.cancel();
     _orderBookService.dispose();
     super.onClose();
   }

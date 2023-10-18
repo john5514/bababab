@@ -1,18 +1,11 @@
 import 'package:bicrypto/Controllers/market/customizechart_controller.dart';
-import 'package:bicrypto/services/orderbook_service.dart';
 import 'package:bicrypto/widgets/market/chart_header.dart';
 import 'package:bicrypto/widgets/market/costomize%20_chart.dart';
+import 'package:bicrypto/widgets/market/orderbook.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:k_chart/flutter_k_chart.dart';
 import 'package:bicrypto/Controllers/market/chart__controller.dart';
-
-class Order {
-  final double price;
-  final double quantity;
-
-  Order(this.price, this.quantity);
-}
 
 class ChartPage extends StatelessWidget {
   final String pair;
@@ -68,7 +61,8 @@ class ChartPage extends StatelessWidget {
                 child: tryRenderChart(),
               ),
               buildControlButtons(),
-              buildOrderBookSection(),
+              buildControlButtons(),
+              OrderBookWidget(pair: pair),
             ],
           );
         },
@@ -79,51 +73,6 @@ class ChartPage extends StatelessWidget {
   // New control buttons widget
   Widget buildControlButtons() {
     return ChartCustomizationWidget();
-  }
-
-  Widget buildOrderBookSection() {
-    return Column(
-      children: [
-        SizedBox(height: 20),
-        Text("Order Book", style: TextStyle(color: Colors.white)),
-        SizedBox(height: 10),
-        Row(
-          children: [
-            Expanded(child: buildOrderBookSide("Bids", Colors.green, true)),
-            Expanded(child: buildOrderBookSide("Asks", Colors.red, false)),
-          ],
-        ),
-      ],
-    );
-  }
-
-  Widget buildOrderBookSide(String title, Color color, bool isBids) {
-    final OrderBook? orderBook = _chartController.currentOrderBook.value;
-    final List<Order> orders = (isBids ? orderBook?.bids : orderBook?.asks)
-            ?.map((e) => Order(e[0], e[1]))
-            .toList() ??
-        [];
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(title, style: TextStyle(color: color)),
-        SizedBox(height: 10),
-        ...orders.map((order) {
-          return Padding(
-            padding: const EdgeInsets.symmetric(vertical: 5),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(order.price.toString(), style: TextStyle(color: color)),
-                Text(order.quantity.toString(),
-                    style: TextStyle(color: Colors.white)),
-              ],
-            ),
-          );
-        }).toList(),
-      ],
-    );
   }
 
   Widget tryRenderChart() {
