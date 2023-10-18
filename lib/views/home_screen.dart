@@ -3,6 +3,7 @@ import 'package:bicrypto/Controllers/home_controller.dart'; // <-- Import HomeCo
 import 'package:bicrypto/Controllers/market/market_controller.dart';
 import 'package:bicrypto/views/market/markethome.dart';
 import 'package:bicrypto/views/wallet_view.dart'; // <-- Import WalletView
+import 'package:bicrypto/widgets/market/orderbook.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -16,7 +17,7 @@ class HomeView extends StatelessWidget {
   final List<Widget> _children = [
     const Center(child: Text('Home')),
     MarketScreen(),
-    const Center(child: Text('Trade')),
+    OrderBookView(),
     const Center(child: Text('Futures')),
     WalletView(),
   ];
