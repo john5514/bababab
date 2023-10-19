@@ -11,86 +11,103 @@ class ChartCustomizationWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    double width = MediaQuery.of(context).size.width;
+    int numberOfButtons = 9;
+    double buttonWidth = width / numberOfButtons - 2;
+
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 4.0),
-      child: Wrap(
-        spacing: 4.0, // space between buttons
-        runSpacing: 2.0, // space between lines
-
-        alignment: WrapAlignment.center,
-
+      padding: const EdgeInsets.symmetric(horizontal: 2.0),
+      child: Row(
         children: <Widget>[
           _buildButton(
             onPressed: () => _customizeController.toggleVolumeVisibility(),
             child: Obx(() => Text(
                 _customizeController.isVolumeVisible.value ? "H V" : "S V")),
+            width: buttonWidth,
           ),
           _buildButton(
             onPressed: () => _customizeController.toggleChartMode(),
             child: Obx(() =>
                 Text(_customizeController.isLineMode.value ? "K-L" : "T-M")),
+            width: buttonWidth,
           ),
           _buildButton(
             onPressed: () => _customizeController.toggleCustomUI(),
             child: Obx(() =>
                 Text(_customizeController.isCustomUI.value ? "D UI" : "C UI")),
+            width: buttonWidth,
           ),
           _buildButton(
             onPressed: () => _customizeController.toggleGridVisibility(),
             child: Obx(() =>
                 Text(_customizeController.isGridHidden.value ? "S G" : "H G")),
+            width: buttonWidth,
           ),
           _buildButton(
             onPressed: () => _customizeController.toggleNowPriceVisibility(),
             child: Obx(() => Text(
                 _customizeController.isNowPriceShown.value ? "H NP" : "S NP")),
+            width: buttonWidth,
           ),
           _buildButton(
             onPressed: () => _customizeController.setMainState(MainState.MA),
             child: Text("MA"),
+            width: buttonWidth,
           ),
           _buildButton(
             onPressed: () => _customizeController.setMainState(MainState.BOLL),
             child: Text("BOLL"),
+            width: buttonWidth,
           ),
           _buildButton(
             onPressed: () => _customizeController.setMainState(MainState.NONE),
             child: Text("H L"),
+            width: buttonWidth,
           ),
-          _buildDropDown(),
+          _buildChartIconDropdown(buttonWidth),
         ],
       ),
     );
   }
 
-  Widget _buildButton({required Widget child, VoidCallback? onPressed}) {
-    return ElevatedButton(
-      onPressed: onPressed,
-      style: ElevatedButton.styleFrom(
-        primary: Colors.grey[850], // button color
-        onPrimary: Colors.white, // button text color
-        padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        textStyle: TextStyle(fontSize: 12), // font size
+  Widget _buildButton(
+      {required Widget child, VoidCallback? onPressed, required double width}) {
+    return SizedBox(
+      width: width,
+      child: TextButton(
+        onPressed: onPressed,
+        style: TextButton.styleFrom(
+          primary: Colors.grey,
+          padding: EdgeInsets.symmetric(horizontal: 6, vertical: 6),
+          textStyle: TextStyle(fontSize: 12),
+        ),
+        child: child,
       ),
-      child: child,
     );
   }
 
-  Widget _buildDropDown() {
-    return Obx(() => DropdownButton<SecondaryState>(
-          value: _customizeController.secondaryState.value,
-          onChanged: (value) =>
-              _customizeController.secondaryState.value = value!,
-          items: SecondaryState.values.map((state) {
-            return DropdownMenuItem(
-              value: state,
-              child: Text(
-                state.toString().split('.').last,
-                style: TextStyle(color: Colors.white),
-              ),
-            );
-          }).toList(),
-          dropdownColor: Colors.grey[850],
-        ));
+  Widget _buildChartIconDropdown(double width) {
+    return SizedBox(
+      width: width,
+      child: PopupMenuButton<SecondaryState>(
+        child: IconButton(
+          icon: Icon(Icons.show_chart, color: Colors.grey), // Chart Icon
+          onPressed: null,
+          padding: EdgeInsets.symmetric(horizontal: 6, vertical: 6),
+        ),
+        onSelected: (value) =>
+            _customizeController.secondaryState.value = value,
+        itemBuilder: (context) => SecondaryState.values.map((state) {
+          return PopupMenuItem(
+            value: state,
+            child: Text(
+              state.toString().split('.').last,
+              style: TextStyle(color: Colors.white),
+            ),
+          );
+        }).toList(),
+        color: Colors.grey[850],
+      ),
+    );
   }
 }
