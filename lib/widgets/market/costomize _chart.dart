@@ -51,23 +51,24 @@ class ChartCustomizationWidget extends StatelessWidget {
           ),
           _buildButton(
             onPressed: () => _customizeController.setMainState(MainState.MA),
-            child: Text("MA"),
+            child: const Text("MA"),
             width: buttonWidth,
           ),
           _buildButton(
             onPressed: () => _customizeController.setMainState(MainState.BOLL),
-            child: Text("BOLL"),
+            child: const Text("BOLL"),
             width: buttonWidth,
           ),
           _buildButton(
             onPressed: () => _customizeController.setMainState(MainState.NONE),
-            child: Text("H L"),
+            child: const Text("H L"),
             width: buttonWidth,
           ),
           _buildChartIconDropdown(buttonWidth),
         ],
       ),
     );
+    //
   }
 
   Widget _buildButton(
@@ -77,9 +78,9 @@ class ChartCustomizationWidget extends StatelessWidget {
       child: TextButton(
         onPressed: onPressed,
         style: TextButton.styleFrom(
-          primary: Colors.grey,
-          padding: EdgeInsets.symmetric(horizontal: 6, vertical: 6),
-          textStyle: TextStyle(fontSize: 12),
+          foregroundColor: Colors.grey,
+          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+          textStyle: const TextStyle(fontSize: 12),
         ),
         child: child,
       ),
@@ -90,11 +91,6 @@ class ChartCustomizationWidget extends StatelessWidget {
     return SizedBox(
       width: width,
       child: PopupMenuButton<SecondaryState>(
-        child: IconButton(
-          icon: Icon(Icons.show_chart, color: Colors.grey), // Chart Icon
-          onPressed: null,
-          padding: EdgeInsets.symmetric(horizontal: 6, vertical: 6),
-        ),
         onSelected: (value) =>
             _customizeController.secondaryState.value = value,
         itemBuilder: (context) => SecondaryState.values.map((state) {
@@ -102,11 +98,16 @@ class ChartCustomizationWidget extends StatelessWidget {
             value: state,
             child: Text(
               state.toString().split('.').last,
-              style: TextStyle(color: Colors.white),
+              style: const TextStyle(color: Colors.white),
             ),
           );
         }).toList(),
         color: Colors.grey[850],
+        child: const IconButton(
+          icon: Icon(Icons.show_chart, color: Colors.grey), // Chart Icon
+          onPressed: null,
+          padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+        ),
       ),
     );
   }

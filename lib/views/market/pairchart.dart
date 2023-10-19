@@ -60,7 +60,15 @@ class ChartPage extends StatelessWidget {
                 height: MediaQuery.of(context).size.height * 0.6,
                 child: tryRenderChart(),
               ),
-              buildControlButtons(),
+              const Divider(color: Colors.grey),
+
+              Container(
+                height: 25,
+                child: buildControlButtons(),
+              ),
+              //gray devider
+              const Divider(color: Colors.grey),
+
               OrderBookWidget(pair: pair),
             ],
           );
