@@ -37,6 +37,7 @@ class ChartPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: appTheme.scaffoldBackgroundColor,
       appBar: AppBar(
+        elevation: 0,
         backgroundColor: appTheme.scaffoldBackgroundColor,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
@@ -58,7 +59,7 @@ class ChartPage extends StatelessWidget {
             children: [
               ChartHeader(_chartController, pair),
               Container(
-                height: MediaQuery.of(context).size.height * 0.6,
+                height: MediaQuery.of(context).size.height * 0.45,
                 child: tryRenderChart(),
               ),
               const Divider(color: Colors.grey),
@@ -74,6 +75,44 @@ class ChartPage extends StatelessWidget {
             ],
           );
         },
+      ),
+      bottomNavigationBar: buildBottomBar(), // Add this line
+    );
+  }
+
+  Widget buildBottomBar() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+      decoration: BoxDecoration(
+        color: appTheme.scaffoldBackgroundColor,
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          ElevatedButton(
+            onPressed: () {
+              // Handle Buy logic here
+            },
+            child: Text("Buy"),
+            style: ElevatedButton.styleFrom(
+              padding: const EdgeInsets.symmetric(horizontal: 32.0),
+              foregroundColor: Colors.white,
+              backgroundColor: Colors.green,
+            ),
+          ),
+          SizedBox(width: 16.0), // Added padding between the buttons
+          ElevatedButton(
+            onPressed: () {
+              // Handle Sell logic here
+            },
+            child: Text("Sell"),
+            style: ElevatedButton.styleFrom(
+              padding: const EdgeInsets.symmetric(horizontal: 32.0),
+              foregroundColor: Colors.white,
+              backgroundColor: Colors.red,
+            ),
+          ),
+        ],
       ),
     );
   }

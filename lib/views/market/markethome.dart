@@ -30,7 +30,7 @@ class MarketScreen extends StatelessWidget {
                     ),
                   ),
                 ),
-                SizedBox(width: 20),
+                const SizedBox(width: 20),
                 GestureDetector(
                   onTap: () {
                     _marketController.showGainers.value = false;
@@ -48,6 +48,7 @@ class MarketScreen extends StatelessWidget {
               ],
             )),
         backgroundColor: appTheme.scaffoldBackgroundColor,
+        elevation: 0,
       ),
       body: Obx(() {
         List<Market> sortedMarkets = List.from(_marketController.markets.value);
@@ -59,7 +60,7 @@ class MarketScreen extends StatelessWidget {
               .compareTo(b.change)); // For losers: Lowest change at the top
         }
         return _marketController.isLoading.value
-            ? Center(child: CircularProgressIndicator())
+            ? const Center(child: CircularProgressIndicator())
             : _buildMarketListView(sortedMarkets);
       }),
     );
@@ -161,7 +162,7 @@ class MarketScreen extends StatelessWidget {
                     // 24h Change
                     Chip(
                         label: Text('${market.change.toStringAsFixed(2)}%',
-                            style: TextStyle(color: Colors.white)),
+                            style: const TextStyle(color: Colors.white)),
                         backgroundColor: market.change > 0
                             ? Colors.green
                             : market.change < 0

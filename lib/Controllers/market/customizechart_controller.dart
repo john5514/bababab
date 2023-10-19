@@ -4,7 +4,7 @@ import 'package:k_chart/flutter_k_chart.dart';
 
 class CustomizeChartController extends GetxController {
   final RxBool isVolumeVisible = true.obs;
-  final RxBool isLineMode = true.obs;
+  final RxBool isLineMode = false.obs;
   var secondaryState = SecondaryState.MACD.obs;
   final RxBool isGridHidden = false.obs;
   final RxBool isNowPriceShown = true.obs;

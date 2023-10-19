@@ -1,6 +1,5 @@
 import 'package:bicrypto/Controllers/Auth/login_controller.dart';
 import 'package:bicrypto/Controllers/home_controller.dart'; // <-- Import HomeController
-import 'package:bicrypto/Controllers/market/market_controller.dart';
 import 'package:bicrypto/views/market/markethome.dart';
 import 'package:bicrypto/views/wallet_view.dart'; // <-- Import WalletView
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';

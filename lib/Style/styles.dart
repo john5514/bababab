@@ -34,14 +34,13 @@ final ThemeData appTheme = ThemeData(
       elevation: 6.0,
       disabledForegroundColor: Colors.grey,
       disabledBackgroundColor: Colors.grey,
-      shadowColor: Colors.red,
       enabledMouseCursor: SystemMouseCursors.click,
       disabledMouseCursor: SystemMouseCursors.forbidden,
-      padding: EdgeInsets.symmetric(
+      padding: const EdgeInsets.symmetric(
           vertical: 12.0, horizontal: 20.0), // Added padding
     ),
   ),
-  scaffoldBackgroundColor: Color(0xFF22262F),
+  scaffoldBackgroundColor: const Color(0xFF22262F),
   floatingActionButtonTheme: const FloatingActionButtonThemeData(
     backgroundColor: Colors.orange,
   ),
