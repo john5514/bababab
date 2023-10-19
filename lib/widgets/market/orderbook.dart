@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'package:bicrypto/Controllers/market/orederbook_controller.dart';
 import 'package:bicrypto/services/orderbook_service.dart';
 import 'package:flutter/material.dart';
@@ -6,7 +7,6 @@ import 'package:get/get.dart';
 class Order {
   final double price;
   final double quantity;
-
   Order(this.price, this.quantity);
 }
 
@@ -14,8 +14,9 @@ class OrderBookWidget extends StatelessWidget {
   final String pair;
   final OrderBookController _orderBookController;
 
-  OrderBookWidget({super.key, required this.pair})
-      : _orderBookController = Get.put(OrderBookController(pair));
+  OrderBookWidget({Key? key, required this.pair})
+      : _orderBookController = Get.put(OrderBookController(pair)),
+        super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -26,40 +27,67 @@ class OrderBookWidget extends StatelessWidget {
         const SizedBox(height: 10),
         Row(
           children: [
-            Expanded(child: buildOrderBookSide("Bids", Colors.green, true)),
-            Expanded(child: buildOrderBookSide("Asks", Colors.red, false)),
+            Expanded(child: buildOrderBookSide(Colors.green, true)),
+            Expanded(child: buildOrderBookSide(Colors.red, false)),
           ],
         ),
       ],
     );
   }
 
-  Widget buildOrderBookSide(String title, Color color, bool isBids) {
+  Widget buildOrderBookSide(Color color, bool isBids) {
     final OrderBook? orderBook = _orderBookController.currentOrderBook.value;
-    final List<Order> orders = (isBids ? orderBook?.bids : orderBook?.asks)
+    List<Order> orders = (isBids ? orderBook?.bids : orderBook?.asks)
             ?.map((e) => Order(e[0], e[1]))
             .toList() ??
         [];
 
+    if (isBids) {
+      orders = orders.reversed.toList();
+    }
+
+    final double maxPrice =
+        orders.isEmpty ? 1 : orders.map((o) => o.price).reduce(max);
+    final double minPrice =
+        orders.isEmpty ? 1 : orders.map((o) => o.price).reduce(min);
+
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(title, style: TextStyle(color: color)),
-        const SizedBox(height: 10),
-        ...orders.map((order) {
-          return Padding(
-            padding: const EdgeInsets.symmetric(vertical: 5),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(order.price.toString(), style: TextStyle(color: color)),
-                Text(order.quantity.toString(),
-                    style: const TextStyle(color: Colors.white)),
-              ],
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: orders.map((order) {
+        double widthFactor = (order.price - minPrice) / (maxPrice - minPrice);
+
+        return Stack(
+          alignment: isBids ? Alignment.centerRight : Alignment.centerLeft,
+          children: [
+            FractionallySizedBox(
+              alignment: isBids ? Alignment.centerRight : Alignment.centerLeft,
+              widthFactor: widthFactor,
+              child: Opacity(
+                opacity: 0.2, // Adjust the opacity as per your requirements
+                child: Container(color: color, height: 20),
+              ),
             ),
-          );
-        }).toList(),
-      ],
+            Positioned(
+              child: Text(
+                order.price.toStringAsFixed(2),
+                style: TextStyle(
+                  color: isBids ? Colors.green : Colors.red,
+                ),
+              ),
+              left: isBids ? null : 8,
+              right: isBids ? 8 : null,
+            ),
+            Positioned(
+              child: Text(
+                order.quantity.toStringAsFixed(2),
+                style: TextStyle(color: Colors.white, fontSize: 10),
+              ),
+              left: isBids ? 8 : null,
+              right: isBids ? null : 8,
+            )
+          ],
+        );
+      }).toList(),
     );
   }
 }
