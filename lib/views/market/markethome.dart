@@ -76,15 +76,9 @@ class MarketScreen extends StatelessWidget {
           child: const Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('Name / Vol',
-                  style: TextStyle(
-                      color: Colors.white, fontWeight: FontWeight.bold)),
-              Text('Last Price',
-                  style: TextStyle(
-                      color: Colors.white, fontWeight: FontWeight.bold)),
-              Text('24h Change',
-                  style: TextStyle(
-                      color: Colors.white, fontWeight: FontWeight.bold)),
+              Text('Name / Vol', style: TextStyle(color: Colors.grey)),
+              Text('Last Price', style: TextStyle(color: Colors.grey)),
+              Text('24h Change', style: TextStyle(color: Colors.grey)),
             ],
           ),
         ),
