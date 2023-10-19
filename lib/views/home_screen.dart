@@ -57,7 +57,7 @@ class HomeView extends StatelessWidget {
             homeController.changeTabIndex(index);
           },
 
-          color: appTheme.hintColor,
+          color: Color.fromARGB(255, 52, 59, 75),
           buttonBackgroundColor: appTheme.hintColor,
           letIndexChange: (index) => true,
         ),

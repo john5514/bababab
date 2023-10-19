@@ -36,6 +36,8 @@ class ChartHeader extends StatelessWidget {
                         "${_chartController.currentMarket.value?.price ?? 0.0}",
                         style: TextStyle(
                           fontSize: 32,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'Inter',
                           color:
                               (_chartController.lastMarket.value?.price ?? 0) <
                                       (_chartController

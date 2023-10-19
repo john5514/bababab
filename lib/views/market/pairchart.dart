@@ -1,4 +1,5 @@
 import 'package:bicrypto/Controllers/market/customizechart_controller.dart';
+import 'package:bicrypto/Style/styles.dart';
 import 'package:bicrypto/widgets/market/chart_header.dart';
 import 'package:bicrypto/widgets/market/costomize%20_chart.dart';
 import 'package:bicrypto/widgets/market/orderbook.dart';
@@ -34,9 +35,9 @@ class ChartPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: appTheme.scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: Colors.black,
+        backgroundColor: appTheme.scaffoldBackgroundColor,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {

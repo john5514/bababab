@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 
 final ThemeData appTheme = ThemeData(
-  // <-- Add this line for active icon color
+  fontFamily: 'Inter',
   primaryColor: Colors.black,
   secondaryHeaderColor: Colors.white,
   hintColor: Colors.orange,
-
   textSelectionTheme: const TextSelectionThemeData(
     cursorColor: Colors.white,
   ),
@@ -20,7 +19,6 @@ final ThemeData appTheme = ThemeData(
           color: Colors.white,
         ),
       ),
-
   inputDecorationTheme: const InputDecorationTheme(
     labelStyle: TextStyle(color: Colors.white),
     focusedBorder: OutlineInputBorder(
@@ -43,7 +41,7 @@ final ThemeData appTheme = ThemeData(
           vertical: 12.0, horizontal: 20.0), // Added padding
     ),
   ),
-  scaffoldBackgroundColor: Colors.black,
+  scaffoldBackgroundColor: Color(0xFF22262F),
   floatingActionButtonTheme: const FloatingActionButtonThemeData(
     backgroundColor: Colors.orange,
   ),
