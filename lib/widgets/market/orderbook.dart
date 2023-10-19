@@ -25,11 +25,17 @@ class OrderBookWidget extends StatelessWidget {
         const SizedBox(height: 20),
         const Text("Order Book", style: TextStyle(color: Colors.white)),
         const SizedBox(height: 10),
-        Row(
-          children: [
-            Expanded(child: buildOrderBookSide(Colors.green, true)),
-            Expanded(child: buildOrderBookSide(Colors.red, false)),
-          ],
+        Obx(
+          () => _orderBookController.currentOrderBook.value == null
+              ? const Center(
+                  child:
+                      CircularProgressIndicator()) // Show loading indicator when data is null
+              : Row(
+                  children: [
+                    Expanded(child: buildOrderBookSide(Colors.green, true)),
+                    Expanded(child: buildOrderBookSide(Colors.red, false)),
+                  ],
+                ),
         ),
       ],
     );
@@ -52,7 +58,7 @@ class OrderBookWidget extends StatelessWidget {
         orders.isEmpty ? 1 : orders.map((o) => o.price).reduce(min);
 
     const double orderHeight = 20.0; // The height of each order
-    final double containerHeight =
+    const double containerHeight =
         20 * orderHeight; // Assuming maximum of 20 orders
 
     return Container(
@@ -80,7 +86,7 @@ class OrderBookWidget extends StatelessWidget {
                 right: isBids ? null : 8,
                 child: Text(
                   order.quantity.toStringAsFixed(2),
-                  style: TextStyle(color: Colors.white, fontSize: 10),
+                  style: const TextStyle(color: Colors.white, fontSize: 10),
                 ),
               ),
               Positioned(
