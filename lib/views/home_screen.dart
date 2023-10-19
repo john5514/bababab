@@ -26,6 +26,7 @@ class HomeView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: appTheme.scaffoldBackgroundColor,
       body: Obx(
         () => IndexedStack(
           index: homeController.currentTabIndex.value, // <-- Use HomeController

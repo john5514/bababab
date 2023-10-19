@@ -1,4 +1,5 @@
 import 'package:bicrypto/Controllers/market/market_controller.dart';
+import 'package:bicrypto/Style/styles.dart';
 import 'package:bicrypto/services/market_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -46,7 +47,7 @@ class MarketScreen extends StatelessWidget {
                 ),
               ],
             )),
-        backgroundColor: Colors.black87,
+        backgroundColor: appTheme.scaffoldBackgroundColor,
       ),
       body: Obx(() {
         List<Market> sortedMarkets = List.from(_marketController.markets.value);
@@ -70,7 +71,7 @@ class MarketScreen extends StatelessWidget {
         // Header
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          color: Colors.black87,
+          color: appTheme.scaffoldBackgroundColor,
           child: const Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -93,7 +94,7 @@ class MarketScreen extends StatelessWidget {
             itemBuilder: (context, index) {
               var market = markets[index];
               return ListTile(
-                tileColor: index.isEven ? Colors.grey[850] : Colors.grey[900],
+                tileColor: appTheme.scaffoldBackgroundColor,
                 onTap: () {
                   Get.toNamed('/chart',
                       arguments: '${market.symbol}/${market.pair}');
