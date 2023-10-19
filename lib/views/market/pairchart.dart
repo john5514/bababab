@@ -61,7 +61,6 @@ class ChartPage extends StatelessWidget {
                 child: tryRenderChart(),
               ),
               buildControlButtons(),
-              buildControlButtons(),
               OrderBookWidget(pair: pair),
             ],
           );

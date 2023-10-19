@@ -51,43 +51,52 @@ class OrderBookWidget extends StatelessWidget {
     final double minPrice =
         orders.isEmpty ? 1 : orders.map((o) => o.price).reduce(min);
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: orders.map((order) {
-        double widthFactor = (order.price - minPrice) / (maxPrice - minPrice);
+    const double orderHeight = 20.0; // The height of each order
+    final double containerHeight =
+        20 * orderHeight; // Assuming maximum of 20 orders
 
-        return Stack(
-          alignment: isBids ? Alignment.centerRight : Alignment.centerLeft,
-          children: [
-            FractionallySizedBox(
-              alignment: isBids ? Alignment.centerRight : Alignment.centerLeft,
-              widthFactor: widthFactor,
-              child: Opacity(
-                opacity: 0.2, // Adjust the opacity as per your requirements
-                child: Container(color: color, height: 20),
-              ),
-            ),
-            Positioned(
-              child: Text(
-                order.price.toStringAsFixed(2),
-                style: TextStyle(
-                  color: isBids ? Colors.green : Colors.red,
+    return Container(
+      height: containerHeight,
+      child: ListView.builder(
+        itemCount: orders.length,
+        itemBuilder: (context, index) {
+          final order = orders[index];
+          double widthFactor = (order.price - minPrice) / (maxPrice - minPrice);
+
+          return Stack(
+            alignment: isBids ? Alignment.centerRight : Alignment.centerLeft,
+            children: [
+              FractionallySizedBox(
+                alignment:
+                    isBids ? Alignment.centerRight : Alignment.centerLeft,
+                widthFactor: widthFactor,
+                child: Opacity(
+                  opacity: 0.2, // Adjust the opacity as per your requirements
+                  child: Container(color: color, height: orderHeight),
                 ),
               ),
-              left: isBids ? null : 8,
-              right: isBids ? 8 : null,
-            ),
-            Positioned(
-              child: Text(
-                order.quantity.toStringAsFixed(2),
-                style: TextStyle(color: Colors.white, fontSize: 10),
+              Positioned(
+                left: isBids ? 8 : null,
+                right: isBids ? null : 8,
+                child: Text(
+                  order.quantity.toStringAsFixed(2),
+                  style: TextStyle(color: Colors.white, fontSize: 10),
+                ),
               ),
-              left: isBids ? 8 : null,
-              right: isBids ? null : 8,
-            )
-          ],
-        );
-      }).toList(),
+              Positioned(
+                left: isBids ? null : 8,
+                right: isBids ? 8 : null,
+                child: Text(
+                  order.price.toStringAsFixed(2),
+                  style: TextStyle(
+                    color: isBids ? Colors.green : Colors.red,
+                  ),
+                ),
+              )
+            ],
+          );
+        },
+      ),
     );
   }
 }
