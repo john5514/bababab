@@ -18,23 +18,26 @@ class MarketScreen extends StatelessWidget {
       child: Scaffold(
         appBar: AppBar(
           title: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 8),
             child: CupertinoSearchTextField(
-              placeholder: 'Search coin pairs',
-              style: TextStyle(color: Colors.white),
+              placeholder: 'Search Coin Pairs',
+              style: const TextStyle(color: Colors.white),
               placeholderStyle: TextStyle(color: Colors.grey[400]),
             ),
           ),
           bottom: TabBar(
-            tabs: [
+            tabs: const [
               Tab(text: 'Top Gainers'),
               Tab(text: 'Top Losers'),
             ],
             labelColor: Colors.white,
             unselectedLabelColor: Colors.grey[400],
-            indicator: BoxDecoration(
+            indicator: const BoxDecoration(
                 border: Border(
-                    bottom: BorderSide(color: Colors.orange, width: 1.0))),
+                    bottom: BorderSide(
+              color: Colors.yellow,
+              width: 2.0,
+            ))),
           ),
           backgroundColor: appTheme.scaffoldBackgroundColor,
           elevation: 0,
