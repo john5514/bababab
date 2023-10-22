@@ -19,24 +19,24 @@ class OrderBookService {
   }
 
   void connect() async {
-    print("Attempting to connect to WebSocket at $_wsBaseUrl...");
+    // print("Attempting to connect to WebSocket at $_wsBaseUrl...");
 
     try {
       _webSocket = await WebSocket.connect(_wsBaseUrl);
-      print("++++++++++++WebSocket connected successfully!");
+      // print("++++++++++++WebSocket connected successfully!");
 
       _webSocket!.listen(
         (data) {
-          print(
-              '==================+++++++++=========WebSocket data received: $data');
+          // print(
+          //     '==================+++++++++=========WebSocket data received: $data');
           _handleWebSocketData(data);
         },
         onError: (error) {
-          print("WebSocket error received: $error");
+          // print("WebSocket error received: $error");
           _reconnect();
         },
         onDone: () {
-          print("WebSocket connection closed");
+          // print("WebSocket connection closed");
           if (!_wasClosedIntentionally) {
             _reconnect();
           }
@@ -45,14 +45,14 @@ class OrderBookService {
             true, // This will close the subscription on the first error
       );
     } catch (e) {
-      print("Error while trying to connect to WebSocket: $e");
+      // print("Error while trying to connect to WebSocket: $e");
       _reconnect();
     }
   }
 
   void _reconnect() {
     Future.delayed(Duration(seconds: 5), () {
-      print("Attempting to reconnect...");
+      // print("Attempting to reconnect...");
       connect();
     });
   }
@@ -64,10 +64,10 @@ class OrderBookService {
       if (orderBookData != null) {
         _controller.add(OrderBook.fromJson(orderBookData));
       } else {
-        print("Unexpected data structure received.");
+        // print("Unexpected data structure received.");
       }
     } catch (e) {
-      print("Error processing WebSocket data: $e");
+      // print("Error processing WebSocket data: $e");
     }
   }
 

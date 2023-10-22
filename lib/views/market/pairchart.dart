@@ -91,7 +91,10 @@ class ChartPage extends StatelessWidget {
         children: [
           ElevatedButton(
             onPressed: () {
-              // Handle Buy logic here
+              Get.toNamed('/trade', arguments: {
+                'pair': pair,
+                'change24h': _chartController.currentMarket.value?.change ?? 0.0
+              });
             },
             child: Text("Buy"),
             style: ElevatedButton.styleFrom(
@@ -100,10 +103,13 @@ class ChartPage extends StatelessWidget {
               backgroundColor: Colors.green,
             ),
           ),
-          SizedBox(width: 16.0), // Added padding between the buttons
+          SizedBox(width: 16.0),
           ElevatedButton(
             onPressed: () {
-              // Handle Sell logic here
+              Get.toNamed('/trade', arguments: {
+                'pair': pair,
+                'change24h': _chartController.currentMarket.value?.change ?? 0.0
+              });
             },
             child: Text("Sell"),
             style: ElevatedButton.styleFrom(

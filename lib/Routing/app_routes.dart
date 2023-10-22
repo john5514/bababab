@@ -3,6 +3,7 @@ import 'package:bicrypto/views/Auth/register_view.dart';
 import 'package:bicrypto/views/Auth/resetpassword_view.dart';
 import 'package:bicrypto/views/home_screen.dart';
 import 'package:bicrypto/views/market/pairchart.dart';
+import 'package:bicrypto/views/trade/tradeview.dart';
 import 'package:bicrypto/views/wallet_view.dart';
 import 'package:bicrypto/views/wallets/completedepositview.dart';
 import 'package:bicrypto/views/wallets/depositview.dart';
@@ -47,5 +48,6 @@ class AppRoutes {
       name: '/chart',
       page: () => ChartPage(pair: Get.arguments as String),
     ),
+    GetPage(name: '/trade', page: () => TradeView()), // <-- Add this line
   ];
 }
