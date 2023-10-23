@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:bicrypto/Controllers/market/chart__controller.dart'; // Import the ChartController
 
@@ -7,6 +8,10 @@ class TradeController extends GetxController {
   final ChartController _chartController = Get.find<ChartController>();
   var activeAction = "Buy".obs;
   var selectedOrderType = "Limit".obs;
+  var sliderValue = 0.0.obs;
+
+  final TextEditingController amountController = TextEditingController();
+  final TextEditingController priceController = TextEditingController();
 
   @override
   void onInit() {

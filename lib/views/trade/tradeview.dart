@@ -1,9 +1,11 @@
 import 'package:bicrypto/Controllers/tarde/trade_controller.dart';
-import 'package:bicrypto/widgets/market/orderbook.dart';
 import 'package:bicrypto/widgets/tradeorderbook.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_xlider/flutter_xlider.dart';
 import 'package:get/get.dart';
-import 'package:dropdown_search/dropdown_search.dart';
+import 'package:dropdown_button2/dropdown_button2.dart';
+
+class SfSliderThemeData {}
 
 class TradeView extends StatelessWidget {
   final TradeController _tradeController = Get.put(TradeController());
@@ -49,7 +51,37 @@ class TradeView extends StatelessWidget {
                         ],
                       )),
                   const SizedBox(height: 10), // spacing
-                  _buildDropdown(), // Dropdown for Limit and Market
+                  _buildDropdown(),
+                  const SizedBox(height: 10), // spacing
+                  Obx(() {
+                    if (_tradeController.selectedOrderType.value == "Limit") {
+                      return Column(
+                        children: [
+                          TextFormField(
+                            controller: _tradeController.priceController,
+                            decoration:
+                                const InputDecoration(labelText: 'Price'),
+                          ),
+                          const SizedBox(height: 10),
+                          TextFormField(
+                            controller: _tradeController.amountController,
+                            decoration:
+                                const InputDecoration(labelText: 'Amount'),
+                          ),
+                          const SizedBox(height: 10),
+                          _buildSlider(),
+                        ],
+                      );
+                    } else if (_tradeController.selectedOrderType.value ==
+                        "Market") {
+                      return TextFormField(
+                        controller: _tradeController.amountController,
+                        decoration: const InputDecoration(labelText: 'Amount'),
+                      );
+                    } else {
+                      return Container();
+                    }
+                  }), // Dropdown for Limit and Market
                 ],
               ),
             ),
@@ -73,7 +105,7 @@ class TradeView extends StatelessWidget {
         _tradeController.activeAction.value == "Sell") {
       buttonColor = const Color.fromARGB(255, 246, 84, 72);
     } else {
-      buttonColor = Colors.white10;
+      buttonColor = const Color.fromARGB(26, 255, 255, 255);
     }
 
     return Expanded(
@@ -102,45 +134,120 @@ class TradeView extends StatelessWidget {
 
   Widget _buildDropdown() {
     return Container(
-      height: 40, // same height as the buttons
-      color: Colors.white10, // Set the color here
+      padding: const EdgeInsets.all(8.0),
+      decoration: BoxDecoration(
+        color: const Color(0xFF2C2F33), // Color of the dropdown
+        borderRadius: BorderRadius.circular(5),
+        border: Border.all(
+          color: Colors.black26, // Border color
+        ),
+      ),
       child: Obx(
-        () => DropdownSearch<String>(
-          selectedItem: _tradeController.selectedOrderType.value,
-          items: const ["Limit", "Market"],
-          dropdownDecoratorProps: DropDownDecoratorProps(
-            dropdownSearchDecoration: InputDecoration(
-              fillColor: Colors.white10,
-              filled: true,
-              contentPadding: const EdgeInsets.symmetric(vertical: 8.0),
-              border: OutlineInputBorder(
-                borderSide: BorderSide.none,
+        () => DropdownButtonHideUnderline(
+          child: DropdownButton2<String>(
+            isExpanded: true,
+            value: _tradeController.selectedOrderType.value,
+            items: const ["Limit", "Market"]
+                .map((String item) => DropdownMenuItem<String>(
+                      value: item,
+                      child: Text(
+                        item,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white, // Text color
+                        ),
+                      ),
+                    ))
+                .toList(),
+            onChanged: (newValue) {
+              if (newValue != null) {
+                _tradeController.selectedOrderType.value = newValue;
+              }
+            },
+            buttonStyleData: ButtonStyleData(
+              height: 40,
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(5),
+                color: const Color(0xFF2C2F33), // Color of the dropdown
               ),
             ),
-          ),
-          onChanged: (newValue) {
-            if (newValue != null) {
-              _tradeController.selectedOrderType.value = newValue;
-            }
-          },
-          dropdownBuilder: (BuildContext context, String? selectedItem) {
-            return Center(
-              child: Text(
-                selectedItem ?? "",
-                style: const TextStyle(color: Colors.white),
-                textAlign: TextAlign.center,
+            iconStyleData: const IconStyleData(
+              icon: Icon(
+                Icons.arrow_drop_down,
+                color: Colors.white, // Icon color
               ),
-            );
-          },
-          popupProps: const PopupProps.menu(
-            fit: FlexFit.loose,
-            menuProps: MenuProps(
-              backgroundColor: Colors.white10,
-              elevation: 0,
+            ),
+            dropdownStyleData: DropdownStyleData(
+              width: 200,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(5),
+                color: const Color(0xFF2C2F33), // Color of the dropdown menu
+              ),
+            ),
+            menuItemStyleData: const MenuItemStyleData(
+              height: 40,
+              padding: EdgeInsets.symmetric(horizontal: 8.0),
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildSlider() {
+    return FlutterSlider(
+      values: [_tradeController.sliderValue.value],
+      min: 0,
+      max: 100,
+      onDragging: (handlerIndex, lowerValue, upperValue) {
+        _tradeController.sliderValue.value = lowerValue;
+      },
+      handler: FlutterSliderHandler(
+        decoration: const BoxDecoration(),
+        child: Material(
+          type: MaterialType.canvas,
+          color: Colors.orange,
+          elevation: 0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(50),
+          ),
+          child: const SizedBox(
+            // Empty container
+            width: 20,
+            height: 20,
+          ),
+        ),
+      ),
+      trackBar: FlutterSliderTrackBar(
+        inactiveTrackBar: BoxDecoration(
+          borderRadius: BorderRadius.circular(1),
+          color: Colors.grey,
+        ),
+        activeTrackBar: BoxDecoration(
+          borderRadius: BorderRadius.circular(1),
+          color: Colors.orange,
+        ),
+      ),
+      tooltip: FlutterSliderTooltip(
+        textStyle: const TextStyle(fontSize: 17, color: Colors.white),
+        boxStyle: FlutterSliderTooltipBox(
+          decoration: BoxDecoration(
+            color: Colors.orange,
+            borderRadius: BorderRadius.circular(4),
+          ),
+        ),
+        format: (value) {
+          return "${double.parse(value).toStringAsFixed(0)}%";
+        },
+      ),
+      hatchMark: FlutterSliderHatchMark(
+        smallLine: const FlutterSliderSizedBox(width: 2, height: 10),
+        bigLine: const FlutterSliderSizedBox(width: 2, height: 20),
+        density: 0.04, // 25% division
+        displayLines: true,
+        linesAlignment: FlutterSliderHatchMarkAlignment.right,
       ),
     );
   }
