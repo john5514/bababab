@@ -5,6 +5,8 @@ class TradeController extends GetxController {
   var tradeName = "".obs;
   var change24h = 0.0.obs;
   final ChartController _chartController = Get.find<ChartController>();
+  var activeAction = "Buy".obs;
+  var selectedOrderType = "Limit".obs;
 
   @override
   void onInit() {
