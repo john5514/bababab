@@ -29,11 +29,55 @@ class TradeView extends StatelessWidget {
           ],
         ),
       ),
-      body: Align(
-        alignment: Alignment.topLeft, // Align to the beginning of the page
-        child: FractionallySizedBox(
-          widthFactor: 0.35, // Set the width to be 35% of the screen width
-          child: TradeOrderBookWidget(pair: arguments['pair']),
+      body: Row(
+        children: [
+          // Buy and Sell Buttons
+          Expanded(
+            flex: 7, // 7 parts out of 10
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(20, 25, 20, 15),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment
+                    .start, // Aligns children to the start (top) of the column
+                children: [
+                  Row(
+                    children: [
+                      _buildActionButton(context, 'Buy',
+                          Colors.amber), // Buy button with amber color
+                      _buildActionButton(
+                          context,
+                          'Sell',
+                          Colors
+                              .white10), // Sell button with the color from the example
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+          // OrderBook
+          Expanded(
+            flex: 3, // 3 parts out of 10
+            child: TradeOrderBookWidget(pair: arguments['pair']),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildActionButton(BuildContext context, String title, Color color) {
+    return Expanded(
+      child: Container(
+        padding: EdgeInsets.symmetric(vertical: 8.0),
+        color: color,
+        child: Text(
+          title,
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: 18.0,
+            color: color == Colors.white10 ? Colors.white : Colors.black,
+            fontWeight: FontWeight.bold,
+          ),
         ),
       ),
     );
