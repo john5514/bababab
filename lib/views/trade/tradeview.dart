@@ -40,7 +40,7 @@ class TradeView extends StatelessWidget {
           Expanded(
             flex: 7, // 7 parts out of 10
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(20, 25, 20, 15),
+              padding: const EdgeInsets.fromLTRB(10, 25, 10, 15),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
@@ -68,8 +68,6 @@ class TradeView extends StatelessWidget {
                             decoration:
                                 const InputDecoration(labelText: 'Amount'),
                           ),
-                          const SizedBox(height: 10),
-                          _buildSlider(),
                         ],
                       );
                     } else if (_tradeController.selectedOrderType.value ==
@@ -81,18 +79,78 @@ class TradeView extends StatelessWidget {
                     } else {
                       return Container();
                     }
-                  }), // Dropdown for Limit and Market
+                  }),
+                  const SizedBox(height: 10),
+                  _buildSlider(),
+                  const SizedBox(height: 10),
+                  _buildTakerFees(),
+                  const SizedBox(height: 10),
+                  _buildTotalExclFees(),
+                  const SizedBox(height: 10),
+                  _buildCost(),
+                  const SizedBox(height: 20),
+                  _buildBuyButton(), // Dropdown for Limit and Market
                 ],
               ),
             ),
           ),
           // OrderBook
           Expanded(
-            flex: 3, // 3 parts out of 10
+            flex: 4, // 3 parts out of 10
             child: TradeOrderBookWidget(pair: arguments['pair']),
           ),
         ],
       ),
+    );
+  }
+
+  _buildTakerFees() {
+    return Obx(() => Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Text("Taker Fees (0.1%)",
+                style: TextStyle(color: Colors.white)), // Updated style
+            Text(
+                "${_tradeController.takerFees.value} ${_tradeController.firstPairName}",
+                style: const TextStyle(color: Colors.white)), // Updated style
+          ],
+        ));
+  }
+
+  _buildTotalExclFees() {
+    return Obx(() => Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Text("Total (excl. fees)",
+                style: TextStyle(color: Colors.white)), // Updated style
+            Text(
+                "${_tradeController.totalExclFees.value} ${_tradeController.firstPairName}",
+                style: const TextStyle(color: Colors.white)), // Updated style
+          ],
+        ));
+  }
+
+  _buildCost() {
+    return Obx(() => Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Text("Cost",
+                style: TextStyle(color: Colors.white)), // Updated style
+            Text(
+                "${_tradeController.cost.value} ${_tradeController.secondPairName}",
+                style: const TextStyle(color: Colors.white)), // Updated style
+          ],
+        ));
+  }
+
+  _buildBuyButton() {
+    return ElevatedButton(
+      onPressed: () {
+        // Logic to buy
+        _tradeController.buy();
+      },
+      child: Text("Buy ${_tradeController.firstPairName}",
+          style: const TextStyle(color: Colors.white)), // Updated style
     );
   }
 
