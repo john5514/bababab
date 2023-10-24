@@ -114,34 +114,57 @@ class TradeView extends StatelessWidget {
 
   Widget _buildRecentTrades() {
     return Container(
-      padding: const EdgeInsets.all(10),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Color.fromARGB(101, 95, 95, 95)
-            .withOpacity(0.7), // Slightly darker background
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            Color.fromARGB(101, 75, 75, 75),
+            Color.fromARGB(101, 95, 95, 95),
+          ],
+        ), // Gradient background
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.2),
+            spreadRadius: 1,
+            blurRadius: 5,
+            offset: Offset(0, 3),
+          ),
+        ], // Shadow for a lifted effect
         borderRadius: const BorderRadius.only(
           topLeft: Radius.circular(25),
           topRight: Radius.circular(25),
         ),
       ),
-      child: const Column(
+      child: Column(
         children: [
           Text(
             'Recent Trades',
-            style: TextStyle(color: Colors.white, fontSize: 18),
+            style: const TextStyle(
+                color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold),
           ),
-          SizedBox(height: 10),
+          const SizedBox(height: 20),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('Price', style: TextStyle(color: Colors.white)),
-              Text('Amount', style: TextStyle(color: Colors.white)),
-              Text('Time', style: TextStyle(color: Colors.white)),
+              Text('Price',
+                  style: const TextStyle(
+                      color: Colors.white, fontWeight: FontWeight.w600)),
+              Text('Amount',
+                  style: const TextStyle(
+                      color: Colors.white, fontWeight: FontWeight.w600)),
+              Text('Time',
+                  style: const TextStyle(
+                      color: Colors.white, fontWeight: FontWeight.w600)),
             ],
           ),
-          SizedBox(height: 10),
+          const Divider(color: Colors.white38),
+          const SizedBox(height: 10),
           Text(
             'No trades yet.',
-            style: TextStyle(color: Colors.white),
+            style: const TextStyle(
+                color: Colors.white, fontStyle: FontStyle.italic),
           )
         ],
       ),
