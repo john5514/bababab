@@ -34,80 +34,98 @@ class TradeView extends StatelessWidget {
           ],
         ),
       ),
-      body: Column(
-        children: [
-          Row(
-            children: [
-              // Buy and Sell Buttons and Dropdown
-              Expanded(
-                flex: 7, // 7 parts out of 10
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(10, 25, 10, 15),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Obx(() => Row(
-                            children: [
-                              _buildActionButton(context, 'Buy'),
-                              _buildActionButton(context, 'Sell'),
-                            ],
-                          )),
-                      const SizedBox(height: 10), // spacing
-                      _buildDropdown(),
-                      const SizedBox(height: 10), // spacing
-                      Obx(() {
-                        if (_tradeController.selectedOrderType.value ==
-                            "Limit") {
-                          return Column(
-                            children: [
-                              TextFormField(
-                                controller: _tradeController.priceController,
-                                decoration:
-                                    const InputDecoration(labelText: 'Price'),
-                              ),
-                              const SizedBox(height: 10),
-                              TextFormField(
-                                controller: _tradeController.amountController,
-                                decoration:
-                                    const InputDecoration(labelText: 'Amount'),
-                              ),
-                            ],
-                          );
-                        } else if (_tradeController.selectedOrderType.value ==
-                            "Market") {
-                          return TextFormField(
-                            controller: _tradeController.amountController,
-                            decoration:
-                                const InputDecoration(labelText: 'Amount'),
-                          );
-                        } else {
-                          return Container();
-                        }
-                      }),
-                      const SizedBox(height: 10),
-                      _buildSlider(),
-                      const SizedBox(height: 10),
-                      _buildTakerFees(),
-                      const SizedBox(height: 10),
-                      _buildTotalExclFees(),
-                      const SizedBox(height: 10),
-                      _buildCost(),
-                      const SizedBox(height: 20),
-                      _buildBuyButton(), // Dropdown for Limit and Market
-                    ],
-                  ),
+      body: LayoutBuilder(
+        builder: (BuildContext context, BoxConstraints constraints) {
+          return SingleChildScrollView(
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    // Buy and Sell Buttons and Dropdown
+                    Expanded(
+                      flex: 7, // 7 parts out of 10
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(10, 25, 10, 15),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Obx(() => Row(
+                                  children: [
+                                    _buildActionButton(context, 'Buy'),
+                                    _buildActionButton(context, 'Sell'),
+                                  ],
+                                )),
+                            const SizedBox(height: 10), // spacing
+                            _buildDropdown(),
+                            const SizedBox(height: 10), // spacing
+                            Obx(() {
+                              if (_tradeController.selectedOrderType.value ==
+                                  "Limit") {
+                                return Column(
+                                  children: [
+                                    TextFormField(
+                                      controller:
+                                          _tradeController.priceController,
+                                      decoration: const InputDecoration(
+                                          labelText: 'Price'),
+                                      keyboardType: TextInputType
+                                          .number, // Allow only number input
+                                    ),
+                                    const SizedBox(height: 10),
+                                    TextFormField(
+                                      controller:
+                                          _tradeController.amountController,
+                                      decoration: const InputDecoration(
+                                          labelText: 'Amount'),
+                                      keyboardType: TextInputType
+                                          .number, // Allow only number input
+                                    ),
+                                  ],
+                                );
+                              } else if (_tradeController
+                                      .selectedOrderType.value ==
+                                  "Market") {
+                                return TextFormField(
+                                  controller: _tradeController.amountController,
+                                  decoration: const InputDecoration(
+                                      labelText: 'Amount'),
+                                  keyboardType: TextInputType
+                                      .number, // Allow only number input
+                                );
+                              } else {
+                                return Container();
+                              }
+                            }),
+                            const SizedBox(height: 10),
+                            _buildSlider(),
+                            const SizedBox(height: 10),
+                            _buildTakerFees(),
+                            const SizedBox(height: 10),
+                            _buildTotalExclFees(),
+                            const SizedBox(height: 10),
+                            _buildCost(),
+                            const SizedBox(height: 20),
+                            _buildBuyButton(), // Dropdown for Limit and Market
+                          ],
+                        ),
+                      ),
+                    ),
+                    // OrderBook
+                    Expanded(
+                      flex: 4, // 4 parts out of 10
+                      child: TradeOrderBookWidget(pair: arguments['pair']),
+                    ),
+                  ],
                 ),
-              ),
-              // OrderBook
-              Expanded(
-                flex: 4, // 3 parts out of 10
-                child: TradeOrderBookWidget(pair: arguments['pair']),
-              ),
-            ],
-          ),
-          const SizedBox(height: 10), // Some padding beneath the main row
-          Expanded(child: _buildRecentTrades()),
-        ],
+                const SizedBox(height: 10), // Some padding beneath the main row
+                Container(
+                  height: constraints.maxHeight - 300,
+                  child: _buildRecentTrades(),
+                ),
+              ],
+            ),
+          );
+        },
       ),
     );
   }
