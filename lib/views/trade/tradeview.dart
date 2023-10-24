@@ -34,71 +34,115 @@ class TradeView extends StatelessWidget {
           ],
         ),
       ),
-      body: Row(
+      body: Column(
         children: [
-          // Buy and Sell Buttons and Dropdown
-          Expanded(
-            flex: 7, // 7 parts out of 10
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(10, 25, 10, 15),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Obx(() => Row(
-                        children: [
-                          _buildActionButton(context, 'Buy'),
-                          _buildActionButton(context, 'Sell'),
-                        ],
-                      )),
-                  const SizedBox(height: 10), // spacing
-                  _buildDropdown(),
-                  const SizedBox(height: 10), // spacing
-                  Obx(() {
-                    if (_tradeController.selectedOrderType.value == "Limit") {
-                      return Column(
-                        children: [
-                          TextFormField(
-                            controller: _tradeController.priceController,
-                            decoration:
-                                const InputDecoration(labelText: 'Price'),
-                          ),
-                          const SizedBox(height: 10),
-                          TextFormField(
+          Row(
+            children: [
+              // Buy and Sell Buttons and Dropdown
+              Expanded(
+                flex: 7, // 7 parts out of 10
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(10, 25, 10, 15),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Obx(() => Row(
+                            children: [
+                              _buildActionButton(context, 'Buy'),
+                              _buildActionButton(context, 'Sell'),
+                            ],
+                          )),
+                      const SizedBox(height: 10), // spacing
+                      _buildDropdown(),
+                      const SizedBox(height: 10), // spacing
+                      Obx(() {
+                        if (_tradeController.selectedOrderType.value ==
+                            "Limit") {
+                          return Column(
+                            children: [
+                              TextFormField(
+                                controller: _tradeController.priceController,
+                                decoration:
+                                    const InputDecoration(labelText: 'Price'),
+                              ),
+                              const SizedBox(height: 10),
+                              TextFormField(
+                                controller: _tradeController.amountController,
+                                decoration:
+                                    const InputDecoration(labelText: 'Amount'),
+                              ),
+                            ],
+                          );
+                        } else if (_tradeController.selectedOrderType.value ==
+                            "Market") {
+                          return TextFormField(
                             controller: _tradeController.amountController,
                             decoration:
                                 const InputDecoration(labelText: 'Amount'),
-                          ),
-                        ],
-                      );
-                    } else if (_tradeController.selectedOrderType.value ==
-                        "Market") {
-                      return TextFormField(
-                        controller: _tradeController.amountController,
-                        decoration: const InputDecoration(labelText: 'Amount'),
-                      );
-                    } else {
-                      return Container();
-                    }
-                  }),
-                  const SizedBox(height: 10),
-                  _buildSlider(),
-                  const SizedBox(height: 10),
-                  _buildTakerFees(),
-                  const SizedBox(height: 10),
-                  _buildTotalExclFees(),
-                  const SizedBox(height: 10),
-                  _buildCost(),
-                  const SizedBox(height: 20),
-                  _buildBuyButton(), // Dropdown for Limit and Market
-                ],
+                          );
+                        } else {
+                          return Container();
+                        }
+                      }),
+                      const SizedBox(height: 10),
+                      _buildSlider(),
+                      const SizedBox(height: 10),
+                      _buildTakerFees(),
+                      const SizedBox(height: 10),
+                      _buildTotalExclFees(),
+                      const SizedBox(height: 10),
+                      _buildCost(),
+                      const SizedBox(height: 20),
+                      _buildBuyButton(), // Dropdown for Limit and Market
+                    ],
+                  ),
+                ),
               ),
-            ),
+              // OrderBook
+              Expanded(
+                flex: 4, // 3 parts out of 10
+                child: TradeOrderBookWidget(pair: arguments['pair']),
+              ),
+            ],
           ),
-          // OrderBook
-          Expanded(
-            flex: 4, // 3 parts out of 10
-            child: TradeOrderBookWidget(pair: arguments['pair']),
+          const SizedBox(height: 10), // Some padding beneath the main row
+          Expanded(child: _buildRecentTrades()),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildRecentTrades() {
+    return Container(
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: Color.fromARGB(101, 95, 95, 95)
+            .withOpacity(0.7), // Slightly darker background
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(25),
+          topRight: Radius.circular(25),
+        ),
+      ),
+      child: const Column(
+        children: [
+          Text(
+            'Recent Trades',
+            style: TextStyle(color: Colors.white, fontSize: 18),
           ),
+          SizedBox(height: 10),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text('Price', style: TextStyle(color: Colors.white)),
+              Text('Amount', style: TextStyle(color: Colors.white)),
+              Text('Time', style: TextStyle(color: Colors.white)),
+            ],
+          ),
+          SizedBox(height: 10),
+          Text(
+            'No trades yet.',
+            style: TextStyle(color: Colors.white),
+          )
         ],
       ),
     );
