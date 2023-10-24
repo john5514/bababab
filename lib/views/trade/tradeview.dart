@@ -116,7 +116,7 @@ class TradeView extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
+        gradient: const LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
           colors: [
@@ -129,7 +129,7 @@ class TradeView extends StatelessWidget {
             color: Colors.black.withOpacity(0.2),
             spreadRadius: 1,
             blurRadius: 5,
-            offset: Offset(0, 3),
+            offset: const Offset(0, 3),
           ),
         ], // Shadow for a lifted effect
         borderRadius: const BorderRadius.only(
@@ -137,34 +137,33 @@ class TradeView extends StatelessWidget {
           topRight: Radius.circular(25),
         ),
       ),
-      child: Column(
+      child: const Column(
         children: [
           Text(
             'Recent Trades',
-            style: const TextStyle(
+            style: TextStyle(
                 color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold),
           ),
-          const SizedBox(height: 20),
+          SizedBox(height: 20),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text('Price',
-                  style: const TextStyle(
+                  style: TextStyle(
                       color: Colors.white, fontWeight: FontWeight.w600)),
               Text('Amount',
-                  style: const TextStyle(
+                  style: TextStyle(
                       color: Colors.white, fontWeight: FontWeight.w600)),
               Text('Time',
-                  style: const TextStyle(
+                  style: TextStyle(
                       color: Colors.white, fontWeight: FontWeight.w600)),
             ],
           ),
-          const Divider(color: Colors.white38),
-          const SizedBox(height: 10),
+          Divider(color: Colors.white38),
+          SizedBox(height: 10),
           Text(
             'No trades yet.',
-            style: const TextStyle(
-                color: Colors.white, fontStyle: FontStyle.italic),
+            style: TextStyle(color: Colors.white, fontStyle: FontStyle.italic),
           )
         ],
       ),

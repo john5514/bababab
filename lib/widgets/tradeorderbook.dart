@@ -2,32 +2,49 @@ import 'dart:math';
 import 'package:bicrypto/Controllers/market/orederbook_controller.dart';
 import 'package:bicrypto/services/orderbook_service.dart';
 import 'package:bicrypto/widgets/market/orderbook.dart';
+import 'package:bicrypto/widgets/market/price_display.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class TradeOrderBookWidget extends StatelessWidget {
   final String pair;
 
-  TradeOrderBookWidget({required this.pair});
+  const TradeOrderBookWidget({super.key, required this.pair});
 
   @override
   Widget build(BuildContext context) {
-    final OrderBookController _orderBookController =
+    final OrderBookController orderBookController =
         Get.find<OrderBookController>();
 
     return Column(
       children: [
-        const SizedBox(height: 20),
-        const Text("Order Book", style: TextStyle(color: Colors.white)),
-        const SizedBox(height: 10),
+        const Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Padding(
+              padding: EdgeInsets.only(left: 8.0), // Left padding for Amount
+              child: Text("Amount", style: TextStyle(color: Colors.grey)),
+            ),
+            Padding(
+              padding: EdgeInsets.only(right: 8.0), // Right padding for Price
+              child: Text("Price", style: TextStyle(color: Colors.grey)),
+            ),
+          ],
+        ),
+        const SizedBox(height: 5),
         Obx(
-          () => _orderBookController.currentOrderBook.value == null
+          () => orderBookController.currentOrderBook.value == null
               ? const Center(child: CircularProgressIndicator())
               : Column(
                   children: [
                     buildOrderBookSide(Colors.red, false),
+                    const SizedBox(height: 10),
+
+                    // Add the PriceDisplay widget here
+                    PriceDisplay(chartController: Get.find()),
+
                     const SizedBox(
-                        height: 10), // Added padding between the two sides
+                        height: 10), // Add some padding after the PriceDisplay
                     buildOrderBookSide(Colors.green, true),
                   ],
                 ),
@@ -37,16 +54,16 @@ class TradeOrderBookWidget extends StatelessWidget {
   }
 
   Widget buildOrderBookSide(Color color, bool isBids) {
-    final OrderBookController _orderBookController =
+    final OrderBookController orderBookController =
         Get.find<OrderBookController>();
-    final OrderBook? orderBook = _orderBookController.currentOrderBook.value;
+    final OrderBook? orderBook = orderBookController.currentOrderBook.value;
     List<Order> orders = (isBids ? orderBook?.bids : orderBook?.asks)
             ?.map((e) => Order(e[0], e[1]))
             .toList() ??
         [];
 
     // Limit to 7 orders
-    orders = orders.take(7).toList();
+    orders = orders.take(9).toList();
 
     final double maxPrice =
         orders.isEmpty ? 1 : orders.map((o) => o.price).reduce(max);
@@ -55,8 +72,8 @@ class TradeOrderBookWidget extends StatelessWidget {
 
     const double orderHeight = 20.0;
 
-    return Container(
-      height: orderHeight * 7, // Height for 7 orders
+    return SizedBox(
+      height: orderHeight * 9, // Height for 7 orders
       child: ListView.builder(
         itemCount: orders.length,
         itemBuilder: (context, index) {

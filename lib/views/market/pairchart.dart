@@ -14,7 +14,7 @@ class ChartPage extends StatelessWidget {
   final CustomizeChartController _customizeChartController =
       Get.put(CustomizeChartController());
 
-  ChartPage({required this.pair})
+  ChartPage({super.key, required this.pair})
       : _chartController = Get.put(ChartController(pair));
   String formatVolume(double volume) {
     if (volume >= 1e9) {
@@ -58,13 +58,13 @@ class ChartPage extends StatelessWidget {
           return ListView(
             children: [
               ChartHeader(_chartController, pair),
-              Container(
+              SizedBox(
                 height: MediaQuery.of(context).size.height * 0.45,
                 child: tryRenderChart(),
               ),
               const Divider(color: Colors.grey),
 
-              Container(
+              SizedBox(
                 height: 25,
                 child: buildControlButtons(),
               ),
@@ -96,14 +96,14 @@ class ChartPage extends StatelessWidget {
                 'change24h': _chartController.currentMarket.value?.change ?? 0.0
               });
             },
-            child: Text("Buy"),
             style: ElevatedButton.styleFrom(
               padding: const EdgeInsets.symmetric(horizontal: 32.0),
               foregroundColor: Colors.white,
               backgroundColor: Colors.green,
             ),
+            child: const Text("Buy"),
           ),
-          SizedBox(width: 16.0),
+          const SizedBox(width: 16.0),
           ElevatedButton(
             onPressed: () {
               Get.toNamed('/trade', arguments: {
@@ -111,12 +111,12 @@ class ChartPage extends StatelessWidget {
                 'change24h': _chartController.currentMarket.value?.change ?? 0.0
               });
             },
-            child: Text("Sell"),
             style: ElevatedButton.styleFrom(
               padding: const EdgeInsets.symmetric(horizontal: 32.0),
               foregroundColor: Colors.white,
               backgroundColor: Colors.red,
             ),
+            child: const Text("Sell"),
           ),
         ],
       ),
@@ -130,12 +130,12 @@ class ChartPage extends StatelessWidget {
 
   Widget tryRenderChart() {
     if (_chartController.isLoading.value) {
-      return Center(
+      return const Center(
           child: CircularProgressIndicator()); // Display a loading spinner
     } else if (_chartController.errorMsg.value.isNotEmpty) {
       return Center(
           child: Text(_chartController.errorMsg.value,
-              style: TextStyle(color: Colors.red)));
+              style: const TextStyle(color: Colors.red)));
     }
 
     try {
@@ -168,7 +168,7 @@ class ChartPage extends StatelessWidget {
           fixedLength: 2,
           timeFormat: TimeFormat.YEAR_MONTH_DAY,
           onLoadMore: (bool isRight) {},
-          maDayList: [5, 10, 20],
+          maDayList: const [5, 10, 20],
           volHidden: !_customizeChartController.isVolumeVisible.value,
           hideGrid: _customizeChartController.isGridHidden.value,
           showNowPrice: _customizeChartController.isNowPriceShown.value,
@@ -184,9 +184,10 @@ class ChartPage extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.error, color: Colors.red, size: 48),
-            SizedBox(height: 16),
-            Text("Error rendering chart", style: TextStyle(color: Colors.red)),
+            const Icon(Icons.error, color: Colors.red, size: 48),
+            const SizedBox(height: 16),
+            const Text("Error rendering chart",
+                style: TextStyle(color: Colors.red)),
             Text("$e"),
           ],
         ),
