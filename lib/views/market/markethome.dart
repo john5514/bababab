@@ -15,7 +15,7 @@ class MarketScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 2,
+      length: 4, // Update the length for the added tabs
       child: Scaffold(
         appBar: AppBar(
           title: Padding(
@@ -37,6 +37,8 @@ class MarketScreen extends StatelessWidget {
             tabs: const [
               Tab(text: 'Top Gainers'),
               Tab(text: 'Top Losers'),
+              Tab(text: 'Trending'), // New Tab for Trending
+              Tab(text: 'Hot'), // New Tab for Hot
             ],
             labelColor: Colors.white,
             unselectedLabelColor: Colors.grey[400],
@@ -52,24 +54,46 @@ class MarketScreen extends StatelessWidget {
         ),
         body: TabBarView(
           children: [
-            Obx(() => _buildMarketList(showGainers: true)),
-            Obx(() => _buildMarketList(showGainers: false)),
+            Obx(() => _buildMarketList(category: 'gainers')),
+            Obx(() => _buildMarketList(category: 'losers')),
+            Obx(() => _buildMarketList(category: 'trending')),
+            Obx(() => _buildMarketList(category: 'hot')),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildMarketList({required bool showGainers}) {
-    List<Market> sortedMarkets = List.from(_marketController.markets.value);
-    if (showGainers) {
-      sortedMarkets.sort((a, b) => b.change.compareTo(a.change));
-    } else {
-      sortedMarkets.sort((a, b) => a.change.compareTo(b.change));
-    }
+  Widget _buildMarketList({required String category}) {
+    List<Market> filteredMarkets =
+        _filterAndLimitMarkets(_marketController.markets.value, category);
 
     return _marketController.isLoading.value
         ? const Center(child: CircularProgressIndicator())
-        : pairs_listview(markets: sortedMarkets);
+        : pairs_listview(markets: filteredMarkets);
+  }
+
+  List<Market> _filterAndLimitMarkets(List<Market> markets, String category) {
+    List<Market> sortedMarkets = List.from(markets);
+
+    switch (category) {
+      case 'gainers':
+        sortedMarkets.sort((a, b) => b.change.compareTo(a.change));
+        break;
+      case 'losers':
+        sortedMarkets.sort((a, b) => a.change.compareTo(b.change));
+        break;
+      case 'trending':
+        sortedMarkets.sort((a, b) => b.change.abs().compareTo(a.change.abs()));
+        break;
+      case 'hot':
+        sortedMarkets.sort((a, b) => b.volume.compareTo(a.volume));
+        break;
+      default:
+        break;
+    }
+
+    // Limit the list to 20 items
+    return sortedMarkets.take(20).toList();
   }
 }
