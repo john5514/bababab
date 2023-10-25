@@ -70,7 +70,7 @@ class MarketScreen extends StatelessWidget {
 
     return _marketController.isLoading.value
         ? const Center(child: CircularProgressIndicator())
-        : pairs_listview(markets: filteredMarkets);
+        : PairsListView(markets: filteredMarkets);
   }
 
   List<Market> _filterAndLimitMarkets(List<Market> markets, String category) {

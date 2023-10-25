@@ -40,7 +40,7 @@ class _SearchScreenState extends State<SearchScreen> {
         backgroundColor: appTheme.scaffoldBackgroundColor,
         elevation: 0,
       ),
-      body: pairs_listview(markets: filteredMarkets),
+      body: PairsListView(markets: filteredMarkets),
     );
   }
 }
