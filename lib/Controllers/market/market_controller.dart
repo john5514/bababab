@@ -34,7 +34,21 @@ class MarketController extends GetxController {
         print("StreamController is closed. Cannot add new data.");
         return;
       }
-      markets.value = updatedMarkets;
+
+      // Update existing markets or add new ones
+      for (var updatedMarket in updatedMarkets) {
+        var index = markets.value.indexWhere((m) =>
+            m.symbol == updatedMarket.symbol && m.pair == updatedMarket.pair);
+
+        if (index != -1) {
+          // Update existing market
+          markets.value[index].updateWith(updatedMarket);
+        } else {
+          // Add new market
+          markets.value.add(updatedMarket);
+        }
+      }
+      markets.refresh(); // Notify listeners about the update
       isLoading.value = false;
     }, onError: (error) {
       isLoading.value = false;

@@ -277,9 +277,9 @@ class Market {
   final bool isHot;
   final MarketMetadata metadata;
   final bool status;
-  final double price; // <-- Add this line
-  final double change; // <-- Add this line
-  final double volume; // <-- Add this line
+  double price; // Changed from final to mutable
+  double change; // Changed from final to mutable
+  double volume; // Changed from final to mutable
   final double high24h;
   final double low24h;
 
@@ -291,13 +291,12 @@ class Market {
     required this.isHot,
     required this.metadata,
     required this.status,
-    required this.price, // <-- Add this line
-    required this.change, // <-- Add this line
-    required this.volume, // <-- Add this line
+    required this.price,
+    required this.change,
+    required this.volume,
     required this.high24h,
     required this.low24h,
   });
-
   // Factory constructor to create a Market object from a map
   factory Market.fromJson(String marketName, Map<String, dynamic> json) {
     final splitMarketName = marketName.split('/');
@@ -320,6 +319,15 @@ class Market {
       high24h: (json['high24h'] ?? 0.0).toDouble(),
       low24h: (json['low24h'] ?? 0.0).toDouble(),
     );
+  }
+  // Add this method to update dynamic fields
+  void updateWith(Market other) {
+    if (this.symbol == other.symbol && this.pair == other.pair) {
+      this.price = other.price;
+      this.change = other.change;
+      this.volume = other.volume;
+      // Add any other dynamic fields here
+    }
   }
 }
 
