@@ -54,6 +54,7 @@ dependencies:
   dropdown_button2: ^2.3.9
   syncfusion_flutter_sliders: ^23.1.41
   flutter_xlider: ^3.5.0
+  webview_flutter: ^3.0.0
 
 dev_dependencies:
   flutter_test:
