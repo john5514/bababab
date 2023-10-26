@@ -6,7 +6,7 @@ import 'package:timeago/timeago.dart' as timeago;
 class NewsWidget extends StatelessWidget {
   final ScrollController _scrollController = ScrollController();
 
-  NewsWidget() {
+  NewsWidget({super.key}) {
     // Listener to change the state of FAB visibility
     _scrollController.addListener(() {
       if (_scrollController.offset >= 2000) {
@@ -24,7 +24,7 @@ class NewsWidget extends StatelessWidget {
 
     return Obx(() {
       if (newsController.isLoading.value && newsController.newsList.isEmpty) {
-        return Center(child: CircularProgressIndicator());
+        return const Center(child: CircularProgressIndicator());
       } else {
         return NotificationListener<ScrollNotification>(
           onNotification: (ScrollNotification scrollInfo) {
@@ -61,11 +61,13 @@ class NewsWidget extends StatelessWidget {
                           ),
                           title: Text(
                             newsItem['source_info']['name'],
-                            style: TextStyle(color: Colors.white),
+                            style: const TextStyle(
+                                color: Colors.white, fontFamily: 'Inter'),
                           ),
                           subtitle: Text(
                             "$relativeTime ago",
-                            style: TextStyle(color: Colors.grey[400]),
+                            style: TextStyle(
+                                color: Colors.grey[400], fontFamily: 'Inter'),
                           ),
                         ),
                         Padding(
@@ -76,15 +78,18 @@ class NewsWidget extends StatelessWidget {
                             children: [
                               Text(
                                 newsItem['title'],
-                                style: TextStyle(
+                                style: const TextStyle(
                                     color: Colors.white,
                                     fontSize: 16,
+                                    fontFamily: 'Inter',
                                     fontWeight: FontWeight.bold),
                               ),
-                              SizedBox(height: 8),
+                              const SizedBox(height: 8),
                               Text(
                                 newsItem['body'],
-                                style: TextStyle(color: Colors.grey[350]),
+                                style: TextStyle(
+                                    color: Colors.grey[350],
+                                    fontFamily: 'Inter'),
                                 maxLines: 4,
                                 overflow: TextOverflow.ellipsis,
                               ),
@@ -124,11 +129,11 @@ class NewsWidget extends StatelessWidget {
                     onPressed: () {
                       _scrollController.animateTo(
                         0.0,
-                        duration: Duration(milliseconds: 300),
+                        duration: const Duration(milliseconds: 300),
                         curve: Curves.easeOut,
                       );
                     },
-                    child: Icon(Icons.arrow_upward, size: 20),
+                    child: const Icon(Icons.arrow_upward, size: 20),
                   ),
                 ),
             ],
