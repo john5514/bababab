@@ -29,7 +29,9 @@ class NewsController extends GetxController {
   }
 
   void loadMore() {
-    page++;
-    fetchNews();
+    if (!isLoading.value) {
+      page.value++;
+      fetchNews();
+    }
   }
 }
