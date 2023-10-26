@@ -55,6 +55,7 @@ dependencies:
   syncfusion_flutter_sliders: ^23.1.41
   flutter_xlider: ^3.5.0
   webview_flutter: ^3.0.0
+  timeago: ^3.5.0
 
 dev_dependencies:
   flutter_test:

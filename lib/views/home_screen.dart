@@ -1,6 +1,7 @@
 import 'package:bicrypto/Controllers/Auth/login_controller.dart';
 import 'package:bicrypto/Controllers/home_controller.dart'; // <-- Import HomeController
 import 'package:bicrypto/views/market/markethome.dart';
+import 'package:bicrypto/views/news/news_screen.dart';
 import 'package:bicrypto/views/wallet_view.dart'; // <-- Import WalletView
 import 'package:bicrypto/views/webview/fiat.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
@@ -14,7 +15,7 @@ class HomeView extends StatelessWidget {
       Get.put(HomeController()); // <-- Initialize HomeController
 
   final List<Widget> _children = [
-    const Center(child: Text('Home')),
+    NewsWidget(),
     MarketScreen(),
     const Center(child: Text('Trade')),
     WebWalletView(),

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_xlider/flutter_xlider.dart';
 import 'package:get/get.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
+import 'dart:ui';
 
 class SfSliderThemeData {}
 
@@ -118,7 +119,7 @@ class TradeView extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 10), // Some padding beneath the main row
-                Container(
+                SizedBox(
                   height: constraints.maxHeight - 300,
                   child: _buildRecentTrades(),
                 ),
@@ -240,14 +241,21 @@ class TradeView extends StatelessWidget {
 
   Widget _buildActionButton(BuildContext context, String title) {
     Color buttonColor;
+    Color textColor;
+    bool isActive = _tradeController.activeAction.value == title;
 
-    if (title == "Buy" && _tradeController.activeAction.value == "Buy") {
-      buttonColor = const Color.fromARGB(255, 101, 195, 104);
-    } else if (title == "Sell" &&
-        _tradeController.activeAction.value == "Sell") {
-      buttonColor = const Color.fromARGB(255, 246, 84, 72);
+    if (title == "Buy") {
+      buttonColor = isActive
+          ? const Color.fromARGB(255, 101, 195, 104)
+          : Colors.transparent;
+      textColor =
+          isActive ? Colors.white : const Color.fromARGB(255, 246, 84, 72);
     } else {
-      buttonColor = const Color.fromARGB(26, 255, 255, 255);
+      buttonColor = isActive
+          ? const Color.fromARGB(255, 246, 84, 72)
+          : Colors.transparent;
+      textColor =
+          isActive ? Colors.white : const Color.fromARGB(255, 101, 195, 104);
     }
 
     return Expanded(
@@ -256,19 +264,44 @@ class TradeView extends StatelessWidget {
           _tradeController.activeAction.value =
               title; // Update the active action
         },
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 8.0),
-          color: buttonColor,
-          child: Text(
-            title,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 15.0,
-              color:
-                  buttonColor == Colors.white10 ? Colors.white : Colors.black,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
+        child: isActive
+            ? ClipPath(
+                clipper:
+                    title == "Buy" ? LeftButtonClipper() : RightButtonClipper(),
+                child: Container(
+                  color: buttonColor,
+                  child: Center(
+                    child: Text(
+                      title,
+                      style: TextStyle(color: textColor),
+                    ),
+                  ),
+                ),
+              )
+            : Container(
+                color: buttonColor,
+                child: Center(
+                  child: Text(
+                    title,
+                    style: TextStyle(color: textColor),
+                  ),
+                ),
+              ),
+      ),
+    );
+  }
+
+  Widget _buildButtonText(String title, Color buttonColor) {
+    return Center(
+      child: Text(
+        title,
+        textAlign: TextAlign.center,
+        style: TextStyle(
+          fontSize: 15.0,
+          color: buttonColor.computeLuminance() > 0.5
+              ? Colors.black
+              : Colors.white,
+          fontWeight: FontWeight.bold,
         ),
       ),
     );
@@ -348,28 +381,27 @@ class TradeView extends StatelessWidget {
       },
       handler: FlutterSliderHandler(
         decoration: const BoxDecoration(),
-        child: Material(
+        child: const Material(
           type: MaterialType.canvas,
-          color: Colors.orange,
+          color:
+              Color.fromARGB(255, 177, 175, 175), // Darker diamond for handler
           elevation: 0,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(50),
-          ),
-          child: const SizedBox(
-            // Empty container
-            width: 20,
-            height: 20,
+          shape: DiamondShape(), // Custom diamond shape
+          child: SizedBox(
+            width: 16,
+            height: 16,
           ),
         ),
       ),
       trackBar: FlutterSliderTrackBar(
         inactiveTrackBar: BoxDecoration(
           borderRadius: BorderRadius.circular(1),
-          color: Colors.grey,
+          color: Colors.grey[300], // Lighter track color
         ),
         activeTrackBar: BoxDecoration(
           borderRadius: BorderRadius.circular(1),
-          color: Colors.orange,
+          color: Colors
+              .grey[300], // Keep it the same as inactive for consistent look
         ),
       ),
       tooltip: FlutterSliderTooltip(
@@ -387,10 +419,70 @@ class TradeView extends StatelessWidget {
       hatchMark: FlutterSliderHatchMark(
         smallLine: const FlutterSliderSizedBox(width: 2, height: 10),
         bigLine: const FlutterSliderSizedBox(width: 2, height: 20),
-        density: 0.04, // 25% division
-        displayLines: true,
+        density: 0.04,
+        displayLines: false, // No lines, just the diamonds
         linesAlignment: FlutterSliderHatchMarkAlignment.right,
       ),
     );
   }
+}
+
+// Custom diamond shape
+class DiamondShape extends ShapeBorder {
+  const DiamondShape();
+
+  @override
+  EdgeInsetsGeometry get dimensions => const EdgeInsets.all(0);
+
+  @override
+  Path getInnerPath(Rect rect, {TextDirection? textDirection}) =>
+      getOuterPath(rect);
+
+  @override
+  Path getOuterPath(Rect rect, {TextDirection? textDirection}) {
+    return Path()
+      ..moveTo(rect.left + rect.width / 2, rect.top)
+      ..lineTo(rect.right, rect.top + rect.height / 2)
+      ..lineTo(rect.left + rect.width / 2, rect.bottom)
+      ..lineTo(rect.left, rect.top + rect.height / 2)
+      ..close();
+  }
+
+  @override
+  void paint(Canvas canvas, Rect rect, {TextDirection? textDirection}) {}
+
+  @override
+  ShapeBorder scale(double t) => this;
+}
+
+class LeftButtonClipper extends CustomClipper<Path> {
+  @override
+  Path getClip(Size size) {
+    final path = Path();
+    path.moveTo(0, 0);
+    path.lineTo(size.width * 0.9, 0);
+    path.lineTo(size.width, size.height);
+    path.lineTo(0, size.height);
+    path.close();
+    return path;
+  }
+
+  @override
+  bool shouldReclip(CustomClipper<Path> oldClipper) => true;
+}
+
+class RightButtonClipper extends CustomClipper<Path> {
+  @override
+  Path getClip(Size size) {
+    final path = Path();
+    path.moveTo(size.width * 0.1, 0);
+    path.lineTo(size.width, 0);
+    path.lineTo(size.width, size.height);
+    path.lineTo(0, size.height);
+    path.close();
+    return path;
+  }
+
+  @override
+  bool shouldReclip(CustomClipper<Path> oldClipper) => true;
 }
