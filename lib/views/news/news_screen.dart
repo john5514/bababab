@@ -1,4 +1,5 @@
 import 'package:bicrypto/Controllers/news/news_controller.dart';
+import 'package:bicrypto/widgets/market/SimplifiedMarketScreen%20.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:timeago/timeago.dart' as timeago;
@@ -7,10 +8,8 @@ class NewsWidget extends StatelessWidget {
   final ScrollController _scrollController = ScrollController();
 
   NewsWidget({super.key}) {
-    // Listener to change the state of FAB visibility
     _scrollController.addListener(() {
       if (_scrollController.offset >= 2000) {
-        // Assuming each item is about 100 pixels height, adjust as needed
         Get.find<NewsController>().showScrollToTopBtn.value = true;
       } else {
         Get.find<NewsController>().showScrollToTopBtn.value = false;
@@ -28,10 +27,9 @@ class NewsWidget extends StatelessWidget {
       } else {
         return NotificationListener<ScrollNotification>(
           onNotification: (ScrollNotification scrollInfo) {
-            // Check if you're at the bottom of the list
             if (scrollInfo.metrics.extentAfter == 0 &&
                 !newsController.isLoading.value) {
-              newsController.loadMore(); // Load more when scrolled to bottom
+              newsController.loadMore();
             }
             return true;
           },
@@ -39,18 +37,33 @@ class NewsWidget extends StatelessWidget {
             children: [
               ListView.builder(
                 controller: _scrollController,
-                itemCount: newsController.newsList.length,
+                itemCount: newsController.newsList.length + 2,
                 itemBuilder: (context, index) {
-                  var newsItem = newsController.newsList[index];
+                  if (index == 0) {
+                    return SizedBox(
+                      height: MediaQuery.of(context).size.height *
+                          0.5, // Or another appropriate height
+                      child: SimpleMarketScreen(),
+                    );
+                  }
+
+                  if (index == 1) {
+                    return const Divider(
+                      color: Colors.grey,
+                      thickness: 1,
+                    );
+                  }
+
+                  var newsIndex = index - 2;
+                  var newsItem = newsController.newsList[newsIndex];
                   var publishedDate = DateTime.fromMillisecondsSinceEpoch(
                       newsItem['published_on'] * 1000);
                   var relativeTime =
                       timeago.format(publishedDate, locale: 'en_short');
 
                   return Card(
-                    color:
-                        Colors.transparent, // Make card background transparent
-                    elevation: 0, // Remove card shadow
+                    color: Colors.transparent,
+                    elevation: 0,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
