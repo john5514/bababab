@@ -1,4 +1,5 @@
 import 'package:bicrypto/Controllers/tarde/trade_controller.dart';
+import 'package:bicrypto/views/market/markethome.dart';
 import 'package:bicrypto/widgets/tradeorderbook.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_xlider/flutter_xlider.dart';
@@ -10,6 +11,7 @@ class SfSliderThemeData {}
 
 class TradeView extends StatelessWidget {
   final TradeController _tradeController = Get.put(TradeController());
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   TradeView({super.key});
 
@@ -19,21 +21,28 @@ class TradeView extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      key: _scaffoldKey,
       appBar: AppBar(
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        title: Row(
-          children: [
-            Obx(() => Text(_tradeController.tradeName.value)),
-            const SizedBox(width: 8.0),
-            Obx(() => Text(
-                  "${_tradeController.change24h.value}%",
-                  style: const TextStyle(
-                    fontSize: 20,
-                    color: Colors.green,
-                  ),
-                )),
-          ],
+        title: GestureDetector(
+          onTap: () => _scaffoldKey.currentState?.openDrawer(),
+          child: Row(
+            children: [
+              Obx(() => Text(_tradeController.tradeName.value)),
+              const SizedBox(width: 8.0),
+              Obx(() => Text(
+                    "${_tradeController.change24h.value}%",
+                    style: const TextStyle(
+                      fontSize: 20,
+                      color: Colors.green,
+                    ),
+                  )),
+            ],
+          ),
         ),
+      ),
+      drawer: Drawer(
+        child: MarketScreen(), // Your MarketScreen widget
       ),
       body: LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
