@@ -17,7 +17,7 @@ class HomeView extends StatelessWidget {
   final List<Widget> _children = [
     NewsWidget(),
     MarketScreen(),
-    const Center(child: Text('Trade')),
+    // const Center(child: Text('Trade')),
     WebWalletView(),
     WalletView(),
   ];
@@ -48,8 +48,8 @@ class HomeView extends StatelessWidget {
             Icon(Icons.home, size: 30, color: appTheme.secondaryHeaderColor),
             Icon(Icons.pie_chart,
                 size: 30, color: appTheme.secondaryHeaderColor),
-            Icon(Icons.swap_horiz,
-                size: 30, color: appTheme.secondaryHeaderColor),
+            // Icon(Icons.swap_horiz,
+            //     size: 30, color: appTheme.secondaryHeaderColor),
             Icon(Icons.show_chart,
                 size: 30, color: appTheme.secondaryHeaderColor),
             Icon(Icons.account_balance_wallet,

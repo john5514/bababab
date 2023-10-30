@@ -54,4 +54,10 @@ class TradeController extends GetxController {
     // For now, let's just print a message:
     print("Buying ${amountController.text} of ${tradeName.value}");
   }
+
+  void sell() {
+    // Your logic to perform the selling action goes here.
+    // For now, let's just print a message:
+    print("Selling ${amountController.text} of ${tradeName.value}");
+  }
 }

@@ -15,7 +15,7 @@ class PriceDisplay extends StatelessWidget {
           Text(
             "${chartController.currentMarket.value?.price ?? 0.0}",
             style: TextStyle(
-              fontSize: 32,
+              fontSize: 28,
               fontWeight: FontWeight.bold,
               fontFamily: 'Inter',
               color: (chartController.lastMarket.value?.price ?? 0) <
