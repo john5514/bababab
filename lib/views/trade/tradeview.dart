@@ -68,20 +68,64 @@ class TradeView extends StatelessWidget {
                                     TextFormField(
                                       controller:
                                           _tradeController.priceController,
-                                      decoration: const InputDecoration(
-                                          labelText: 'Price'),
-
-                                      keyboardType: TextInputType
-                                          .number, // Allow only number input
+                                      decoration: InputDecoration(
+                                        labelText: 'Price',
+                                        floatingLabelBehavior:
+                                            FloatingLabelBehavior.always,
+                                        labelStyle: const TextStyle(
+                                            color: Colors.white),
+                                        border: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(15.0),
+                                          borderSide: BorderSide.none,
+                                        ),
+                                        filled: true,
+                                        fillColor: const Color(
+                                            0xFF2C2F33), // Specific fill color for dark mode
+                                        prefixIcon: const Icon(
+                                            Icons.attach_money,
+                                            color: Colors.white),
+                                        contentPadding:
+                                            const EdgeInsets.symmetric(
+                                                vertical: 8,
+                                                horizontal:
+                                                    12), // Reduced padding
+                                      ),
+                                      keyboardType: TextInputType.number,
+                                      style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 14), // Smaller font size
                                     ),
                                     const SizedBox(height: 10),
                                     TextFormField(
                                       controller:
                                           _tradeController.amountController,
-                                      decoration: const InputDecoration(
-                                          labelText: 'Amount'),
-                                      keyboardType: TextInputType
-                                          .number, // Allow only number input
+                                      decoration: InputDecoration(
+                                        labelText: 'Amount',
+                                        floatingLabelBehavior:
+                                            FloatingLabelBehavior.always,
+                                        labelStyle: const TextStyle(
+                                            color: Colors.white),
+                                        border: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(15.0),
+                                          borderSide: BorderSide.none,
+                                        ),
+                                        filled: true,
+                                        fillColor: const Color(
+                                            0xFF2C2F33), // Specific fill color for dark mode
+                                        prefixIcon: const Icon(Icons.balance,
+                                            color: Colors.white),
+                                        contentPadding:
+                                            const EdgeInsets.symmetric(
+                                                vertical: 8,
+                                                horizontal:
+                                                    12), // Reduced padding
+                                      ),
+                                      keyboardType: TextInputType.number,
+                                      style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 14), // Smaller font size
                                     ),
                                   ],
                                 );
@@ -90,15 +134,35 @@ class TradeView extends StatelessWidget {
                                   "Market") {
                                 return TextFormField(
                                   controller: _tradeController.amountController,
-                                  decoration: const InputDecoration(
-                                      labelText: 'Amount'),
-                                  keyboardType: TextInputType
-                                      .number, // Allow only number input
+                                  decoration: InputDecoration(
+                                    labelText: 'Amount',
+                                    floatingLabelBehavior:
+                                        FloatingLabelBehavior.always,
+                                    labelStyle:
+                                        const TextStyle(color: Colors.white),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(15.0),
+                                      borderSide: BorderSide.none,
+                                    ),
+                                    filled: true,
+                                    fillColor: const Color(
+                                        0xFF2C2F33), // Specific fill color for dark mode
+                                    prefixIcon: const Icon(Icons.balance,
+                                        color: Colors.white),
+                                    contentPadding: const EdgeInsets.symmetric(
+                                        vertical: 8,
+                                        horizontal: 12), // Reduced padding
+                                  ),
+                                  keyboardType: TextInputType.number,
+                                  style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 14), // Smaller font size
                                 );
                               } else {
                                 return Container();
                               }
                             }),
+
                             const SizedBox(height: 10),
                             _buildSlider(),
                             const SizedBox(height: 10),
