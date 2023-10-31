@@ -43,10 +43,13 @@ class FiatWalletView extends StatelessWidget {
 
                 // Define a list of gradients to be used for the cards
                 List<LinearGradient> gradients = [
-                  LinearGradient(colors: [Colors.blue, Colors.blueAccent]),
-                  LinearGradient(colors: [Colors.red, Colors.redAccent]),
-                  LinearGradient(colors: [Colors.green, Colors.greenAccent]),
-                  LinearGradient(colors: [Colors.purple, Colors.purpleAccent]),
+                  const LinearGradient(
+                      colors: [Colors.blue, Colors.blueAccent]),
+                  const LinearGradient(colors: [Colors.red, Colors.redAccent]),
+                  const LinearGradient(
+                      colors: [Colors.green, Colors.greenAccent]),
+                  const LinearGradient(
+                      colors: [Colors.purple, Colors.purpleAccent]),
                   // Add more gradients as needed
                 ];
 
@@ -58,7 +61,7 @@ class FiatWalletView extends StatelessWidget {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(15.0),
                   ),
-                  margin: EdgeInsets.all(12),
+                  margin: const EdgeInsets.all(12),
                   elevation: 8,
                   shadowColor: appTheme.hintColor.withOpacity(0.5),
                   child: InkWell(
@@ -100,7 +103,7 @@ class FiatWalletView extends StatelessWidget {
                             style: appTheme.textTheme.displayLarge?.copyWith(
                                 color: appTheme.secondaryHeaderColor),
                           ),
-                          SizedBox(height: 12),
+                          const SizedBox(height: 12),
                           Text(
                             '${walletInfo['currency']} Wallet',
                             style: appTheme.textTheme.bodyLarge?.copyWith(
@@ -122,13 +125,13 @@ class FiatWalletView extends StatelessWidget {
             context: context,
             builder: (context) {
               return AlertDialog(
-                title: Text('Create Wallet'),
+                title: const Text('Create Wallet'),
                 content: Obx(
                   () => DropdownButton<String>(
                     value: walletController.selectedCurrency.value.isEmpty
                         ? null
                         : walletController.selectedCurrency.value,
-                    hint: Text('Select Currency'),
+                    hint: const Text('Select Currency'),
                     onChanged: (String? newValue) {
                       walletController.selectedCurrency.value = newValue!;
                     },
@@ -149,7 +152,7 @@ class FiatWalletView extends StatelessWidget {
                       walletController.selectedCurrency.value = '';
                       Navigator.pop(context);
                     },
-                    child: Text('Cancel'),
+                    child: const Text('Cancel'),
                   ),
                   TextButton(
                     onPressed: () {
@@ -160,14 +163,14 @@ class FiatWalletView extends StatelessWidget {
                       walletController.selectedCurrency.value = '';
                       Navigator.pop(context);
                     },
-                    child: Text('Create'),
+                    child: const Text('Create'),
                   ),
                 ],
               );
             },
           );
         },
-        child: Icon(Icons.add),
+        child: const Icon(Icons.add),
         backgroundColor: appTheme.floatingActionButtonTheme.backgroundColor,
       ),
     );

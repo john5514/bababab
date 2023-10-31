@@ -27,7 +27,8 @@ class WalletInfoView extends StatelessWidget {
           'Wallet Info',
           style: TextStyle(color: appTheme.secondaryHeaderColor),
         ),
-        backgroundColor: appTheme.primaryColor,
+        backgroundColor: appTheme.scaffoldBackgroundColor,
+        elevation: 0,
       ),
       body: Obx(
         () => Column(
@@ -36,17 +37,15 @@ class WalletInfoView extends StatelessWidget {
             Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // Display wallet name
                 const SizedBox(height: 20),
+                // Display wallet balance with enhanced UI
                 Text(
-                  'Wallet Name: ${walletInfoController.walletName.value}',
-                  style: appTheme.textTheme.bodyLarge,
-                ),
-                const SizedBox(height: 20),
-                // Display wallet balance
-                Text(
-                  'Wallet Balance: ${walletInfoController.walletBalance.value}',
-                  style: appTheme.textTheme.bodyLarge,
+                  '${walletInfoController.walletName.value} Balance: ${walletInfoController.walletBalance.value}',
+                  style: appTheme.textTheme.bodyLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    fontFamily: 'Inter',
+                    fontSize: 24,
+                  ),
                 ),
                 const SizedBox(height: 20),
                 // Display income and expense with icons
@@ -59,13 +58,17 @@ class WalletInfoView extends StatelessWidget {
                       Map<String, double> balance =
                           walletController.calculateBalanceForCurrency(
                               walletInfoController.walletName.value);
-                      String currencySymbol = walletController
-                          .getCurrencySymbol(walletInfoController.walletName
-                              .value); // Function to get the currency symbol
+                      String currencySymbol =
+                          walletController.getCurrencySymbol(
+                              walletInfoController.walletName.value);
                       return Text(
                         '+$currencySymbol${balance['income']?.toStringAsFixed(2)}',
-                        style: appTheme.textTheme.bodyLarge
-                            ?.copyWith(color: Colors.green),
+                        style: appTheme.textTheme.bodyLarge?.copyWith(
+                          color: Colors.green,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'Inter',
+                          fontSize: 20, // Adjust the font size as needed
+                        ),
                       );
                     }),
                     const SizedBox(width: 20),
@@ -75,21 +78,31 @@ class WalletInfoView extends StatelessWidget {
                       Map<String, double> balance =
                           walletController.calculateBalanceForCurrency(
                               walletInfoController.walletName.value);
-                      String currencySymbol = walletController
-                          .getCurrencySymbol(walletInfoController.walletName
-                              .value); // Function to get the currency symbol
+                      String currencySymbol =
+                          walletController.getCurrencySymbol(
+                              walletInfoController.walletName.value);
                       return Text(
                         '-$currencySymbol${balance['expense']?.toStringAsFixed(2)}',
-                        style: appTheme.textTheme.bodyLarge
-                            ?.copyWith(color: Colors.red),
+                        style: appTheme.textTheme.bodyLarge?.copyWith(
+                          color: Colors.red,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'Inter',
+                          fontSize: 20, // Adjust the font size as needed
+                        ),
                       );
                     }),
                   ],
                 ),
-                const SizedBox(height: 20),
+
+                const SizedBox(height: 80),
                 Text(
                   'Weekly Summary (Last 7 Days)',
-                  style: appTheme.textTheme.bodyLarge,
+                  style: appTheme.textTheme.bodyLarge?.copyWith(
+                    color: const Color.fromARGB(255, 255, 255, 255),
+                    fontWeight: FontWeight.bold,
+                    fontFamily: 'Inter',
+                    fontSize: 20, // Adjust the font size as needed
+                  ),
                 ),
 
                 AspectRatio(
@@ -185,14 +198,22 @@ class WalletInfoView extends StatelessWidget {
                             int index = walletController.weeklySummaries
                                 .indexOf(summary);
 
-                            double incomeHeight = (summary.income > 20000
-                                    ? 20000
-                                    : summary.income) /
-                                1000; // Normalize and cap at 20,000
-                            double expenseHeight = (summary.expense > 20000
-                                    ? 20000
-                                    : summary.expense) /
-                                1000; // Normalize and cap at 20,000
+                            // Set a minimum height for the bars
+                            double minBarHeight =
+                                0.2; // Adjust this value as needed
+
+                            double incomeHeight = summary.income > 0
+                                ? (summary.income > 20000
+                                        ? 20000
+                                        : summary.income) /
+                                    1000
+                                : minBarHeight;
+                            double expenseHeight = summary.expense > 0
+                                ? (summary.expense > 20000
+                                        ? 20000
+                                        : summary.expense) /
+                                    1000
+                                : minBarHeight;
 
                             Color incomeColor = summary.income > 20000
                                 ? Colors.yellow
@@ -228,7 +249,6 @@ class WalletInfoView extends StatelessWidget {
                     ),
                   ),
                 ),
-
                 const SizedBox(height: 40),
               ],
             ),
