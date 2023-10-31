@@ -87,36 +87,52 @@ class ChartPage extends StatelessWidget {
         color: appTheme.scaffoldBackgroundColor,
       ),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
+        mainAxisAlignment:
+            MainAxisAlignment.spaceEvenly, // Fill the space evenly
         children: [
-          ElevatedButton(
-            onPressed: () {
-              Get.toNamed('/trade', arguments: {
-                'pair': pair,
-                'change24h': _chartController.currentMarket.value?.change ?? 0.0
-              });
-            },
-            style: ElevatedButton.styleFrom(
-              padding: const EdgeInsets.symmetric(horizontal: 32.0),
-              foregroundColor: Colors.white,
-              backgroundColor: Colors.green,
+          Expanded(
+            child: ClipPath(
+              clipper: LeftButtonClipper(),
+              child: ElevatedButton(
+                onPressed: () {
+                  Get.toNamed('/trade', arguments: {
+                    'pair': pair,
+                    'change24h':
+                        _chartController.currentMarket.value?.change ?? 0.0
+                  });
+                },
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(horizontal: 32.0),
+                  foregroundColor: Colors.white,
+                  backgroundColor: Colors.green,
+                  shape:
+                      RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+                ),
+                child: const Text("Buy"),
+              ),
             ),
-            child: const Text("Buy"),
           ),
-          const SizedBox(width: 16.0),
-          ElevatedButton(
-            onPressed: () {
-              Get.toNamed('/trade', arguments: {
-                'pair': pair,
-                'change24h': _chartController.currentMarket.value?.change ?? 0.0
-              });
-            },
-            style: ElevatedButton.styleFrom(
-              padding: const EdgeInsets.symmetric(horizontal: 32.0),
-              foregroundColor: Colors.white,
-              backgroundColor: Colors.red,
+          Expanded(
+            child: ClipPath(
+              clipper: RightButtonClipper(),
+              child: ElevatedButton(
+                onPressed: () {
+                  Get.toNamed('/trade', arguments: {
+                    'pair': pair,
+                    'change24h':
+                        _chartController.currentMarket.value?.change ?? 0.0
+                  });
+                },
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(horizontal: 32.0),
+                  foregroundColor: Colors.white,
+                  backgroundColor: Colors.red,
+                  shape:
+                      RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+                ),
+                child: const Text("Sell"),
+              ),
             ),
-            child: const Text("Sell"),
           ),
         ],
       ),
@@ -194,4 +210,36 @@ class ChartPage extends StatelessWidget {
       );
     }
   }
+}
+
+class LeftButtonClipper extends CustomClipper<Path> {
+  @override
+  Path getClip(Size size) {
+    final path = Path();
+    path.moveTo(0, 0); // Start top-left
+    path.lineTo(size.width, 0); // Top edge to top-right
+    path.lineTo(size.width * 0.85, size.height); // Bottom edge, shifted left
+    path.lineTo(0, size.height); // Bottom-left
+    path.close();
+    return path;
+  }
+
+  @override
+  bool shouldReclip(CustomClipper<Path> oldClipper) => true;
+}
+
+class RightButtonClipper extends CustomClipper<Path> {
+  @override
+  Path getClip(Size size) {
+    final path = Path();
+    path.moveTo(size.width * 0.15, 0); // Start 15% from left along top edge
+    path.lineTo(size.width, 0); // Top-right
+    path.lineTo(size.width, size.height); // Bottom-right
+    path.lineTo(0, size.height); // Bottom-left
+    path.close();
+    return path;
+  }
+
+  @override
+  bool shouldReclip(CustomClipper<Path> oldClipper) => true;
 }
