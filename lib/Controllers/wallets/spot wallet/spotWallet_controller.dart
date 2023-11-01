@@ -31,19 +31,26 @@ class WalletSpotController extends GetxController {
   }
 
   Future<void> fetchBalancesForCurrencies() async {
+    var fetchTasks = <Future>[];
+
     for (var currency in currencies) {
-      try {
-        var walletInfo =
-            await walletService.fetchSpotWallet(currency['currency']);
+      var task = walletService
+          .fetchSpotWallet(currency['currency'])
+          .then((walletInfo) {
         if (walletInfo['status'] == 'success' &&
             walletInfo['data']['result'] != null) {
           updateCurrencyWithWalletDetails(
               currency['currency'], walletInfo['data']['result']);
         }
-      } catch (e) {
+      }).catchError((e) {
         print('Error fetching wallet for currency ${currency['currency']}: $e');
-      }
+      });
+
+      fetchTasks.add(task);
     }
+
+    // Wait for all the fetch tasks to complete
+    await Future.wait(fetchTasks);
   }
 
   void calculateTotalEstimatedBalance() {
