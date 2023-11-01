@@ -30,7 +30,7 @@ class WalletView extends StatelessWidget {
         body: TabBarView(
           children: [
             FiatWalletView(), // Your FiatWalletView goes here
-            CoinGeckoView(), // Placeholder for Spot Wallets
+            WalletSpotView(), // Placeholder for Spot Wallets
           ],
         ),
       ),
