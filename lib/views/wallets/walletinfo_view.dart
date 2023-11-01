@@ -198,22 +198,14 @@ class WalletInfoView extends StatelessWidget {
                             int index = walletController.weeklySummaries
                                 .indexOf(summary);
 
-                            // Set a minimum height for the bars
-                            double minBarHeight =
-                                0.2; // Adjust this value as needed
-
-                            double incomeHeight = summary.income > 0
-                                ? (summary.income > 20000
-                                        ? 20000
-                                        : summary.income) /
-                                    1000
-                                : minBarHeight;
-                            double expenseHeight = summary.expense > 0
-                                ? (summary.expense > 20000
-                                        ? 20000
-                                        : summary.expense) /
-                                    1000
-                                : minBarHeight;
+                            double incomeHeight = (summary.income > 20000
+                                    ? 20000
+                                    : summary.income) /
+                                1000; // Normalize and cap at 20,000
+                            double expenseHeight = (summary.expense > 20000
+                                    ? 20000
+                                    : summary.expense) /
+                                1000; // Normalize and cap at 20,000
 
                             Color incomeColor = summary.income > 20000
                                 ? Colors.yellow
@@ -249,6 +241,7 @@ class WalletInfoView extends StatelessWidget {
                     ),
                   ),
                 ),
+
                 const SizedBox(height: 40),
               ],
             ),

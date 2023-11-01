@@ -1,4 +1,5 @@
 import 'package:bicrypto/Routing/app_routes.dart';
+import 'package:bicrypto/services/CoinGeckoService.dart';
 import 'package:bicrypto/services/api_service.dart'; // Make sure to import ApiService
 import 'package:bicrypto/services/wallet_service.dart';
 import 'package:flutter/material.dart';
@@ -14,6 +15,7 @@ void main() async {
   // Pass the ApiService instance when creating WalletService
   Get.put(WalletService(apiService));
   Get.put(ApiService());
+  Get.put(CoinGeckoService());
 
   final LoginController loginController = Get.put(LoginController());
   await loginController.init(); // Wait for initialization to complete
