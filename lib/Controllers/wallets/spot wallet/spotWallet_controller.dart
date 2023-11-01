@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 class WalletSpotController extends GetxController {
   final WalletService walletService;
   var currencies = <dynamic>[].obs;
-  var balance = 0.0.obs; // Observable balance
+  var totalEstimatedBalance = 0.0.obs;
   var isLoading = true.obs;
 
   WalletSpotController({required this.walletService});
@@ -13,15 +13,15 @@ class WalletSpotController extends GetxController {
   void onInit() {
     super.onInit();
     fetchCurrencies();
-    fetchBalance(); // Fetch balance on initialization
   }
 
   void fetchCurrencies() async {
     isLoading(true);
     try {
-      var response = await walletService.getCurrencies();
+      var response = await walletService.getExchangeCurrencies();
       if (response['status'] == 'success') {
         currencies.value = response['data']['result'];
+        await fetchBalancesForCurrencies(); // New method to fetch balances
       }
     } catch (e) {
       print('Error fetching currencies: $e');
@@ -30,12 +30,81 @@ class WalletSpotController extends GetxController {
     }
   }
 
-  void fetchBalance() async {
-    try {
-      balance.value = await walletService.fetchWalletBalance();
-      // print("Fetched balance: ${balance.value}");
-    } catch (e) {
-      print('Error fetching wallet balance: $e');
+  Future<void> fetchBalancesForCurrencies() async {
+    for (var currency in currencies) {
+      try {
+        var walletInfo =
+            await walletService.fetchSpotWallet(currency['currency']);
+        if (walletInfo['status'] == 'success' &&
+            walletInfo['data']['result'] != null) {
+          updateCurrencyWithWalletDetails(
+              currency['currency'], walletInfo['data']['result']);
+        }
+      } catch (e) {
+        print('Error fetching wallet for currency ${currency['currency']}: $e');
+      }
     }
+  }
+
+  void calculateTotalEstimatedBalance() {
+    double total = 0.0;
+    for (var currency in currencies) {
+      // Ensuring that price is a double
+      var priceValue = currency['price'];
+      double price =
+          (priceValue is int) ? priceValue.toDouble() : (priceValue ?? 0.0);
+
+      // Ensuring that balance is a double
+      var balanceValue = currency['balance'];
+      double amount = (balanceValue is int)
+          ? balanceValue.toDouble()
+          : (balanceValue ?? 0.0);
+
+      total += price * amount;
+    }
+    totalEstimatedBalance.value = total;
+    print("Calculated total balance: $total");
+  }
+
+  void handleCurrencyTap(String currencyCode) async {
+    isLoading(true);
+    try {
+      Map<String, dynamic> walletInfo =
+          await walletService.fetchSpotWallet(currencyCode);
+
+      if (walletInfo['status'] == 'success') {
+        if (walletInfo['data']['result'] != null) {
+          updateCurrencyWithWalletDetails(
+              currencyCode, walletInfo['data']['result']);
+        } else {
+          await walletService.postSpotWallet(currencyCode);
+          await Future.delayed(Duration(seconds: 2));
+          walletInfo = await walletService.fetchSpotWallet(currencyCode);
+          if (walletInfo['status'] == 'success') {
+            updateCurrencyWithWalletDetails(
+                currencyCode, walletInfo['data']['result']);
+          } else {
+            print("Failed to create or fetch wallet for $currencyCode");
+          }
+        }
+      }
+    } catch (e) {
+      print('Error handling currency tap: $e');
+    } finally {
+      isLoading(false);
+    }
+  }
+
+  void updateCurrencyWithWalletDetails(
+      String currencyCode, dynamic walletDetails) {
+    int index = currencies
+        .indexWhere((currency) => currency['currency'] == currencyCode);
+    if (index != -1) {
+      currencies[index]['uuid'] = walletDetails['uuid'];
+      currencies[index]['balance'] = walletDetails['balance'];
+      // Recalculate total balance whenever a wallet's details are updated
+      calculateTotalEstimatedBalance();
+    }
+    print("Updated currency: ${currencies[index]}");
   }
 }

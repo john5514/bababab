@@ -11,8 +11,8 @@ class WalletSpotView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Wallet Spot Currencies'),
-        backgroundColor: Colors.black, // Considering dark theme
+        title: Obx(() => Text(
+            'Total Balance: \$${controller.totalEstimatedBalance.value.toStringAsFixed(2)}')),
       ),
       body: Obx(() {
         if (controller.isLoading.value) {
@@ -24,19 +24,18 @@ class WalletSpotView extends StatelessWidget {
             var currency = controller.currencies[index];
             return ListTile(
               title: Text(
-                currency['code'],
+                currency['currency'], // Adjusted key
                 style: const TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
                     fontSize: 16.0),
               ),
               subtitle: Text(
-                currency['name'],
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 14.0,
-                ),
+                currency['name'], // Adjusted key
+                style: const TextStyle(color: Colors.white, fontSize: 14.0),
               ),
+              onTap: () => controller
+                  .handleCurrencyTap(currency['currency']), // Adjusted key
             );
           },
         );
