@@ -18,9 +18,6 @@ class SpotWalletDetailView extends StatelessWidget {
         Map<String, dynamic>.from(arguments);
     controller.setWalletDetails(walletDetails);
 
-    // Calculate deposit and withdrawal amounts
-    final depositWithdrawalAmounts = controller.calculateDepositsAndWithdrawals();
-
     return Scaffold(
       appBar: AppBar(
         title: const Text("Wallet Details"),
@@ -29,21 +26,9 @@ class SpotWalletDetailView extends StatelessWidget {
       ),
       body: Column(
         children: [
-          Obx(() => Column(
-                children: [
-                  Text(
-                    "Balance: ${controller.walletDetails['balance'].toStringAsFixed(4)}",
-                    style: const TextStyle(fontSize: 20, color: Colors.white),
-                  ),
-                  Text(
-                    "Deposits: ${depositWithdrawalAmounts['deposits'].toStringAsFixed(4)}",
-                    style: const TextStyle(fontSize: 18, color: Colors.green),
-                  ),
-                  Text(
-                    "Withdrawals: ${depositWithdrawalAmounts['withdrawals'].toStringAsFixed(4)}",
-                    style: const TextStyle(fontSize: 18, color: Colors.red),
-                  ),
-                ],
+          Obx(() => Text(
+                "Balance: ${controller.walletDetails['balance'].toStringAsFixed(4)}",
+                style: const TextStyle(fontSize: 20, color: Colors.white),
               )),
           const SizedBox(height: 20),
           Expanded(child: _buildTransactions(controller.transactions)),
@@ -51,7 +36,6 @@ class SpotWalletDetailView extends StatelessWidget {
       ),
     );
   }
-}
 
   Widget _buildTransactions(List<dynamic> transactions) {
     return Container(
