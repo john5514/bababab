@@ -442,6 +442,28 @@ class WalletService {
     }
   }
 
+  Future<List<dynamic>> fetchTransactions(String walletType) async {
+    await loadHeaders();
+    final response = await HttpClientHelper.get(
+      Uri.parse('${baseUrl}/transactions?walletType=$walletType'),
+      headers: headers,
+    );
+
+    if (response?.statusCode == 200) {
+      var decodedResponse = jsonDecode(response!.body);
+      if (decodedResponse['status'] == 'success') {
+        return decodedResponse['data'][
+            'result']; // Assuming the structure is similar to your previous method
+      } else {
+        throw Exception(
+            'Failed to fetch transactions: ${decodedResponse['message']}');
+      }
+    } else {
+      throw Exception(
+          'Failed to fetch transactions. Status Code: ${response?.statusCode}');
+    }
+  }
+
   Future<List<dynamic>> fetchWalletTransactionsForUserID35() async {
     await loadHeaders();
     final response = await HttpClientHelper.get(

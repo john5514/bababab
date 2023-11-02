@@ -137,8 +137,14 @@ class WalletSpotController extends GetxController {
                 currencyCode, walletInfo['data']['result']);
           } else {
             print("Failed to create or fetch wallet for $currencyCode");
+            return; // Early return if failed to create or fetch
           }
         }
+        // Navigate to detail screen with the wallet details
+        Get.toNamed('/spot-wallet-detail', arguments: {
+          ...walletInfo['data']['result'], // Existing wallet details
+          'walletType': 'SPOT' // Explicitly add walletType
+        });
       }
     } catch (e) {
       print('Error handling currency tap: $e');
