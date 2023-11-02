@@ -7,21 +7,53 @@ class WalletSpotView extends StatelessWidget {
   final WalletSpotController controller =
       Get.put(WalletSpotController(walletService: Get.find<WalletService>()));
 
+  WalletSpotView({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Obx(() => Text(
-            'Total Balance: \$${controller.totalEstimatedBalance.value.toStringAsFixed(2)}')),
+        backgroundColor: Colors.transparent,
+        title: Obx(() => controller.isSearching.value
+            ? TextField(
+                onChanged: (value) => controller.filterCurrencies(value),
+                style: const TextStyle(color: Colors.white),
+                decoration: const InputDecoration(
+                  icon: Icon(Icons.search, color: Colors.white),
+                  hintText: "Search Currencies",
+                  hintStyle: TextStyle(color: Colors.white),
+                ),
+              )
+            : Text(
+                'Total Balance: \$${controller.totalEstimatedBalance.value.toStringAsFixed(2)}')),
+        actions: <Widget>[
+          Obx(() => controller.isSearching.value
+              ? IconButton(
+                  icon: const Icon(Icons.cancel),
+                  onPressed: () {
+                    controller.clearSearch();
+                  },
+                )
+              : IconButton(
+                  icon: const Icon(Icons.search),
+                  onPressed: () {
+                    controller.enableSearch();
+                  },
+                )),
+        ],
       ),
       body: Obx(() {
         if (controller.isLoading.value) {
           return const Center(child: CircularProgressIndicator());
         }
         return ListView.builder(
-          itemCount: controller.currencies.length,
+          itemCount: controller.isSearching.isTrue
+              ? controller.filteredCurrencies.length
+              : controller.currencies.length,
           itemBuilder: (context, index) {
-            var currency = controller.currencies[index];
+            var currency = controller.isSearching.isTrue
+                ? controller.filteredCurrencies[index]
+                : controller.currencies[index];
             return ListTile(
               title: Text(
                 currency['currency'], // Adjusted key
@@ -33,6 +65,11 @@ class WalletSpotView extends StatelessWidget {
               subtitle: Text(
                 currency['name'], // Adjusted key
                 style: const TextStyle(color: Colors.white, fontSize: 14.0),
+              ),
+              trailing: Text(
+                "${currency['balance']?.toStringAsFixed(1) ?? '0.0'}",
+                style: const TextStyle(
+                    color: Colors.white, fontWeight: FontWeight.bold),
               ),
               onTap: () => controller
                   .handleCurrencyTap(currency['currency']), // Adjusted key

@@ -6,6 +6,8 @@ class WalletSpotController extends GetxController {
   var currencies = <dynamic>[].obs;
   var totalEstimatedBalance = 0.0.obs;
   var isLoading = true.obs;
+  var isSearching = false.obs;
+  var filteredCurrencies = <dynamic>[].obs;
 
   WalletSpotController({required this.walletService});
 
@@ -13,6 +15,24 @@ class WalletSpotController extends GetxController {
   void onInit() {
     super.onInit();
     fetchCurrencies();
+  }
+
+  void enableSearch() {
+    isSearching(true);
+    filteredCurrencies.assignAll(currencies);
+  }
+
+  void clearSearch() {
+    isSearching(false);
+    filteredCurrencies.clear();
+  }
+
+  void filterCurrencies(String query) {
+    var filteredList = currencies.where((currency) {
+      var currencyName = currency['currency'].toLowerCase();
+      return currencyName.contains(query.toLowerCase());
+    }).toList();
+    filteredCurrencies.assignAll(filteredList);
   }
 
   void fetchCurrencies() async {
