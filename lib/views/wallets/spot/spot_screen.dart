@@ -52,6 +52,12 @@ class WalletSpotView extends StatelessWidget {
                       value: controller.hideZeroBalances.value,
                       onChanged: (bool? value) =>
                           controller.setHideZeroBalances(value ?? false),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(4.0),
+                      ),
+                      // ignore: prefer_const_constructors
+                      side: BorderSide(color: Colors.grey),
+                      activeColor: Theme.of(context).hintColor,
                     ),
                     const Text(
                       'Hide Zero Balances',

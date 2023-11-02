@@ -9,6 +9,7 @@ class WalletSpotController extends GetxController {
   var isSearching = false.obs;
   var filteredCurrencies = <dynamic>[].obs;
   var hideZeroBalances = false.obs;
+  var originalCurrencies = <dynamic>[].obs; // Add this line
 
   WalletSpotController({required this.walletService});
 
@@ -24,15 +25,15 @@ class WalletSpotController extends GetxController {
   }
 
   void updateFilteredCurrencies() {
-    var listToFilter = isSearching.isTrue ? filteredCurrencies : currencies;
-    var filteredList = listToFilter.where((currency) {
-      var balance = currency['balance'] ?? 0.0;
-      return !hideZeroBalances.isTrue || balance > 0.0;
-    }).toList();
-    if (isSearching.isTrue) {
-      filteredCurrencies.assignAll(filteredList);
-    } else {
+    if (hideZeroBalances.isTrue) {
+      var filteredList = originalCurrencies.where((currency) {
+        var balance = currency['balance'] ?? 0.0;
+        return balance > 0.0;
+      }).toList();
       currencies.assignAll(filteredList);
+    } else {
+      // Reset to the original list if hideZeroBalances is false
+      currencies.assignAll(originalCurrencies);
     }
   }
 
@@ -61,8 +62,11 @@ class WalletSpotController extends GetxController {
     try {
       var response = await walletService.getExchangeCurrencies();
       if (response['status'] == 'success') {
-        currencies.value = response['data']['result'];
-        await fetchBalancesForCurrencies(); // New method to fetch balances
+        var fetchedCurrencies = response['data']['result'];
+        currencies.assignAll(fetchedCurrencies);
+        originalCurrencies
+            .assignAll(fetchedCurrencies); // Store the original list
+        await fetchBalancesForCurrencies();
       }
     } catch (e) {
       print('Error fetching currencies: $e');
