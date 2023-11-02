@@ -32,4 +32,22 @@ class SpotWalletDetailController extends GetxController {
       // Handle case when walletType is null
     }
   }
+
+  Map<String, double> calculateDepositsAndWithdrawals() {
+    double depositTotal = 0.0;
+    double withdrawalTotal = 0.0;
+
+    for (var transaction in transactions) {
+      if (transaction['type'] == "DEPOSIT") {
+        depositTotal += transaction['amount'];
+      } else if (transaction['type'] == "WITHDRAWAL") {
+        withdrawalTotal += transaction['amount'];
+      }
+    }
+
+    return {
+      "deposits": depositTotal,
+      "withdrawals": withdrawalTotal,
+    };
+  }
 }
