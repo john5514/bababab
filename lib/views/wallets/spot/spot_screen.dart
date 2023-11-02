@@ -42,41 +42,64 @@ class WalletSpotView extends StatelessWidget {
                 )),
         ],
       ),
-      body: Obx(() {
-        if (controller.isLoading.value) {
-          return const Center(child: CircularProgressIndicator());
-        }
-        return ListView.builder(
-          itemCount: controller.isSearching.isTrue
-              ? controller.filteredCurrencies.length
-              : controller.currencies.length,
-          itemBuilder: (context, index) {
-            var currency = controller.isSearching.isTrue
-                ? controller.filteredCurrencies[index]
-                : controller.currencies[index];
-            return ListTile(
-              title: Text(
-                currency['currency'], // Adjusted key
-                style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16.0),
-              ),
-              subtitle: Text(
-                currency['name'], // Adjusted key
-                style: const TextStyle(color: Colors.white, fontSize: 14.0),
-              ),
-              trailing: Text(
-                "${currency['balance']?.toStringAsFixed(1) ?? '0.0'}",
-                style: const TextStyle(
-                    color: Colors.white, fontWeight: FontWeight.bold),
-              ),
-              onTap: () => controller
-                  .handleCurrencyTap(currency['currency']), // Adjusted key
-            );
-          },
-        );
-      }),
+      body: Column(
+        children: [
+          Obx(() => Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  children: [
+                    Checkbox(
+                      value: controller.hideZeroBalances.value,
+                      onChanged: (bool? value) =>
+                          controller.setHideZeroBalances(value ?? false),
+                    ),
+                    const Text(
+                      'Hide Zero Balances',
+                      style: TextStyle(color: Colors.grey, fontSize: 14),
+                    ),
+                  ],
+                ),
+              )),
+          Expanded(
+            child: Obx(() {
+              if (controller.isLoading.value) {
+                return const Center(child: CircularProgressIndicator());
+              }
+              return ListView.builder(
+                itemCount: controller.isSearching.isTrue
+                    ? controller.filteredCurrencies.length
+                    : controller.currencies.length,
+                itemBuilder: (context, index) {
+                  var currency = controller.isSearching.isTrue
+                      ? controller.filteredCurrencies[index]
+                      : controller.currencies[index];
+                  return ListTile(
+                    title: Text(
+                      currency['currency'], // Adjusted key
+                      style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16.0),
+                    ),
+                    subtitle: Text(
+                      currency['name'], // Adjusted key
+                      style:
+                          const TextStyle(color: Colors.white, fontSize: 14.0),
+                    ),
+                    trailing: Text(
+                      "${currency['balance']?.toStringAsFixed(1) ?? '0.0'}",
+                      style: const TextStyle(
+                          color: Colors.white, fontWeight: FontWeight.bold),
+                    ),
+                    onTap: () => controller.handleCurrencyTap(
+                        currency['currency']), // Adjusted key
+                  );
+                },
+              );
+            }),
+          ),
+        ],
+      ),
     );
   }
 }

@@ -8,6 +8,7 @@ class WalletSpotController extends GetxController {
   var isLoading = true.obs;
   var isSearching = false.obs;
   var filteredCurrencies = <dynamic>[].obs;
+  var hideZeroBalances = false.obs;
 
   WalletSpotController({required this.walletService});
 
@@ -15,6 +16,34 @@ class WalletSpotController extends GetxController {
   void onInit() {
     super.onInit();
     fetchCurrencies();
+  }
+
+  void setHideZeroBalances(bool value) {
+    hideZeroBalances(value);
+    updateFilteredCurrencies();
+  }
+
+  void updateFilteredCurrencies() {
+    var listToFilter = isSearching.isTrue ? filteredCurrencies : currencies;
+    var filteredList = listToFilter.where((currency) {
+      var balance = currency['balance'] ?? 0.0;
+      return !hideZeroBalances.isTrue || balance > 0.0;
+    }).toList();
+    if (isSearching.isTrue) {
+      filteredCurrencies.assignAll(filteredList);
+    } else {
+      currencies.assignAll(filteredList);
+    }
+  }
+
+  void filterCurrencies(String query) {
+    var filteredList = currencies.where((currency) {
+      var currencyName = currency['currency'].toLowerCase();
+      var balance = currency['balance'] ?? 0.0;
+      return currencyName.contains(query.toLowerCase()) &&
+          (!hideZeroBalances.isTrue || balance > 0.0);
+    }).toList();
+    filteredCurrencies.assignAll(filteredList);
   }
 
   void enableSearch() {
@@ -25,14 +54,6 @@ class WalletSpotController extends GetxController {
   void clearSearch() {
     isSearching(false);
     filteredCurrencies.clear();
-  }
-
-  void filterCurrencies(String query) {
-    var filteredList = currencies.where((currency) {
-      var currencyName = currency['currency'].toLowerCase();
-      return currencyName.contains(query.toLowerCase());
-    }).toList();
-    filteredCurrencies.assignAll(filteredList);
   }
 
   void fetchCurrencies() async {
