@@ -1,5 +1,5 @@
 import 'package:bicrypto/Controllers/wallets/spot%20wallet/spot_transfer_controller.dart.dart';
-import 'package:bicrypto/Style/styles.dart';
+import 'package:bicrypto/style/styles.dart';
 import 'package:bicrypto/services/wallet_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -15,37 +15,37 @@ class SpotTransferView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Use Theme data to adjust colors for dark mode
+    ThemeData theme = Theme.of(context);
+    var inputTextColor = theme.textTheme.bodyText1?.color ?? Colors.white;
+    var borderColor = theme.hintColor;
+    var focusedBorderColor = theme.colorScheme.secondary;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Transfer Funds'),
-        backgroundColor: appTheme.scaffoldBackgroundColor,
+        backgroundColor: appTheme
+            .scaffoldBackgroundColor, // Make sure this is set for dark mode
         elevation: 0,
       ),
-      body: Form(
-        key: _formKey,
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: TextFormField(
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16.0),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            children: [
+              TextFormField(
                 controller: _uuidController,
-                style: const TextStyle(
-                  color: Colors.white, // Text color
-                ),
-                decoration: const InputDecoration(
+                style: TextStyle(color: inputTextColor),
+                decoration: InputDecoration(
                   labelText: 'Target User UUID',
-                  labelStyle: TextStyle(
-                    color: Colors.white, // Label text color for dark mode
-                  ),
+                  labelStyle: TextStyle(color: inputTextColor),
                   border: OutlineInputBorder(),
                   enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(
-                        color: Colors.white), // Border color for dark mode
+                    borderSide: BorderSide(color: borderColor),
                   ),
                   focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(
-                        color: Colors
-                            .white), // Border color when the field is focused
+                    borderSide: BorderSide(color: focusedBorderColor),
                   ),
                 ),
                 validator: (value) {
@@ -55,16 +55,21 @@ class SpotTransferView extends StatelessWidget {
                   return null;
                 },
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: TextFormField(
+              SizedBox(height: 16.0),
+              TextFormField(
                 controller: _amountController,
-                keyboardType:
-                    const TextInputType.numberWithOptions(decimal: true),
-                decoration: const InputDecoration(
+                keyboardType: TextInputType.numberWithOptions(decimal: true),
+                style: TextStyle(color: inputTextColor),
+                decoration: InputDecoration(
                   labelText: 'Amount',
+                  labelStyle: TextStyle(color: inputTextColor),
                   border: OutlineInputBorder(),
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: borderColor),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: focusedBorderColor),
+                  ),
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
@@ -75,43 +80,42 @@ class SpotTransferView extends StatelessWidget {
                   return null;
                 },
               ),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                if (_formKey.currentState!.validate()) {
-                  // Only attempt the transfer if the form is valid
-                  controller
-                      .transferFunds(
-                    'currency', // You would have to provide the actual currency
-                    'SPOT',
-                    _amountController.text,
-                    _uuidController.text,
-                  )
-                      .then((_) {
-                    // Here, you can show a snackbar with the results for debugging purposes
-                    if (controller.transferResult['status'] == 'fail') {
-                      Get.snackbar(
-                        'Transfer Failed',
-                        controller.transferResult['error']['message'],
-                        snackPosition: SnackPosition.BOTTOM,
-                      );
-                    }
-                  });
+              SizedBox(height: 24.0),
+              ElevatedButton.icon(
+                icon: Icon(Icons.send),
+                label: Obx(() => controller.isLoading.value
+                    ? SizedBox(
+                        width: 24,
+                        height: 24,
+                        child: CircularProgressIndicator(
+                          valueColor:
+                              AlwaysStoppedAnimation<Color>(inputTextColor),
+                        ),
+                      )
+                    : Text('Transfer')),
+                onPressed: () {
+                  if (_formKey.currentState!.validate()) {
+                    FocusScope.of(context).unfocus(); // Hide the keyboard
+                    controller.transferFunds(
+                      'currency', // Actual currency value should be provided here
+                      'SPOT',
+                      _amountController.text,
+                      _uuidController.text,
+                    );
+                  }
+                },
+              ),
+              Obx(() {
+                if (controller.transferResult.isNotEmpty) {
+                  return Text(
+                    'Transfer Status: ${controller.transferResult['status']}',
+                    style: TextStyle(color: inputTextColor),
+                  );
                 }
-              },
-              child: Obx(() => controller.isLoading.value
-                  ? const CircularProgressIndicator()
-                  : const Text('Transfer')),
-            ),
-            Obx(() {
-              if (controller.transferResult.isNotEmpty) {
-                return Text(
-                    'Transfer Status: ${controller.transferResult['status']}');
-              }
-              return const SizedBox
-                  .shrink(); // Return an empty widget if no result
-            }),
-          ],
+                return SizedBox.shrink();
+              }),
+            ],
+          ),
         ),
       ),
     );

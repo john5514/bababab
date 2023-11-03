@@ -14,7 +14,24 @@ class SpotWalletDetailView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Map<dynamic, dynamic> arguments = Get.arguments;
+    // Ensure arguments are not null before using them
+    final Map<dynamic, dynamic>? arguments = Get.arguments;
+    if (arguments == null) {
+      // Handle the case where arguments are null
+      // You could show an error or redirect the user back
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Get.snackbar(
+          'Error',
+          'No wallet details provided.',
+          snackPosition: SnackPosition.BOTTOM,
+        );
+        Get.back(); // Go back to the previous screen if no arguments are passed
+      });
+      return Scaffold(
+          body:
+              Container()); // Return an empty container to avoid rendering errors
+    }
+
     final Map<String, dynamic> walletDetails =
         Map<String, dynamic>.from(arguments);
     controller.setWalletDetails(walletDetails);
