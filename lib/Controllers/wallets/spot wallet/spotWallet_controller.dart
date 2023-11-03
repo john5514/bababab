@@ -9,7 +9,7 @@ class WalletSpotController extends GetxController {
   var isSearching = false.obs;
   var filteredCurrencies = <dynamic>[].obs;
   var hideZeroBalances = false.obs;
-  var originalCurrencies = <dynamic>[].obs; // Add this line
+  var originalCurrencies = <dynamic>[].obs;
 
   WalletSpotController({required this.walletService});
 
@@ -32,7 +32,6 @@ class WalletSpotController extends GetxController {
       }).toList();
       currencies.assignAll(filteredList);
     } else {
-      // Reset to the original list if hideZeroBalances is false
       currencies.assignAll(originalCurrencies);
     }
   }
@@ -64,8 +63,7 @@ class WalletSpotController extends GetxController {
       if (response['status'] == 'success') {
         var fetchedCurrencies = response['data']['result'];
         currencies.assignAll(fetchedCurrencies);
-        originalCurrencies
-            .assignAll(fetchedCurrencies); // Store the original list
+        originalCurrencies.assignAll(fetchedCurrencies);
         await fetchBalancesForCurrencies();
       }
     } catch (e) {
@@ -76,41 +74,33 @@ class WalletSpotController extends GetxController {
   }
 
   Future<void> fetchBalancesForCurrencies() async {
-    var fetchTasks = <Future>[];
+    isLoading(true);
+    try {
+      List<dynamic> spotWallets = await walletService.fetchSpotWallets();
+      Map<String, dynamic> spotWalletsMap = {
+        for (var wallet in spotWallets) wallet['currency']: wallet['balance']
+      };
 
-    for (var currency in currencies) {
-      var task = walletService
-          .fetchSpotWallet(currency['currency'])
-          .then((walletInfo) {
-        if (walletInfo['status'] == 'success' &&
-            walletInfo['data']['result'] != null) {
-          updateCurrencyWithWalletDetails(
-              currency['currency'], walletInfo['data']['result']);
-        }
-      }).catchError((e) {
-        print('Error fetching wallet for currency ${currency['currency']}: $e');
-      });
-
-      fetchTasks.add(task);
+      for (var currency in currencies) {
+        var balance = spotWalletsMap[currency['currency']];
+        currency['balance'] =
+            balance is int ? balance.toDouble() : (balance ?? 0.0);
+      }
+      calculateTotalEstimatedBalance();
+    } catch (e) {
+      print('Error fetching spot wallets: $e');
+    } finally {
+      isLoading(false);
     }
-
-    // Wait for all the fetch tasks to complete
-    await Future.wait(fetchTasks);
   }
 
   void calculateTotalEstimatedBalance() {
     double total = 0.0;
     for (var currency in currencies) {
-      // Ensuring that price is a double
       var priceValue = currency['price'];
       double price =
           (priceValue is int) ? priceValue.toDouble() : (priceValue ?? 0.0);
-
-      // Ensuring that balance is a double
-      var balanceValue = currency['balance'];
-      double amount = (balanceValue is int)
-          ? balanceValue.toDouble()
-          : (balanceValue ?? 0.0);
+      double amount = currency['balance'];
 
       total += price * amount;
     }
@@ -129,10 +119,14 @@ class WalletSpotController extends GetxController {
           updateCurrencyWithWalletDetails(
               currencyCode, walletInfo['data']['result']);
         } else {
+          // Attempt to create the wallet if it does not exist
           await walletService.postSpotWallet(currencyCode);
-          await Future.delayed(Duration(seconds: 2));
+          // Wait for a couple of seconds to simulate delay (if necessary)
+          // await Future.delayed(Duration(seconds: 2));
+          // Try to fetch the wallet again after creation
           walletInfo = await walletService.fetchSpotWallet(currencyCode);
-          if (walletInfo['status'] == 'success') {
+          if (walletInfo['status'] == 'success' &&
+              walletInfo['data']['result'] != null) {
             updateCurrencyWithWalletDetails(
                 currencyCode, walletInfo['data']['result']);
           } else {
@@ -140,11 +134,9 @@ class WalletSpotController extends GetxController {
             return; // Early return if failed to create or fetch
           }
         }
-        // Navigate to detail screen with the wallet details
-        Get.toNamed('/spot-wallet-detail', arguments: {
-          ...walletInfo['data']['result'], // Existing wallet details
-          'walletType': 'SPOT' // Explicitly add walletType
-        });
+        // Navigate to the details page with the fetched wallet info
+        Get.toNamed('/spot-wallet-detail',
+            arguments: {...walletInfo['data']['result'], 'walletType': 'SPOT'});
       }
     } catch (e) {
       print('Error handling currency tap: $e');
@@ -158,9 +150,11 @@ class WalletSpotController extends GetxController {
     int index = currencies
         .indexWhere((currency) => currency['currency'] == currencyCode);
     if (index != -1) {
-      currencies[index]['uuid'] = walletDetails['uuid'];
-      currencies[index]['balance'] = walletDetails['balance'];
-      // Recalculate total balance whenever a wallet's details are updated
+      // Ensure that the balance is cast to a double
+      double balance = (walletDetails['balance'] is int)
+          ? walletDetails['balance'].toDouble()
+          : walletDetails['balance'];
+      currencies[index]['balance'] = balance;
       calculateTotalEstimatedBalance();
     }
     print("Updated currency: ${currencies[index]}");
