@@ -149,6 +149,28 @@ class WalletService {
     }
   }
 
+  Future<List<dynamic>> fetchSpotWallets() async {
+    await loadHeaders();
+    final response = await HttpClientHelper.get(
+      Uri.parse('${baseUrl}/user'),
+      headers: headers,
+    );
+    if (response?.statusCode == 200) {
+      var responseBody = jsonDecode(response!.body);
+      List<dynamic> allWallets = responseBody['data']['result'];
+      List<dynamic> spotWallets =
+          allWallets.where((wallet) => wallet['type'] == 'SPOT').toList();
+      // Uncomment the line below to print the SPOT wallets
+      // print("WalletService - Fetched SPOT Wallets: $spotWallets");
+      return spotWallets;
+    } else {
+      // Uncomment the lines below to print the error details
+      // print("Failed to fetch wallets with status code: ${response?.statusCode}");
+      // print("Failure response: ${response?.body}");
+      throw Exception('Failed to fetch wallets');
+    }
+  }
+
 ////////////////////////// Fiat Wallet /////////////////////////
   Future<List<dynamic>> fetchFiatDepositMethods() async {
     await loadHeaders();
