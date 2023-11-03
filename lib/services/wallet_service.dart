@@ -3,6 +3,7 @@ import 'package:bicrypto/Controllers/wallet_controller.dart';
 import 'package:bicrypto/services/api_service.dart';
 import 'package:http_client_helper/http_client_helper.dart';
 import 'package:intl/intl.dart';
+import 'package:http/http.dart' as http;
 
 class WalletService {
   final String baseUrl = "https://v3.mash3div.com/api/wallets";
@@ -168,6 +169,41 @@ class WalletService {
       // print("Failed to fetch wallets with status code: ${response?.statusCode}");
       // print("Failure response: ${response?.body}");
       throw Exception('Failed to fetch wallets');
+    }
+  }
+
+  Future<Map<String, dynamic>> transfer({
+    required String currency,
+    required String type,
+    required String amount,
+    required String to,
+  }) async {
+    await loadHeaders(); // Make sure headers are loaded with tokens
+
+    final Uri transferUri = Uri.parse('${baseUrl}/transfer');
+    final response = await http.post(
+      transferUri,
+      headers: headers,
+      body: jsonEncode({
+        'currency': currency,
+        'type': type,
+        'amount': amount,
+        'to': to,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      // If the call to the server was successful, parse the JSON
+      return json.decode(response.body);
+    } else {
+      // If the call to the server was not successful, handle errors
+      var responseBody = json.decode(response.body);
+      var errorMessage = 'Failed to transfer funds.';
+      if (responseBody is Map<String, dynamic> &&
+          responseBody['error'] != null) {
+        errorMessage = responseBody['error']['message'] ?? errorMessage;
+      }
+      throw Exception(errorMessage);
     }
   }
 

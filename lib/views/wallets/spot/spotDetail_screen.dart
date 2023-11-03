@@ -1,6 +1,7 @@
 import 'package:bicrypto/Controllers/wallets/spot%20wallet/spotDetail_controller.dart';
 import 'package:bicrypto/Style/styles.dart';
 import 'package:bicrypto/services/wallet_service.dart';
+import 'package:bicrypto/views/wallets/spot/SpotTransferView.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -30,6 +31,18 @@ class SpotWalletDetailView extends StatelessWidget {
                 "Balance: ${controller.walletDetails['balance'].toStringAsFixed(4)}",
                 style: const TextStyle(fontSize: 20, color: Colors.white),
               )),
+          const SizedBox(height: 20),
+          ElevatedButton.icon(
+            icon: Icon(Icons.swap_horiz), // Replace with your transfer icon
+            label: Text("Transfer"),
+            onPressed: () {
+              Get.to(() => SpotTransferView()); // Navigate to the transfer page
+            },
+            style: ElevatedButton.styleFrom(
+              primary: Colors.blue, // Button color
+              onPrimary: Colors.white, // Text color
+            ),
+          ),
           const SizedBox(height: 20),
           Expanded(child: _buildTransactions(controller.transactions)),
         ],
