@@ -3,6 +3,7 @@ import 'package:bicrypto/services/wallet_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
+import 'package:flutter/services.dart'; // For Clipboard
 
 class SpotDepositView extends StatelessWidget {
   final SpotDepositController controller =
@@ -12,6 +13,8 @@ class SpotDepositView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final TextEditingController txHashController = TextEditingController();
+
     // Safely access 'currency' from arguments
     final walletName =
         (Get.arguments as Map<String, dynamic>?)?['currency'] ?? 'Wallet';
@@ -27,86 +30,126 @@ class SpotDepositView extends StatelessWidget {
           );
         }
 
-        // If chains are loaded, show the DropdownButton2
-        return Padding(
+        return SingleChildScrollView(
           padding: const EdgeInsets.all(16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                "Select Chain",
-                style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white), // For dark theme
-              ),
-              const SizedBox(height: 8),
-              Container(
-                padding: const EdgeInsets.all(4.0),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF2C2F33), // Color of the dropdown
-                  borderRadius: BorderRadius.circular(5),
-                  border: Border.all(
-                    color: Colors.black26, // Border color
+              // Dropdown to select chain
+              _buildChainDropdown(controller),
+              if (controller.selectedChain.isNotEmpty) ...[
+                const SizedBox(height: 16),
+                Text(
+                  "Send Transaction:",
+                  style: Theme.of(context).textTheme.headline6,
+                ),
+                const SizedBox(height: 8),
+                Text("Deposit to the address:"),
+                SelectableText(
+                  controller.depositAddress.value,
+                  style: Theme.of(context).textTheme.bodyText1,
+                ),
+                TextButton.icon(
+                  onPressed: () {
+                    Clipboard.setData(
+                        ClipboardData(text: controller.depositAddress.value));
+                    // Show a snackbar or toast message after copying
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                          content: Text('Address copied to clipboard!')),
+                    );
+                  },
+                  icon: const Icon(Icons.copy),
+                  label: const Text("Copy"),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  "Submit Transaction:",
+                  style: Theme.of(context).textTheme.headline6,
+                ),
+                TextField(
+                  controller: txHashController,
+                  decoration: const InputDecoration(
+                    labelText: 'Transaction Hash',
+                    helperText:
+                        'After you have sent the transaction, please enter the transaction hash below.',
                   ),
                 ),
-                child: DropdownButtonHideUnderline(
-                  child: DropdownButton2<String>(
-                    isExpanded: true,
-                    value: controller.selectedChain.value.isNotEmpty
-                        ? controller.selectedChain.value
-                        : null,
-                    items: controller.chains
-                        .map((String chain) => DropdownMenuItem<String>(
-                              value: chain,
-                              child: Text(
-                                chain,
-                                style: const TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white, // Text color
-                                ),
-                              ),
-                            ))
-                        .toList(),
-                    onChanged: (newValue) {
-                      controller.setChain(newValue!);
-                    },
-                    buttonStyleData: ButtonStyleData(
-                      height: 40,
-                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(5),
-                        color: const Color(
-                            0xFF2C2F33), // Color of the dropdown button
-                      ),
-                    ),
-                    iconStyleData: const IconStyleData(
-                      icon: Icon(
-                        Icons.arrow_drop_down,
-                        color: Colors.white, // Icon color
-                      ),
-                    ),
-                    dropdownStyleData: DropdownStyleData(
-                      width: 200,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(5),
-                        color: const Color(
-                            0xFF2C2F33), // Color of the dropdown menu
-                      ),
-                    ),
-                    menuItemStyleData: const MenuItemStyleData(
-                      height: 40,
-                      padding: EdgeInsets.symmetric(horizontal: 8.0),
-                    ),
-                  ),
+                const SizedBox(height: 8),
+                ElevatedButton(
+                  onPressed: () {
+                    // Submit the transaction hash
+                    // if (txHashController.text.isNotEmpty) {
+                    //   controller.submitTransaction(txHashController.text);
+                    // }
+                  },
+                  child: const Text("Submit"),
                 ),
-              ),
-              // ... Other UI elements
+              ],
             ],
           ),
         );
       }),
+    );
+  }
+
+  Widget _buildChainDropdown(SpotDepositController controller) {
+    return Container(
+      padding: const EdgeInsets.all(4.0),
+      decoration: BoxDecoration(
+        color: const Color(0xFF2C2F33),
+        borderRadius: BorderRadius.circular(5),
+        border: Border.all(color: Colors.black26),
+      ),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton2<String>(
+          isExpanded: true,
+          value: controller.selectedChain.value.isNotEmpty
+              ? controller.selectedChain.value
+              : null,
+          items: controller.chains
+              .map((String chain) => DropdownMenuItem<String>(
+                    value: chain,
+                    child: Text(
+                      chain,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white, // Text color
+                      ),
+                    ),
+                  ))
+              .toList(),
+          onChanged: (newValue) {
+            controller.setChain(newValue!);
+          },
+          buttonStyleData: ButtonStyleData(
+            height: 40,
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(5),
+              color: const Color(0xFF2C2F33), // Color of the dropdown button
+            ),
+          ),
+          iconStyleData: const IconStyleData(
+            icon: Icon(
+              Icons.arrow_drop_down,
+              color: Colors.white, // Icon color
+            ),
+          ),
+          dropdownStyleData: DropdownStyleData(
+            width: 200,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(5),
+              color: const Color(0xFF2C2F33), // Color of the dropdown menu
+            ),
+          ),
+          menuItemStyleData: const MenuItemStyleData(
+            height: 40,
+            padding: EdgeInsets.symmetric(horizontal: 8.0),
+          ),
+        ),
+      ),
     );
   }
 }

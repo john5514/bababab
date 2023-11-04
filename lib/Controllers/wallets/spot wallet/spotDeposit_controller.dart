@@ -2,21 +2,20 @@ import 'package:get/get.dart';
 import 'package:bicrypto/services/wallet_service.dart';
 
 class SpotDepositController extends GetxController {
-  var isLoading = false.obs;
-  var selectedChain = ''.obs;
-  var chains = <String>[].obs;
+  var isLoading = RxBool(false);
+  var selectedChain = RxString('');
+  var chains = RxList<String>();
+  var depositAddress = RxString('');
   final WalletService walletService;
+  var selectedWallet = {}.obs; // To store the selected wallet details
 
   SpotDepositController(this.walletService);
 
   @override
   void onInit() {
     super.onInit();
-    // Extract the currency from the arguments passed to this view
-    // Ensure you handle the case where Get.arguments is null
     var arguments = Get.arguments as Map<String, dynamic>?;
     String currency = arguments?['currency'] ?? 'default_currency_value';
-    // Now fetch chains for the selected currency
     fetchChains(currency);
   }
 
@@ -24,21 +23,23 @@ class SpotDepositController extends GetxController {
     try {
       isLoading(true);
       var spotWallets = await walletService.fetchSpotWallets();
-      // Find the wallet that matches the selected currency
-      var selectedWallet = spotWallets.firstWhere(
+      var wallet = spotWallets.firstWhere(
         (wallet) => wallet['currency'] == currency,
         orElse: () => null,
       );
 
-      if (selectedWallet != null && selectedWallet['addresses'] != null) {
-        chains.value = selectedWallet['addresses'].keys.cast<String>().toList();
+      if (wallet != null) {
+        selectedWallet(wallet); // Store the wallet details
+        chains(wallet['addresses'].keys.cast<String>().toList());
+        if (selectedChain.isNotEmpty) {
+          setChain(selectedChain
+              .value); // Fetch deposit address if chain is already selected
+        }
       } else {
-        // Handle the case where no chains are found or the addresses are null
-        chains.value = [];
+        chains([]);
       }
     } catch (e) {
-      // Handle exception by showing error message or empty list
-      chains.value = [];
+      chains([]);
       print('Error fetching chains for $currency: $e');
     } finally {
       isLoading(false);
@@ -46,12 +47,17 @@ class SpotDepositController extends GetxController {
   }
 
   void setChain(String chain) {
-    selectedChain.value = chain;
-    print('Selected Chain: $chain'); // Print the selected chain
-
-    // Fetch the deposit address and QR code for the selected chain
-    // You would need to implement this in the walletService
+    selectedChain(chain);
+    // Get the deposit address for the selected chain from the stored wallet details
+    var addressDetails = selectedWallet['addresses'][chain];
+    if (addressDetails != null) {
+      depositAddress(addressDetails['address']);
+    } else {
+      depositAddress('Address not available');
+    }
   }
+
+  // Add any additional methods you need for the rest of your logic, such as transaction submission
 
   // ... Other methods for handling deposit logic
 }
