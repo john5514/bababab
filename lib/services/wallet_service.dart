@@ -175,6 +175,34 @@ class WalletService {
     }
   }
 
+  Future<Map<String, dynamic>> verifySpotDeposit(String transactionId) async {
+    await loadHeaders();
+    final response = await HttpClientHelper.get(
+      Uri.parse('${baseUrl}/spot/deposit/verify/$transactionId'),
+      headers: headers,
+    );
+    if (response?.statusCode == 200) {
+      return jsonDecode(response!.body);
+    } else {
+      throw Exception(
+          'Failed to verify deposit. Status code: ${response?.statusCode}');
+    }
+  }
+
+  Future<Map<String, dynamic>> cancelSpotDeposit(String transactionId) async {
+    await loadHeaders();
+    final response = await HttpClientHelper.delete(
+      Uri.parse('${baseUrl}/spot/deposit/cancel/$transactionId'),
+      headers: headers,
+    );
+    if (response?.statusCode == 200) {
+      return jsonDecode(response!.body);
+    } else {
+      throw Exception(
+          'Failed to cancel deposit. Status code: ${response?.statusCode}');
+    }
+  }
+
   Future<Map<String, dynamic>> transfer({
     required String currency,
     required String type,

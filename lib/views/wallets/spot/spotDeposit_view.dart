@@ -1,5 +1,6 @@
 import 'package:bicrypto/Controllers/wallets/spot%20wallet/spotDeposit_controller.dart';
 import 'package:bicrypto/services/wallet_service.dart';
+import 'package:bicrypto/widgets/wallet/deposit_instructions_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
@@ -78,10 +79,8 @@ class SpotDepositView extends StatelessWidget {
                 const SizedBox(height: 8),
                 ElevatedButton(
                   onPressed: () {
-                    // Submit the transaction hash
-                    // if (txHashController.text.isNotEmpty) {
-                    //   controller.submitTransaction(txHashController.text);
-                    // }
+                    // Call the showDialog method from your SpotDepositController
+                    controller.showDialog();
                   },
                   child: const Text("Submit"),
                 ),
