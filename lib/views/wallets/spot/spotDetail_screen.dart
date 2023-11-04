@@ -49,16 +49,46 @@ class SpotWalletDetailView extends StatelessWidget {
                 style: const TextStyle(fontSize: 20, color: Colors.white),
               )),
           const SizedBox(height: 20),
-          ElevatedButton.icon(
-            icon: Icon(Icons.swap_horiz), // Replace with your transfer icon
-            label: Text("Transfer"),
-            onPressed: () {
-              Get.to(() => SpotTransferView()); // Navigate to the transfer page
-            },
-            style: ElevatedButton.styleFrom(
-              primary: Colors.blue, // Button color
-              onPrimary: Colors.white, // Text color
-            ),
+          Row(
+            mainAxisAlignment:
+                MainAxisAlignment.spaceEvenly, // To distribute buttons evenly
+            children: [
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  child: ElevatedButton.icon(
+                    icon: const Icon(
+                        Icons.swap_horiz), // Replace with your transfer icon
+                    label: const Text("Transfer"),
+                    onPressed: () {
+                      Get.to(() =>
+                          SpotTransferView()); // Navigate to the transfer page
+                    },
+                    style: ElevatedButton.styleFrom(
+                      foregroundColor: Colors.white,
+                      backgroundColor: Colors.blue, // Button color
+                    ),
+                  ),
+                ),
+              ),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  child: ElevatedButton.icon(
+                    icon: const Icon(Icons
+                        .account_balance_wallet), // Replace with your deposit icon
+                    label: const Text("Deposit"),
+                    onPressed: () {
+                      // Handle deposit action
+                    },
+                    style: ElevatedButton.styleFrom(
+                      foregroundColor: Colors.white,
+                      backgroundColor: Colors.green, // Button color
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: 20),
           Expanded(child: _buildTransactions(controller.transactions)),
