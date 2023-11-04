@@ -2,6 +2,7 @@ import 'package:bicrypto/Controllers/wallets/spot%20wallet/spotDetail_controller
 import 'package:bicrypto/Style/styles.dart';
 import 'package:bicrypto/services/wallet_service.dart';
 import 'package:bicrypto/views/wallets/spot/SpotTransferView.dart';
+import 'package:bicrypto/widgets/wallet/defaultDialog.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -79,7 +80,8 @@ class SpotWalletDetailView extends StatelessWidget {
                         .account_balance_wallet), // Replace with your deposit icon
                     label: const Text("Deposit"),
                     onPressed: () {
-                      // Handle deposit action
+                      // Call the function to show the deposit instructions dialog
+                      showDepositInstructions(context);
                     },
                     style: ElevatedButton.styleFrom(
                       foregroundColor: Colors.white,

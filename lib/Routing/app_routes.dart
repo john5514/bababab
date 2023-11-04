@@ -9,6 +9,7 @@ import 'package:bicrypto/views/wallet_view.dart';
 import 'package:bicrypto/views/wallets/completedepositview.dart';
 import 'package:bicrypto/views/wallets/depositview.dart';
 import 'package:bicrypto/views/wallets/spot/SpotTransferView.dart';
+import 'package:bicrypto/views/wallets/spot/spotDeposit_view.dart';
 import 'package:bicrypto/views/wallets/spot/spotDetail_screen.dart';
 import 'package:bicrypto/views/wallets/walletinfo_view.dart';
 import 'package:bicrypto/views/wallets/withdrowview.dart';
@@ -55,5 +56,8 @@ class AppRoutes {
     GetPage(name: '/market', page: () => MarketScreen()),
     GetPage(name: '/spot-wallet-detail', page: () => SpotWalletDetailView()),
     GetPage(name: '/spot-transfer', page: () => SpotTransferView()),
+    GetPage(
+        name: '/spot-deposit',
+        page: () => SpotDepositView()), // Add your SpotDepositView page here
   ];
 }
