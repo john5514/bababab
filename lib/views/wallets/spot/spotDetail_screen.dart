@@ -46,7 +46,7 @@ class SpotWalletDetailView extends StatelessWidget {
       body: Column(
         children: [
           Obx(() => Text(
-                "Balance: ${controller.walletDetails['balance'].toStringAsFixed(4)}",
+                "Balance: ${controller.walletDetails['balance']?.toStringAsFixed(2) ?? '0.00'}",
                 style: const TextStyle(fontSize: 20, color: Colors.white),
               )),
           const SizedBox(height: 20),
@@ -80,8 +80,8 @@ class SpotWalletDetailView extends StatelessWidget {
                         .account_balance_wallet), // Replace with your deposit icon
                     label: const Text("Deposit"),
                     onPressed: () {
-                      // Call the function to show the deposit instructions dialog
-                      showDepositInstructions(context);
+                      showDepositInstructions(
+                          context, controller.walletDetails.value);
                     },
                     style: ElevatedButton.styleFrom(
                       foregroundColor: Colors.white,

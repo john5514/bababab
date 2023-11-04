@@ -2,7 +2,8 @@ import 'package:bicrypto/services/wallet_service.dart';
 import 'package:get/get.dart';
 
 class SpotWalletDetailController extends GetxController {
-  var walletDetails = {}.obs;
+  // Explicitly declare walletDetails as Map<String, dynamic>
+  var walletDetails = <String, dynamic>{}.obs;
   var transactions = <dynamic>[].obs;
   final WalletService walletService;
 
@@ -19,7 +20,8 @@ class SpotWalletDetailController extends GetxController {
   }
 
   void fetchTransactions() async {
-    String? walletType = walletDetails['walletType'];
+    String? walletType = walletDetails[
+        'type']; // It should be 'type' instead of 'walletType' based on your service response
     if (walletType != null) {
       try {
         transactions.value = await walletService.fetchTransactions(walletType);

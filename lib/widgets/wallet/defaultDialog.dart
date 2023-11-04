@@ -1,8 +1,10 @@
+import 'package:bicrypto/views/wallets/spot/spotDeposit_view.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 
-void showDepositInstructions(BuildContext context) {
+void showDepositInstructions(
+    BuildContext context, Map<String, dynamic> walletDetails) {
   Alert(
     context: context,
     type: AlertType.none,
@@ -127,7 +129,13 @@ void showDepositInstructions(BuildContext context) {
     ),
     buttons: [
       DialogButton(
-        onPressed: () => Get.toNamed('/spot-deposit'),
+        onPressed: () => Get.to(
+          () => SpotDepositView(),
+          arguments: {
+            'currency': walletDetails[
+                'currency'], // Make sure walletDetails has a 'currency' key
+          },
+        ),
         color: Colors.blueAccent,
         child: const Text(
           "NEXT",

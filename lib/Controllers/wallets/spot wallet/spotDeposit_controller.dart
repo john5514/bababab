@@ -1,53 +1,57 @@
-import 'package:bicrypto/services/wallet_service.dart';
 import 'package:get/get.dart';
+import 'package:bicrypto/services/wallet_service.dart';
 
 class SpotDepositController extends GetxController {
-  var chains = <String>[].obs;
-
+  var isLoading = false.obs;
   var selectedChain = ''.obs;
-  var depositAddress = ''.obs;
-  var depositQRCode = ''.obs;
-  var transactionHash = ''.obs;
-  var isVerified = false.obs;
-  var remainingTime = 30.minutes.obs;
+  var chains = <String>[].obs;
+  final WalletService walletService;
 
-  void startDepositCountdown() {
-    // Assuming you want to start a countdown when the deposit process begins
-    remainingTime.value = 30.minutes;
-    ever(remainingTime, (_) {
-      if (remainingTime.value.inSeconds > 0) {
-        remainingTime.value = remainingTime.value - 1.seconds;
-      } else {
-        // Handle times up
-      }
-    });
+  SpotDepositController(this.walletService);
+
+  @override
+  void onInit() {
+    super.onInit();
+    // Extract the currency from the arguments passed to this view
+    // Ensure you handle the case where Get.arguments is null
+    var arguments = Get.arguments as Map<String, dynamic>?;
+    String currency = arguments?['currency'] ?? 'default_currency_value';
+    // Now fetch chains for the selected currency
+    fetchChains(currency);
   }
 
-  Future<void> fetchChains() async {
+  void fetchChains(String currency) async {
     try {
-      var wallets = await Get.find<WalletService>().fetchSpotWallets();
-      var chains = wallets
-          .map((wallet) => wallet['addresses'].keys.toList())
-          .expand((i) => i)
-          .toSet()
-          .toList();
-      // Now you have the list of chains. You can store it in a variable or do something with it.
+      isLoading(true);
+      var spotWallets = await walletService.fetchSpotWallets();
+      // Find the wallet that matches the selected currency
+      var selectedWallet = spotWallets.firstWhere(
+        (wallet) => wallet['currency'] == currency,
+        orElse: () => null,
+      );
+
+      if (selectedWallet != null && selectedWallet['addresses'] != null) {
+        chains.value = selectedWallet['addresses'].keys.cast<String>().toList();
+      } else {
+        // Handle the case where no chains are found or the addresses are null
+        chains.value = [];
+      }
     } catch (e) {
-      // Handle the error
+      // Handle exception by showing error message or empty list
+      chains.value = [];
+      print('Error fetching chains for $currency: $e');
+    } finally {
+      isLoading(false);
     }
   }
 
-  // Call this when the user selects a chain
   void setChain(String chain) {
     selectedChain.value = chain;
+    print('Selected Chain: $chain'); // Print the selected chain
+
     // Fetch the deposit address and QR code for the selected chain
+    // You would need to implement this in the walletService
   }
 
-  // Call this when the user submits the transaction hash
-  void setTransactionHash(String hash) {
-    transactionHash.value = hash;
-    // Verify the transaction hash
-  }
-
-  // Add other necessary methods and logic for deposit verification, fetching addresses, etc.
+  // ... Other methods for handling deposit logic
 }
