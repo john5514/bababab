@@ -35,7 +35,7 @@ class DepositInstructionsDialog extends StatelessWidget {
             children: [
               Text(
                 "Your transaction is currently pending and is waiting to be verified. Please refrain from closing the modal or refreshing the page until the verification process is complete. This may take a few moments, but rest assured that we are working diligently to ensure that your transaction is processed as quickly and securely as possible. Thank you for your patience and cooperation.",
-                textAlign: TextAlign.center, // This will center the text
+                textAlign: TextAlign.center,
                 style: TextStyle(color: Colors.grey[300]),
               ),
               SizedBox(height: 20),
@@ -49,13 +49,10 @@ class DepositInstructionsDialog extends StatelessWidget {
         TextButton(
           onPressed: () {
             // Cancel the deposit
-            controller.cancelDeposit(walletDetails['transactionId']);
+            controller.cancelDeposit();
             Navigator.of(context).pop();
           },
-          child: Text(
-            "CANCEL",
-            style: TextStyle(color: Colors.red),
-          ),
+          child: Text('Cancel Deposit'),
         ),
       ],
     );

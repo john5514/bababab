@@ -153,7 +153,7 @@ class WalletService {
   Future<List<dynamic>> fetchSpotWallets() async {
     await loadHeaders();
     final response = await HttpClientHelper.get(
-      Uri.parse('${baseUrl}/user'),
+      Uri.parse('${baseUrl}'),
       headers: headers,
     );
     if (response?.statusCode == 200) {
@@ -189,11 +189,15 @@ class WalletService {
     }
   }
 
-  Future<Map<String, dynamic>> cancelSpotDeposit(String transactionId) async {
+  Future<Map<String, dynamic>> cancelSpotDeposit(String referenceId) async {
     await loadHeaders();
-    final response = await HttpClientHelper.delete(
-      Uri.parse('${baseUrl}/spot/deposit/cancel/$transactionId'),
+    // Update the endpoint to use the transaction reference ID
+    String endpoint = '${baseUrl}/spot/deposit/cancel/$referenceId';
+    // Make sure to use the POST method
+    final response = await HttpClientHelper.post(
+      Uri.parse(endpoint),
       headers: headers,
+      body: '', // Send an empty body if required by the API
     );
     if (response?.statusCode == 200) {
       return jsonDecode(response!.body);
@@ -418,15 +422,27 @@ class WalletService {
     }
   }
 
-  Future<void> postSpotDeposit(Map<String, dynamic> payload) async {
+  Future<Map<String, dynamic>> postSpotDeposit(
+      Map<String, dynamic> payload) async {
     await loadHeaders();
+    print('Headers for request: $headers'); // Log the headers
+    print('Payload for request: $payload'); // Log the payload
+
     final response = await HttpClientHelper.post(
-      Uri.parse('${baseUrl}/spot/deposit'),
+      Uri.parse('$baseUrl/spot/deposit'),
       headers: headers,
       body: jsonEncode(payload),
     );
-    if (response?.statusCode != 200 && response?.statusCode != 201) {
-      throw Exception('Failed to post spot deposit');
+
+    print('Status code: ${response?.statusCode}'); // Log the status code
+    print('Response body: ${response?.body}'); // Log the response body
+
+    if (response?.statusCode == 200 || response?.statusCode == 201) {
+      // If the call to the server was successful, parse the JSON
+      return json.decode(response!.body);
+    } else {
+      // If that call was not successful, throw an error.
+      throw Exception('Failed to post spot deposit: ${response?.body}');
     }
   }
 

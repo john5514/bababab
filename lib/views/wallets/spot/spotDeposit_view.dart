@@ -79,8 +79,23 @@ class SpotDepositView extends StatelessWidget {
                 const SizedBox(height: 8),
                 ElevatedButton(
                   onPressed: () {
-                    // Call the showDialog method from your SpotDepositController
-                    controller.showDialog();
+                    if (txHashController.text.isNotEmpty) {
+                      // Prepare the deposit data with dynamic values
+                      Map<String, dynamic> depositData = {
+                        "wallet_id":
+                            controller.selectedWallet.value['id'].toString(),
+                        "trx": txHashController
+                            .text, // transaction hash input by the user
+                        "chain": controller.selectedChain.value,
+                      };
+
+                      // Call the validateAndShowDialog method with the dynamic data
+                      controller.validateAndShowDialog(depositData);
+                    } else {
+                      // If the transaction hash is empty, notify the user to enter it
+                      Get.snackbar(
+                          'Error', 'Please enter the transaction hash.');
+                    }
                   },
                   child: const Text("Submit"),
                 ),

@@ -113,6 +113,7 @@ class WalletSpotController extends GetxController {
     try {
       Map<String, dynamic> walletInfo =
           await walletService.fetchSpotWallet(currencyCode);
+      print(walletInfo); // Add this to debug the structure of walletInfo
 
       if (walletInfo['status'] == 'success') {
         if (walletInfo['data']['result'] != null) {
@@ -150,10 +151,13 @@ class WalletSpotController extends GetxController {
     int index = currencies
         .indexWhere((currency) => currency['currency'] == currencyCode);
     if (index != -1) {
-      // Ensure that the balance is cast to a double
-      double balance = (walletDetails['balance'] is int)
-          ? walletDetails['balance'].toDouble()
-          : walletDetails['balance'];
+      // Ensure that the balance is cast to a double and is not null
+      double balance = 0.0; // Default to 0.0 if balance is null
+      if (walletDetails['balance'] != null) {
+        balance = (walletDetails['balance'] is int)
+            ? walletDetails['balance'].toDouble()
+            : walletDetails['balance'];
+      }
       currencies[index]['balance'] = balance;
       calculateTotalEstimatedBalance();
     }

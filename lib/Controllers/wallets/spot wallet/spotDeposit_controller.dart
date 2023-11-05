@@ -12,6 +12,8 @@ class SpotDepositController extends GetxController {
   var selectedWallet =
       Map<String, dynamic>().obs; // To store the selected wallet details
   var remainingTime = (30 * 60).obs; // 30 minutes countdown in seconds
+  var transactionHashForCancellation = ''.obs;
+
   Timer? countdownTimer;
 
   SpotDepositController(this.walletService);
@@ -73,13 +75,39 @@ class SpotDepositController extends GetxController {
     }
   }
 
-  Future<void> cancelDeposit(String transactionId) async {
+  String? findTransactionToCancel() {
+    for (var transaction in selectedWallet.value['transactions'] ?? []) {
+      if (transaction['type'] == 'DEPOSIT' &&
+          transaction['status'] == 'PENDING') {
+        return transaction['uuid']; // Assuming 'uuid' is the transaction ID
+      }
+    }
+    return null;
+  }
+
+  Future<void> cancelDeposit() async {
     isLoading.value = true;
+    String transactionHashToCancel = transactionHashForCancellation.value;
+    if (transactionHashToCancel.isEmpty) {
+      print('No transaction hash stored for cancellation.');
+      isLoading.value = false;
+      return; // No transaction hash stored, so return early
+    }
+
     try {
-      var response = await walletService.cancelSpotDeposit(transactionId);
+      print(
+          'Attempting to cancel deposit with transaction hash: $transactionHashToCancel');
+      var response =
+          await walletService.cancelSpotDeposit(transactionHashToCancel);
+      print('Cancellation response: $response');
+      // Clear the stored transaction hash after attempting cancellation
+      transactionHashForCancellation.value = '';
       // Handle the successful cancellation here
+      // Depending on the response, you might want to update the UI or user state here
     } catch (e) {
+      print('An error occurred during cancellation: $e');
       // Handle the error here
+      // Display an error message or update the UI accordingly
     } finally {
       isLoading.value = false;
     }
@@ -103,5 +131,33 @@ class SpotDepositController extends GetxController {
     );
   }
 
-  // ... Other methods for handling deposit logic
+  void validateAndShowDialog(Map<String, dynamic> depositData) async {
+    isLoading.value = true;
+    // Ensure wallet_id is an integer
+    depositData['wallet_id'] = int.tryParse(depositData['wallet_id']) ?? 0;
+    print('Sending deposit data: $depositData');
+
+    try {
+      var response = await walletService.postSpotDeposit(depositData);
+      print('Received response: $response');
+
+      if (response['status'] == 'success') {
+        // Save the transaction hash for later use in cancellation
+        transactionHashForCancellation.value = depositData['trx'];
+        showDialog();
+      } else if (response['status'] == 'fail') {
+        String errorMessage = response['error']['message'];
+        print('Validation failed with message: $errorMessage');
+        Get.snackbar('Error', 'Validation failed: $errorMessage');
+      } else {
+        print('Validation failed with an unknown error');
+        Get.snackbar('Error', 'Validation failed with an unknown error');
+      }
+    } catch (e) {
+      print('An error occurred during validation: $e');
+      Get.snackbar('Error', 'An error occurred during validation: $e');
+    } finally {
+      isLoading.value = false;
+    }
+  }
 }
