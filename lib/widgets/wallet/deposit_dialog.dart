@@ -46,12 +46,40 @@ class DepositInstructionsDialog extends StatelessWidget {
             ],
           )),
       actions: <Widget>[
+        // Close Button
         TextButton(
           onPressed: () {
-            // Cancel the deposit
-            controller.cancelDeposit();
-            Navigator.of(context).pop();
+            // Just close the dialog
+            Get.back();
+            int count = 0;
+            Navigator.popUntil(context, (route) {
+              return count++ == 2;
+            });
           },
+          child: Text(
+            'Close',
+            style: TextStyle(color: Colors.white),
+          ),
+        ),
+        // Cancel Deposit Button
+        TextButton(
+          onPressed: () async {
+            // Call the function to cancel the deposit.
+            await controller.cancelDeposit();
+
+            // Pop current dialog
+            Get.back();
+
+            // Pop the next two screens/step back in the navigation stack
+            int count = 0;
+            Navigator.popUntil(context, (route) {
+              return count++ == 2;
+            });
+          },
+          style: TextButton.styleFrom(
+            primary: Colors.white, // Text Color
+            backgroundColor: Colors.red, // Button background color
+          ),
           child: Text('Cancel Deposit'),
         ),
       ],
