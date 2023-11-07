@@ -53,10 +53,10 @@ class DepositInstructionsDialog extends StatelessWidget {
             Get.back();
             int count = 0;
             Navigator.popUntil(context, (route) {
-              return count++ == 2;
+              return count++ == 3;
             });
           },
-          child: Text(
+          child: const Text(
             'Close',
             style: TextStyle(color: Colors.white),
           ),
@@ -72,15 +72,16 @@ class DepositInstructionsDialog extends StatelessWidget {
 
             // Pop the next two screens/step back in the navigation stack
             int count = 0;
+            // ignore: use_build_context_synchronously
             Navigator.popUntil(context, (route) {
-              return count++ == 2;
+              return count++ == 3;
             });
           },
           style: TextButton.styleFrom(
-            primary: Colors.white, // Text Color
+            foregroundColor: Colors.white,
             backgroundColor: Colors.red, // Button background color
           ),
-          child: Text('Cancel Deposit'),
+          child: const Text('Cancel Deposit'),
         ),
       ],
     );
