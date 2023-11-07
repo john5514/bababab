@@ -22,7 +22,7 @@ class DepositInstructionsDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     return AlertDialog(
       backgroundColor: Colors.grey[850],
-      title: Text(
+      title: const Text(
         "DEPOSIT INSTRUCTIONS",
         style: TextStyle(
           color: Colors.white,
@@ -38,7 +38,7 @@ class DepositInstructionsDialog extends StatelessWidget {
                 textAlign: TextAlign.center,
                 style: TextStyle(color: Colors.grey[300]),
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               Text(
                 "Remaining time: ${formatTime(controller.remainingTime.value)}",
                 style: TextStyle(color: Colors.orange[300]),

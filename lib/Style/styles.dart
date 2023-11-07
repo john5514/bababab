@@ -18,6 +18,11 @@ final ThemeData appTheme = ThemeData(
           fontSize: 14, // Reduced from 18
           color: Colors.white,
         ),
+        //make gray color
+        titleMedium: const TextStyle(
+          fontSize: 12, // Reduced from 18
+          color: Colors.grey,
+        ),
       ),
   inputDecorationTheme: const InputDecorationTheme(
     labelStyle: TextStyle(color: Colors.white),

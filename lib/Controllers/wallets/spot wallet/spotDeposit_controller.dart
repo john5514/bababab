@@ -1,4 +1,4 @@
-import 'package:bicrypto/widgets/wallet/deposit_instructions_dialog.dart';
+import 'package:bicrypto/widgets/wallet/deposit_dialog.dart';
 import 'package:get/get.dart';
 import 'package:bicrypto/services/wallet_service.dart';
 import 'dart:async';
@@ -24,7 +24,6 @@ class SpotDepositController extends GetxController {
     var arguments = Get.arguments as Map<String, dynamic>?;
     String currency = arguments?['currency'] ?? 'default_currency_value';
     fetchChains(currency);
-    startCountdown();
   }
 
   @override
@@ -144,6 +143,8 @@ class SpotDepositController extends GetxController {
       if (response['status'] == 'success') {
         // Save the transaction hash for later use in cancellation
         transactionHashForCancellation.value = depositData['trx'];
+        startCountdown();
+
         showDialog();
       } else if (response['status'] == 'fail') {
         String errorMessage = response['error']['message'];
