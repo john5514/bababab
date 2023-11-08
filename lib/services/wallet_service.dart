@@ -457,15 +457,51 @@ class WalletService {
     }
   }
 
-  Future<void> postSpotWithdraw(Map<String, dynamic> payload) async {
-    await loadHeaders();
+  // Future<void> postSpotWithdraw(Map<String, dynamic> payload) async {
+  //   await loadHeaders();
+  //   final response = await HttpClientHelper.post(
+  //     Uri.parse('${baseUrl}/spot/withdraw'),
+  //     headers: headers,
+  //     body: jsonEncode(payload),
+  //   );
+  //   if (response?.statusCode != 200 && response?.statusCode != 201) {
+  //     throw Exception('Failed to post spot withdraw');
+  //   }
+  // }
+  Future<Map<String, dynamic>> withdraw({
+    required String currency,
+    required String chain,
+    required String amount,
+    required String address,
+    String? memo,
+  }) async {
+    await loadHeaders(); // Ensure the headers are loaded with tokens
+
+    // Construct the body of the request
+    var body = jsonEncode({
+      "currency": currency,
+      "chain": chain,
+      "amount": amount,
+      "address": address,
+      if (memo != null) "memo": memo, // Only add memo if it's not null
+    });
+
+    // Use the POST method to initiate a withdrawal
     final response = await HttpClientHelper.post(
-      Uri.parse('${baseUrl}/spot/withdraw'),
+      Uri.parse('$baseUrl/spot/withdraw'),
       headers: headers,
-      body: jsonEncode(payload),
+      body: body,
     );
-    if (response?.statusCode != 200 && response?.statusCode != 201) {
-      throw Exception('Failed to post spot withdraw');
+
+    // Check the response status code and decode the body if successful
+    if (response?.statusCode == 200) {
+      var responseBody = jsonDecode(response!.body);
+      // Optionally print the response or handle it as needed
+      return responseBody;
+    } else {
+      // Handle errors or unsuccessful status codes
+      throw Exception(
+          'Failed to withdraw. Status code: ${response?.statusCode}');
     }
   }
 

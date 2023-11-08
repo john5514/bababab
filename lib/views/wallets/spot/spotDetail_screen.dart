@@ -2,6 +2,8 @@ import 'package:bicrypto/Controllers/wallets/spot%20wallet/spotDetail_controller
 import 'package:bicrypto/Style/styles.dart';
 import 'package:bicrypto/services/wallet_service.dart';
 import 'package:bicrypto/views/wallets/spot/SpotTransferView.dart';
+import 'package:bicrypto/views/wallets/spot/spotWithdraw_screen.dart';
+import 'package:bicrypto/views/wallets/withdrowview.dart';
 import 'package:bicrypto/widgets/wallet/defaultDialog.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -51,8 +53,7 @@ class SpotWalletDetailView extends StatelessWidget {
               )),
           const SizedBox(height: 20),
           Row(
-            mainAxisAlignment:
-                MainAxisAlignment.spaceEvenly, // To distribute buttons evenly
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               Expanded(
                 child: Padding(
@@ -67,7 +68,9 @@ class SpotWalletDetailView extends StatelessWidget {
                     },
                     style: ElevatedButton.styleFrom(
                       foregroundColor: Colors.white,
-                      backgroundColor: Colors.blue, // Button color
+                      backgroundColor: Colors.blue,
+                      padding: const EdgeInsets.all(4), // Reduced padding
+                      minimumSize: const Size(88, 36), // Reduced minimum size
                     ),
                   ),
                 ),
@@ -85,9 +88,32 @@ class SpotWalletDetailView extends StatelessWidget {
                     },
                     style: ElevatedButton.styleFrom(
                       foregroundColor: Colors.white,
-                      backgroundColor: Colors.green, // Button color
+                      backgroundColor: Colors.green,
+                      padding: const EdgeInsets.all(4), // Reduced padding
+                      minimumSize: const Size(88, 36), // Reduced minimum size
                     ),
                   ),
+                ),
+              ),
+              ElevatedButton.icon(
+                icon: const Icon(Icons
+                    .remove_circle_outline), // Use an appropriate icon for withdrawal
+                label: const Text("Withdraw"),
+                onPressed: () {
+                  // Navigate to WithdrawView and pass the currency as an argument
+                  Get.to(
+                    () => SpotWithdrawView(),
+                    arguments: {
+                      'currency': walletDetails[
+                          'currency'], // Make sure walletDetails has a 'currency' key
+                    },
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  foregroundColor: Colors.white,
+                  backgroundColor: Colors.red,
+                  padding: const EdgeInsets.all(4), // Reduced padding
+                  minimumSize: const Size(88, 36), // Reduced minimum size
                 ),
               ),
             ],
@@ -210,7 +236,7 @@ class SpotWalletDetailView extends StatelessWidget {
           ),
           Expanded(
             child: Text(
-              "${transaction['amount'].toString()}",
+              transaction['amount'].toString(),
               style: const TextStyle(color: Colors.white),
               textAlign: TextAlign.center,
             ),
