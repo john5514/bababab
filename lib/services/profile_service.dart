@@ -1,6 +1,9 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:bicrypto/services/api_service.dart';
 import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
+import 'package:path/path.dart';
 
 class ProfileService {
   final String _baseUrl = "https://v3.mash3div.com/api/auth/profile";
@@ -69,6 +72,52 @@ class ProfileService {
       print('Failed to update profile. Status code: ${response.statusCode}');
       print('Error: ${response.body}');
       return false; // or throw an exception based on your error handling policies
+    }
+  }
+
+  Future<bool> updateAvatar(File image) async {
+    await loadHeaders();
+    final Uri url = Uri.parse(_baseUrl);
+
+    print('Updating avatar with image path: ${image.path}');
+
+    var request = http.MultipartRequest('PUT', url)
+      ..headers.addAll(headers)
+      ..files.add(
+        http.MultipartFile(
+          'avatar', // The field name should match what the server expects
+          image.readAsBytes().asStream(),
+          image.lengthSync(),
+          filename: basename(image.path),
+          contentType:
+              MediaType('image', 'jpeg'), // Update to match your image type
+        ),
+      );
+
+    print('Sending avatar update request...');
+
+    try {
+      var streamedResponse = await request.send();
+
+      print('Avatar update request sent. Awaiting response...');
+
+      var response = await http.Response.fromStream(streamedResponse);
+
+      print('Avatar update response status code: ${response.statusCode}');
+      print('Avatar update response body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        // Here you may want to decode the response body if it contains
+        // the new avatar URL or other relevant information
+        return true;
+      } else {
+        print(
+            'Avatar update request failed with status code: ${response.statusCode}');
+        return false;
+      }
+    } catch (e) {
+      print('Exception during avatar update: $e');
+      return false;
     }
   }
 }

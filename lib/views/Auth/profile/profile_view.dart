@@ -7,7 +7,6 @@ class ProfileView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Use a theme that contrasts well with dark mode
     ThemeData theme = Theme.of(context);
 
     return Scaffold(
@@ -20,10 +19,29 @@ class ProfileView extends StatelessWidget {
           return Center(child: CircularProgressIndicator());
         }
 
-        return Container(
+        return SingleChildScrollView(
           padding: EdgeInsets.all(16),
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
+              // Profile Picture
+              Center(
+                child: GestureDetector(
+                  onTap: controller
+                      .pickAndUpdateAvatar, // Use the controller method directly
+                  child: CircleAvatar(
+                    radius: 50,
+                    backgroundColor: Colors.grey[700],
+                    backgroundImage: controller.avatarUrl.value.isNotEmpty
+                        ? NetworkImage(controller.avatarUrl.value)
+                        : null,
+                    child: controller.avatarUrl.value.isEmpty
+                        ? Icon(Icons.camera_alt, color: Colors.white)
+                        : null,
+                  ),
+                ),
+              ),
+              SizedBox(height: 24),
               TextFormField(
                 initialValue: controller.firstName.value,
                 decoration: InputDecoration(
@@ -46,7 +64,7 @@ class ProfileView extends StatelessWidget {
               SizedBox(height: 24),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  primary: theme.hintColor, // This is what you need!
+                  primary: theme.hintColor,
                 ),
                 onPressed: () {
                   controller.updateProfileData(
