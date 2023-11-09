@@ -75,14 +75,16 @@ class ProfileService {
     }
   }
 
-  Future<String?> updateAvatar(File image) async {
+  Future<String?> updateAvatar(File image, String oldAvatarPath) async {
     await loadHeaders();
     final Uri uploadUrl = Uri.parse('https://v3.mash3div.com/api/upload');
-
     print('Updating avatar with image path: ${image.path}');
 
     var request = http.MultipartRequest('POST', uploadUrl)
       ..headers.addAll(headers)
+      // Add the old avatar path and the type if necessary
+      ..fields['oldImagePath'] = oldAvatarPath
+      ..fields['type'] = 'avatar'
       ..files.add(
         http.MultipartFile(
           'files', // The field name must match the server's expected field name
@@ -95,27 +97,18 @@ class ProfileService {
       );
 
     print('Sending avatar update request...');
-
     try {
       var streamedResponse = await request.send();
-
       print('Avatar update request sent. Awaiting response...');
 
       var response = await http.Response.fromStream(streamedResponse);
-
       print('Avatar update response status code: ${response.statusCode}');
       print('Avatar update response body: ${response.body}');
 
       if (response.statusCode == 200) {
-        var responseBody = json.decode(response.body);
-        if (responseBody is List && responseBody.isNotEmpty) {
-          var newAvatarUrl = responseBody[0];
-          print('New avatar URL: $newAvatarUrl');
-          return 'https://v3.mash3div.com' + newAvatarUrl;
-        } else {
-          print('Unexpected response format: ${response.body}');
-          return null;
-        }
+        // Directly return the response body if it's not JSON.
+        print('New avatar path: ${response.body}');
+        return 'https://v3.mash3div.com' + response.body;
       } else {
         print(
             'Avatar update request failed with status code: ${response.statusCode}');
@@ -128,12 +121,16 @@ class ProfileService {
   }
 
   Future<bool> saveAvatarUrl(String newAvatarUrl) async {
-    // Construct the data to send to the backend to update the user's profile.
+    // Use the URL as returned by the server without any alteration
     Map<String, dynamic> profileData = {
-      'avatar': newAvatarUrl, // Add other user profile fields as needed.
+      'avatar': newAvatarUrl,
     };
+    print('Attempting to save new avatar URL: $newAvatarUrl');
 
-    // Call the updateProfile method with the new avatar URL.
-    return await updateProfile(profileData);
+    bool result = await updateProfile(profileData);
+    if (!result) {
+      print('Failed to save the new avatar URL to the profile.');
+    }
+    return result;
   }
 }

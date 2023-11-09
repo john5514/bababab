@@ -37,7 +37,7 @@ class ProfileController extends GetxController {
         var result = profileData['data']['result'];
         firstName(result['first_name']);
         lastName(result['last_name']);
-        avatarUrl('https://v3.mash3div.com${result['avatar']}');
+        avatarUrl(result['avatar']);
 
         // Assuming metadata and its fields are always present, otherwise add null checks.
         var metadata = result['metadata'];
@@ -94,16 +94,21 @@ class ProfileController extends GetxController {
   }
 
   // This method in ProfileController needs to be corrected
-  void updateAvatar(File image) async {
+  void updateAvatar(File image, String oldAvatarPath) async {
     isLoading(true);
+    print('Begin updateAvatar');
+
     try {
-      // Step 1: Upload the avatar and get the new URL
-      var newAvatarUrl = await profileService.updateAvatar(image);
+      // Pass the old avatar path to the updateAvatar function
+      var newAvatarUrl =
+          await profileService.updateAvatar(image, oldAvatarPath);
+      print('New avatar URL after upload: $newAvatarUrl');
+
       if (newAvatarUrl != null) {
-        // Step 2: Save the new avatar URL to the user's profile
         var saved = await profileService.saveAvatarUrl(newAvatarUrl);
+        print('Save avatar URL result: $saved');
+
         if (saved) {
-          // Step 3: Fetch the updated profile data
           fetchProfileData();
           Get.snackbar('Success', 'Avatar updated successfully');
         } else {
@@ -119,29 +124,22 @@ class ProfileController extends GetxController {
     }
   }
 
-  // In ProfileController
   Future<void> pickAndUpdateAvatar() async {
     final ImagePicker _picker = ImagePicker();
+    // Retrieve the current avatar path from the user's profile
+    final currentAvatarPath = avatarUrl
+        .value; // Adjust this line to get the actual current avatar path
+
     final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
 
     if (image != null) {
-      isLoading(true); // Display a loading indicator
-      File imageFile = File(image.path);
+      isLoading(true);
+      print('Picked image path: ${image.path}');
 
-      // Call the updateAvatar method in ProfileService, and check if the result is not null
-      var newAvatarUrl = await profileService.updateAvatar(imageFile);
-      if (newAvatarUrl != null) {
-        // If the upload was successful, you may want to update the avatar image
-        avatar.value = imageFile;
-        // And update the avatarUrl with the returned string URL
-        avatarUrl.value = newAvatarUrl;
-        // Fetch the new profile data
-        fetchProfileData();
-        Get.snackbar('Success', 'Avatar updated successfully');
-      } else {
-        Get.snackbar('Error', 'Failed to update avatar');
-      }
-      isLoading(false); // Hide the loading indicator
+      File imageFile = File(image.path);
+      // Pass the current avatar path to the updateAvatar function
+      updateAvatar(imageFile, currentAvatarPath);
+      isLoading(false);
     }
   }
 }
