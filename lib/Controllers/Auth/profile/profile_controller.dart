@@ -97,15 +97,18 @@ class ProfileController extends GetxController {
   void updateAvatar(File image) async {
     isLoading(true);
     try {
-      // Call the updateAvatar method from the profile service
-      bool success = await profileService.updateAvatar(image);
-      if (success) {
-        // If the upload was successful, update the avatar file
-        avatar.value = image;
-        // Optionally, you might want to fetch and update the avatarUrl observable
-        // with the new URL returned by the server after a successful upload
-        fetchProfileData();
-        Get.snackbar('Success', 'Avatar updated successfully');
+      // Step 1: Upload the avatar and get the new URL
+      var newAvatarUrl = await profileService.updateAvatar(image);
+      if (newAvatarUrl != null) {
+        // Step 2: Save the new avatar URL to the user's profile
+        var saved = await profileService.saveAvatarUrl(newAvatarUrl);
+        if (saved) {
+          // Step 3: Fetch the updated profile data
+          fetchProfileData();
+          Get.snackbar('Success', 'Avatar updated successfully');
+        } else {
+          Get.snackbar('Error', 'Failed to save new avatar');
+        }
       } else {
         Get.snackbar('Error', 'Failed to update avatar');
       }
@@ -125,12 +128,14 @@ class ProfileController extends GetxController {
       isLoading(true); // Display a loading indicator
       File imageFile = File(image.path);
 
-      // This should call the updateAvatar method in ProfileService, not a local method.
-      bool success = await profileService.updateAvatar(imageFile);
-      if (success) {
+      // Call the updateAvatar method in ProfileService, and check if the result is not null
+      var newAvatarUrl = await profileService.updateAvatar(imageFile);
+      if (newAvatarUrl != null) {
         // If the upload was successful, you may want to update the avatar image
         avatar.value = imageFile;
-        // And possibly fetch the new avatar URL
+        // And update the avatarUrl with the returned string URL
+        avatarUrl.value = newAvatarUrl;
+        // Fetch the new profile data
         fetchProfileData();
         Get.snackbar('Success', 'Avatar updated successfully');
       } else {
