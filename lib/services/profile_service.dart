@@ -46,13 +46,24 @@ class ProfileService {
   Future<bool> updateProfile(Map<String, dynamic> profileData) async {
     await loadHeaders();
     final Uri url = Uri.parse(_baseUrl);
+
+    // Wrap the profile data inside a "user" key as the API expects.
+    Map<String, dynamic> wrappedProfileData = {
+      "user": profileData,
+    };
+
     final response = await http.put(
       url,
       headers: headers,
-      body: jsonEncode(profileData),
+      body: jsonEncode(wrappedProfileData),
     );
 
+    print('PUT Profile Request Headers: $headers');
+    print('PUT Profile Request to URL: $url');
+    print('PUT Profile Request Body: ${jsonEncode(wrappedProfileData)}');
+
     if (response.statusCode == 200) {
+      print('Profile Updated Successfully: ${response.body}');
       return true; // Profile updated successfully
     } else {
       print('Failed to update profile. Status code: ${response.statusCode}');
