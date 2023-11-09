@@ -158,8 +158,8 @@ class WalletService {
     );
     if (response?.statusCode == 200) {
       var responseBody = jsonDecode(response!.body);
-      print(
-          'Wallet Service Response: $responseBody'); // Add this line to print response
+      // print(
+      //     'Wallet Service Response: $responseBody'); // Add this line to print response
 
       List<dynamic> allWallets = responseBody['data']['result'];
       List<dynamic> spotWallets =

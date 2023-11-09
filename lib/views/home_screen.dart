@@ -1,5 +1,6 @@
 import 'package:bicrypto/Controllers/Auth/login_controller.dart';
 import 'package:bicrypto/Controllers/home_controller.dart'; // <-- Import HomeController
+import 'package:bicrypto/views/Auth/profile/profile_view.dart';
 import 'package:bicrypto/views/market/markethome.dart';
 import 'package:bicrypto/views/news/news_screen.dart';
 import 'package:bicrypto/views/wallet_view.dart'; // <-- Import WalletView
@@ -20,6 +21,7 @@ class HomeView extends StatelessWidget {
     // const Center(child: Text('Trade')),
     WebWalletView(),
     WalletView(),
+    ProfileView(),
   ];
 
   HomeView({super.key});
@@ -54,6 +56,7 @@ class HomeView extends StatelessWidget {
                 size: 30, color: appTheme.secondaryHeaderColor),
             Icon(Icons.account_balance_wallet,
                 size: 30, color: appTheme.secondaryHeaderColor),
+            Icon(Icons.person, size: 30, color: appTheme.secondaryHeaderColor),
           ],
           onTap: (index) {
             homeController.changeTabIndex(index);
