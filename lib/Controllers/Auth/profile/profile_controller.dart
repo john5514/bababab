@@ -9,6 +9,14 @@ class ProfileController extends GetxController {
   final ProfileService profileService;
   var firstName = ''.obs;
   var lastName = ''.obs;
+
+  var address = ''.obs;
+  var city = ''.obs;
+  var country = ''.obs;
+  var zip = ''.obs;
+  var role = ''.obs;
+  var bio = ''.obs;
+
   Rx<File?> avatar = Rx<File?>(null);
   var avatarUrl = ''.obs;
   var isLoading = false.obs;
@@ -26,24 +34,48 @@ class ProfileController extends GetxController {
     try {
       var profileData = await profileService.getProfile();
       if (profileData != null) {
-        firstName(profileData['data']['result']['first_name']);
-        lastName(profileData['data']['result']['last_name']);
-        // Set the complete URL for the avatar image
-        avatarUrl(
-            'https://v3.mash3div.com${profileData['data']['result']['avatar']}');
+        var result = profileData['data']['result'];
+        firstName(result['first_name']);
+        lastName(result['last_name']);
+        avatarUrl('https://v3.mash3div.com${result['avatar']}');
+
+        // Assuming metadata and its fields are always present, otherwise add null checks.
+        var metadata = result['metadata'];
+        var location = metadata['location'];
+        address(location['address']);
+        city(location['city']);
+        country(location['country']);
+        zip(location['zip']);
+        role(metadata['role']);
+        bio(metadata['bio']);
+        // Set other metadata fields as needed.
       }
+    } catch (e) {
+      // Handle any errors here
+      print('Error fetching profile data: $e');
     } finally {
       isLoading(false); // Stop loading
     }
   }
 
-  void updateProfileData(String newFirstName, String newLastName) async {
+  void updateProfileData() async {
     isLoading(true); // Start loading
     try {
       // Construct the profile data in the format the API expects.
       var profileData = {
-        'first_name': newFirstName,
-        'last_name': newLastName,
+        'first_name': firstName.value,
+        'last_name': lastName.value,
+        'metadata': {
+          'location': {
+            'address': address.value,
+            'city': city.value,
+            'country': country.value,
+            'zip': zip.value
+          },
+          'role': role.value,
+          'bio': bio.value,
+          // Add other metadata fields as necessary
+        }
       };
 
       var success = await profileService.updateProfile(profileData);

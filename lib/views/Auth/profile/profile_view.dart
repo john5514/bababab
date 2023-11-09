@@ -5,30 +5,45 @@ import 'package:get/get.dart';
 class ProfileView extends StatelessWidget {
   final ProfileController controller = Get.find<ProfileController>();
 
+  Widget buildTextField(String label, RxString field, ThemeData theme,
+      {bool fullRow = false}) {
+    Widget textField = TextFormField(
+      initialValue: field.value,
+      decoration: InputDecoration(
+        labelText: label,
+        border: const OutlineInputBorder(),
+        labelStyle: TextStyle(color: theme.hintColor),
+      ),
+      onChanged: (value) => field(value),
+    );
+
+    // If fullRow is true, the TextField takes the full width
+    return fullRow ? textField : Expanded(child: textField);
+  }
+
   @override
   Widget build(BuildContext context) {
     ThemeData theme = Theme.of(context);
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Profile'),
+        title: const Text('Profile'),
         backgroundColor: theme.primaryColorDark,
       ),
       body: Obx(() {
         if (controller.isLoading.value) {
-          return Center(child: CircularProgressIndicator());
+          return const Center(child: CircularProgressIndicator());
         }
 
         return SingleChildScrollView(
-          padding: EdgeInsets.all(16),
+          padding: const EdgeInsets.all(16),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               // Profile Picture
               Center(
                 child: GestureDetector(
-                  onTap: controller
-                      .pickAndUpdateAvatar, // Use the controller method directly
+                  onTap: controller.pickAndUpdateAvatar,
                   child: CircleAvatar(
                     radius: 50,
                     backgroundColor: Colors.grey[700],
@@ -36,42 +51,50 @@ class ProfileView extends StatelessWidget {
                         ? NetworkImage(controller.avatarUrl.value)
                         : null,
                     child: controller.avatarUrl.value.isEmpty
-                        ? Icon(Icons.camera_alt, color: Colors.white)
+                        ? const Icon(Icons.camera_alt, color: Colors.white)
                         : null,
                   ),
                 ),
               ),
-              SizedBox(height: 24),
-              TextFormField(
-                initialValue: controller.firstName.value,
-                decoration: InputDecoration(
-                  labelText: 'First Name',
-                  border: OutlineInputBorder(),
-                  labelStyle: TextStyle(color: theme.hintColor),
-                ),
-                onChanged: (value) => controller.firstName(value),
+              const SizedBox(height: 16),
+              Row(
+                children: <Widget>[
+                  buildTextField('First Name', controller.firstName, theme),
+                  const SizedBox(width: 16),
+                  buildTextField('Last Name', controller.lastName, theme),
+                ],
               ),
-              SizedBox(height: 16),
-              TextFormField(
-                initialValue: controller.lastName.value,
-                decoration: InputDecoration(
-                  labelText: 'Last Name',
-                  border: OutlineInputBorder(),
-                  labelStyle: TextStyle(color: theme.hintColor),
-                ),
-                onChanged: (value) => controller.lastName(value),
+              const SizedBox(height: 16),
+              Row(
+                children: <Widget>[
+                  buildTextField('Address', controller.address, theme),
+                  const SizedBox(width: 16),
+                  buildTextField('City', controller.city, theme),
+                ],
               ),
-              SizedBox(height: 24),
+              const SizedBox(height: 16),
+              Row(
+                children: <Widget>[
+                  buildTextField('Country', controller.country, theme),
+                  const SizedBox(width: 16),
+                  buildTextField('ZIP Code', controller.zip, theme),
+                ],
+              ),
+              const SizedBox(height: 16),
+
+              // Role and Bio each in its own row
+              buildTextField('Job Title', controller.role, theme,
+                  fullRow: true),
+              const SizedBox(height: 16),
+              buildTextField('Bio', controller.bio, theme, fullRow: true),
+              const SizedBox(height: 24),
+
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   primary: theme.hintColor,
                 ),
-                onPressed: () {
-                  controller.updateProfileData(
-                    controller.firstName.value,
-                    controller.lastName.value,
-                  );
-                },
+                onPressed:
+                    controller.updateProfileData, // Call the method directly
                 child: Text('Update Profile'),
               ),
             ],
