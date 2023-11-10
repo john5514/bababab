@@ -16,53 +16,50 @@ class ChangePasswordScreen extends StatelessWidget {
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Obx(() => Column(
+        child: Center(
+          child: SingleChildScrollView(
+            child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                if (controller.successMessage.isNotEmpty)
-                  Text(
-                    controller.successMessage.value,
-                    style: TextStyle(color: Colors.green),
-                  ),
-                if (controller.errorMessage.isNotEmpty)
-                  Text(
-                    controller.errorMessage.value,
-                    style: TextStyle(color: Colors.red),
-                  ),
-                TextField(
+                // Old Password TextField
+                _buildPasswordInputField(
+                  label: 'Old Password',
                   onChanged: (value) => controller.oldPassword.value = value,
-                  decoration: InputDecoration(
-                    labelText: 'Old Password',
-                    filled: true,
-                    fillColor: Colors.grey[800],
-                    border: OutlineInputBorder(),
-                  ),
                   obscureText: true,
                 ),
                 SizedBox(height: 16),
-                TextField(
-                  onChanged: (value) => controller.newPassword.value = value,
-                  decoration: InputDecoration(
-                    labelText: 'New Password',
-                    filled: true,
-                    fillColor: Colors.grey[800],
-                    border: OutlineInputBorder(),
-                  ),
+                // New Password TextField
+                _buildPasswordInputField(
+                  label: 'New Password',
+                  onChanged: (value) {
+                    controller.newPassword.value = value;
+                    controller.validateNewPassword(value); // Validate on change
+                  },
                   obscureText: true,
+                  suffixIcon: Obx(() => IconButton(
+                        icon: Icon(
+                          Icons.info_outline,
+                          // Change color based on the overall validity
+                          color: controller.allCriteriaMet
+                              ? Colors.green
+                              : Colors.red,
+                        ),
+                        onPressed: () {
+                          // Show the criteria in a dialog or modal bottom sheet
+                          _showPasswordCriteria(context);
+                        },
+                      )),
                 ),
                 SizedBox(height: 16),
-                TextField(
+                // Repeat New Password TextField
+                _buildPasswordInputField(
+                  label: 'Repeat New Password',
                   onChanged: (value) =>
                       controller.repeatNewPassword.value = value,
-                  decoration: InputDecoration(
-                    labelText: 'Repeat New Password',
-                    filled: true,
-                    fillColor: Colors.grey[800],
-                    border: OutlineInputBorder(),
-                  ),
                   obscureText: true,
                 ),
                 SizedBox(height: 24),
+                // Change Password Button
                 ElevatedButton(
                   onPressed: controller.isLoading.value
                       ? null
@@ -71,13 +68,103 @@ class ChangePasswordScreen extends StatelessWidget {
                       ? 'Changing...'
                       : 'Change Password'),
                   style: ElevatedButton.styleFrom(
-                    primary: Colors.deepPurple,
+                    primary: Colors.deepPurple, // Theme color for buttons
                     minimumSize: Size(double.infinity, 50), // Full width button
                   ),
                 ),
+                // Success and Error Messages
+                // _buildSuccessAndErrorMessage(),
               ],
-            )),
+            ),
+          ),
+        ),
       ),
     );
   }
+
+  void _showPasswordCriteria(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        return Container(
+          color: Colors.black,
+          child: Wrap(
+            children: <Widget>[
+              _buildPasswordCriteriaIndicator(
+                  'Minimum 8 characters', controller.hasMinLength.value),
+              _buildPasswordCriteriaIndicator('Contains uppercase characters',
+                  controller.hasUpperCase.value),
+              _buildPasswordCriteriaIndicator('Contains lowercase characters',
+                  controller.hasLowerCase.value),
+              _buildPasswordCriteriaIndicator(
+                  'Contains numbers', controller.hasNumber.value),
+              _buildPasswordCriteriaIndicator('Contains special characters',
+                  controller.hasSpecialCharacters.value),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildPasswordInputField({
+    required String label,
+    required Function(String) onChanged,
+    required bool obscureText,
+    Widget? suffixIcon, // Make this an optional parameter.
+  }) {
+    return TextField(
+      onChanged: onChanged,
+      decoration: InputDecoration(
+        labelText: label,
+        filled: true,
+        fillColor: Colors.grey[800],
+        border: OutlineInputBorder(),
+        suffixIcon: suffixIcon, // Pass the icon widget here.
+      ),
+      obscureText: obscureText,
+    );
+  }
+
+  Widget _buildPasswordCriteriaIndicator(String criteria, bool isMet) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 2),
+      child: Row(
+        children: [
+          Icon(
+            isMet ? Icons.check_circle_outline : Icons.cancel_outlined,
+            color: isMet ? Colors.green : Colors.red,
+            size: 20,
+          ),
+          SizedBox(width: 10),
+          Text(
+            criteria,
+            style: TextStyle(
+              color: isMet ? Colors.green : Colors.red,
+              fontSize: 16,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Widget _buildSuccessAndErrorMessage() {
+  //   return Column(
+  //     children: [
+  //       Obx(() => controller.successMessage.isNotEmpty
+  //          // ? Text(
+  //               controller.successMessage.value,
+  //               style: TextStyle(color: Colors.green),
+  //             )
+  //           : SizedBox.shrink()),
+  //       Obx(() => controller.errorMessage.isNotEmpty
+  // //           ? Text(
+  //               controller.errorMessage.value,
+  //               style: TextStyle(color: Colors.red),
+  //             )
+  //           : SizedBox.shrink()),
+  //     ],
+  //   );
+  // }
 }

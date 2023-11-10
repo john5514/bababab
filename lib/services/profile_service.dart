@@ -134,7 +134,7 @@ class ProfileService {
     return result;
   }
 
-  Future<bool> changePassword(
+  Future<Map<String, dynamic>> changePassword(
       String currentPassword, String newPassword, String uuid) async {
     await loadHeaders();
     final Uri url = Uri.parse(_baseUrl);
@@ -155,13 +155,15 @@ class ProfileService {
 
     print('PUT Change Password Request to URL: $url');
 
-    if (response.statusCode == 200) {
+    final responseBody = json.decode(response.body);
+
+    if (response.statusCode == 200 && responseBody['status'] != 'fail') {
       print('Password Changed Successfully: ${response.body}');
-      return true; // Password changed successfully
+      return {'success': true, 'message': 'Password changed successfully'};
     } else {
-      print('Failed to change password. Status code: ${response.statusCode}');
-      print('Error: ${response.body}');
-      return false; // or throw an exception based on your error handling policies
+      print('Failed to change password. Response: ${response.body}');
+      // Extract the error message from response and return it
+      return {'success': false, 'message': responseBody['error']['message']};
     }
   }
 }
