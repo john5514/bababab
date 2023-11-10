@@ -133,4 +133,35 @@ class ProfileService {
     }
     return result;
   }
+
+  Future<bool> changePassword(
+      String currentPassword, String newPassword, String uuid) async {
+    await loadHeaders();
+    final Uri url = Uri.parse(_baseUrl);
+
+    Map<String, dynamic> profileData = {
+      'user': {
+        'uuid': uuid,
+        'current_password': currentPassword,
+        'password': newPassword,
+      },
+    };
+
+    final response = await http.put(
+      url,
+      headers: headers,
+      body: jsonEncode(profileData),
+    );
+
+    print('PUT Change Password Request to URL: $url');
+
+    if (response.statusCode == 200) {
+      print('Password Changed Successfully: ${response.body}');
+      return true; // Password changed successfully
+    } else {
+      print('Failed to change password. Status code: ${response.statusCode}');
+      print('Error: ${response.body}');
+      return false; // or throw an exception based on your error handling policies
+    }
+  }
 }
