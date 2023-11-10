@@ -6,12 +6,14 @@ class ChangePasswordScreen extends StatelessWidget {
   final ChangePasswordController controller =
       Get.put(ChangePasswordController());
 
+  ChangePasswordScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[900], // Dark background
       appBar: AppBar(
-        title: Text('Change Password'),
+        title: const Text('Change Password'),
         backgroundColor: Colors.grey[850],
       ),
       body: Padding(
@@ -27,7 +29,7 @@ class ChangePasswordScreen extends StatelessWidget {
                   onChanged: (value) => controller.oldPassword.value = value,
                   obscureText: true,
                 ),
-                SizedBox(height: 16),
+                const SizedBox(height: 16),
                 // New Password TextField
                 _buildPasswordInputField(
                   label: 'New Password',
@@ -50,7 +52,7 @@ class ChangePasswordScreen extends StatelessWidget {
                         },
                       )),
                 ),
-                SizedBox(height: 16),
+                const SizedBox(height: 16),
                 // Repeat New Password TextField
                 _buildPasswordInputField(
                   label: 'Repeat New Password',
@@ -58,19 +60,21 @@ class ChangePasswordScreen extends StatelessWidget {
                       controller.repeatNewPassword.value = value,
                   obscureText: true,
                 ),
-                SizedBox(height: 24),
+                const SizedBox(height: 24),
                 // Change Password Button
                 ElevatedButton(
                   onPressed: controller.isLoading.value
                       ? null
                       : controller.changePassword,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor:
+                        Colors.deepPurple, // Theme color for buttons
+                    minimumSize:
+                        const Size(double.infinity, 50), // Full width button
+                  ),
                   child: Text(controller.isLoading.value
                       ? 'Changing...'
                       : 'Change Password'),
-                  style: ElevatedButton.styleFrom(
-                    primary: Colors.deepPurple, // Theme color for buttons
-                    minimumSize: Size(double.infinity, 50), // Full width button
-                  ),
                 ),
                 // Success and Error Messages
                 // _buildSuccessAndErrorMessage(),
@@ -119,7 +123,7 @@ class ChangePasswordScreen extends StatelessWidget {
         labelText: label,
         filled: true,
         fillColor: Colors.grey[800],
-        border: OutlineInputBorder(),
+        border: const OutlineInputBorder(),
         suffixIcon: suffixIcon, // Pass the icon widget here.
       ),
       obscureText: obscureText,
@@ -136,7 +140,7 @@ class ChangePasswordScreen extends StatelessWidget {
             color: isMet ? Colors.green : Colors.red,
             size: 20,
           ),
-          SizedBox(width: 10),
+          const SizedBox(width: 10),
           Text(
             criteria,
             style: TextStyle(
