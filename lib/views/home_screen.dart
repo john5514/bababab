@@ -21,12 +21,8 @@ class HomeView extends StatelessWidget {
   final List<Widget> _children = [
     NewsWidget(),
     MarketScreen(),
-    // const Center(child: Text('Trade')),
     WebWalletView(),
     WalletView(),
-    //ProfileView(),
-    //ChangePasswordScreen(),
-    //TwoStepVerificationScreen(),
     MainSettingsScreen(),
   ];
 

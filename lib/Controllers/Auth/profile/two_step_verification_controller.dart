@@ -1,5 +1,7 @@
+import 'package:bicrypto/Controllers/home_controller.dart';
 import 'package:bicrypto/services/profile_service.dart';
 import 'package:bicrypto/views/Auth/profile/tabbar.dart';
+import 'package:bicrypto/views/home_screen.dart';
 import 'package:get/get.dart';
 
 class TwoStepVerificationController extends GetxController {
@@ -54,12 +56,20 @@ class TwoStepVerificationController extends GetxController {
       isLoading.value = false;
 
       if (response != null && response['status'] == 'success') {
+        // Assuming the Two-Step Verification tab is the last in the list
+        int settingsTabIndex = 4; // This index might be different in your app
+
         // Update the reactive state to reflect that two-factor is enabled
         isTwoFactorAuthEnabled.value = true;
 
         Get.snackbar('Success', 'OTP verified successfully');
 
-        Get.offAll(() => MainSettingsScreen());
+        // Use Get.find<HomeController>() to find the controller and set the correct tab index
+        HomeController homeController = Get.find<HomeController>();
+        homeController.changeTabIndex(settingsTabIndex);
+
+        // Navigate to the HomeView
+        Get.offAll(() => HomeView());
       } else {
         // Handle error
         print('Error Response: $response'); // Debug print

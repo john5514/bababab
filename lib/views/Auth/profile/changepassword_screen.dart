@@ -1,6 +1,7 @@
 import 'package:bicrypto/Controllers/Auth/profile/changepassword_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:lottie/lottie.dart';
 
 class ChangePasswordScreen extends StatelessWidget {
   final ChangePasswordController controller =
@@ -11,15 +12,17 @@ class ChangePasswordScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[900], // Dark background
-
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Center(
           child: SingleChildScrollView(
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.start,
               children: <Widget>[
+                SizedBox(
+                  height: 150,
+                  child: Lottie.asset('assets/animations/passwordreset.json'),
+                ),
                 // Old Password TextField
                 _buildPasswordInputField(
                   label: 'Old Password',
