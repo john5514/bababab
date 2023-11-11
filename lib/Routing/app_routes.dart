@@ -1,4 +1,5 @@
 import 'package:bicrypto/views/Auth/login_view.dart';
+import 'package:bicrypto/views/Auth/profile/otp_verification_screen.dart';
 import 'package:bicrypto/views/Auth/register_view.dart';
 import 'package:bicrypto/views/Auth/resetpassword_view.dart';
 import 'package:bicrypto/views/home_screen.dart';
@@ -61,8 +62,9 @@ class AppRoutes {
     ),
     GetPage(name: '/spot-wallet-detail', page: () => SpotWalletDetailView()),
     GetPage(name: '/spot-transfer', page: () => SpotTransferView()),
+    GetPage(name: '/spot-deposit', page: () => SpotDepositView()),
     GetPage(
-        name: '/spot-deposit',
-        page: () => SpotDepositView()), // Add your SpotDepositView page here
+        name: '/otp-verification',
+        page: () => OTPVerificationScreen()), // Add this line
   ];
 }
