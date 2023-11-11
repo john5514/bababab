@@ -7,46 +7,67 @@ import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 class TwoStepVerificationScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final controller = Get.put(TwoStepVerificationController(
-        Get.find<ProfileService>())); // Initialize your controller
+    final controller = Get.put(
+      TwoStepVerificationController(Get.find<ProfileService>()),
+    ); // Initialize your controller
+
+    // Ensure the theme is appropriate for dark mode
+    ColorScheme colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
       body: Padding(
-        padding: EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Obx(() {
-              return InternationalPhoneNumberInput(
-                onInputChanged: (PhoneNumber number) {
-                  controller.phoneNumber.value = number.phoneNumber!;
-                },
-                onInputValidated: (bool value) {
-                  // You can use this to take actions based on the validation
-                },
-                selectorConfig: SelectorConfig(
-                  selectorType: PhoneInputSelectorType.DIALOG,
+        padding: const EdgeInsets.all(16.0),
+        child: Center(
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Icon(
+                  Icons.phone_android, // Phone icon
+                  size: 48,
+                  color: colorScheme.onBackground, // Icon color for dark mode
                 ),
-                ignoreBlank: false,
-                autoValidateMode: AutovalidateMode.disabled,
-                selectorTextStyle: TextStyle(color: Colors.white),
-                textFieldController:
-                    TextEditingController(text: controller.phoneNumber.value),
-                formatInput: false,
-                keyboardType: TextInputType.numberWithOptions(
-                    signed: true, decimal: true),
-                inputBorder: OutlineInputBorder(),
-                onSaved: (PhoneNumber number) {
-                  controller.phoneNumber.value = number.phoneNumber!;
-                },
-              );
-            }),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: controller.sendOTP,
-              child: Text('Send OTP'),
+                const SizedBox(height: 16.0),
+                Text(
+                  'Enter your Phone Number',
+                  style: TextStyle(
+                    fontSize: 24.0,
+                    fontWeight: FontWeight.bold,
+                    color: colorScheme.onBackground, // Text color for dark mode
+                  ),
+                ),
+                const SizedBox(height: 8.0),
+                Text(
+                  'Enter the required information to continue',
+                  style: TextStyle(
+                    fontSize: 16.0,
+                    color: colorScheme.onBackground, // Text color for dark mode
+                  ),
+                ),
+                const SizedBox(height: 32.0),
+                Obx(() {
+                  return InternationalPhoneNumberInput(
+                    onInputChanged: (PhoneNumber number) {
+                      controller.phoneNumber.value = number.phoneNumber!;
+                    },
+                  );
+                }),
+                const SizedBox(height: 32),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    primary: Colors
+                        .deepPurple, // Use a color that matches your design
+                    onPrimary: Colors.white,
+                    minimumSize: const Size(double.infinity,
+                        50), // Full-width button with fixed height
+                  ),
+                  onPressed: controller.sendOTP,
+                  child: const Text('Send OTP'),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
