@@ -166,4 +166,95 @@ class ProfileService {
       return {'success': false, 'message': responseBody['error']['message']};
     }
   }
+
+  Future<Map<String, dynamic>?> generateOTPSecret(String type,
+      {String? email, String? phoneNumber}) async {
+    await loadHeaders();
+    final Uri url =
+        Uri.parse('https://v3.mash3div.com/api/profile/generateOTPSecret');
+
+    Map<String, dynamic> requestBody = {
+      "type": type,
+    };
+
+    // Add email and phoneNumber to requestBody if they are not null
+    if (email != null) {
+      requestBody["email"] = email;
+    }
+    if (phoneNumber != null) {
+      requestBody["phoneNumber"] = phoneNumber; // Changed from "?phoneNumber"
+    }
+
+    final response = await http.post(
+      url,
+      headers: headers,
+      body: jsonEncode(requestBody),
+    );
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      // Handle error
+      return null;
+    }
+  }
+
+  Future<Map<String, dynamic>?> verifyOTP(
+      String otp, String secret, String type) async {
+    await loadHeaders();
+    final Uri url = Uri.parse('https://v3.mash3div.com/api/profile/verifyOTP');
+    final response = await http.post(
+      url,
+      headers: headers,
+      body: jsonEncode({
+        "otp": otp,
+        "secret": secret,
+        "type": type,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      // Handle error
+      return null;
+    }
+  }
+
+  Future<Map<String, dynamic>?> saveOTP(String secret, String type) async {
+    await loadHeaders();
+    final Uri url = Uri.parse('https://v3.mash3div.com/api/profile/saveOTP');
+    final response = await http.post(
+      url,
+      headers: headers,
+      body: jsonEncode({
+        "secret": secret,
+        "type": type,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      // Handle error
+      return null;
+    }
+  }
+
+  Future<Map<String, dynamic>?> toggleOtp(String status) async {
+    await loadHeaders();
+    final Uri url = Uri.parse('https://v3.mash3div.com/api/profile/toggleOtp');
+    final response = await http.post(
+      url,
+      headers: headers,
+      body: jsonEncode({"status": status}),
+    );
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      // Handle error
+      return null;
+    }
+  }
 }

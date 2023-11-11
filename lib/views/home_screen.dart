@@ -2,6 +2,7 @@ import 'package:bicrypto/Controllers/Auth/login_controller.dart';
 import 'package:bicrypto/Controllers/home_controller.dart'; // <-- Import HomeController
 import 'package:bicrypto/views/Auth/profile/changepassword_screen.dart';
 import 'package:bicrypto/views/Auth/profile/profile_view.dart';
+import 'package:bicrypto/views/Auth/profile/two_step_verification_screen.dart';
 import 'package:bicrypto/views/market/markethome.dart';
 import 'package:bicrypto/views/news/news_screen.dart';
 import 'package:bicrypto/views/wallet_view.dart'; // <-- Import WalletView
@@ -23,7 +24,8 @@ class HomeView extends StatelessWidget {
     WebWalletView(),
     WalletView(),
     //ProfileView(),
-    ChangePasswordScreen(),
+    //ChangePasswordScreen(),
+    TwoStepVerificationScreen(),
   ];
 
   HomeView({super.key});
