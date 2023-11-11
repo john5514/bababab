@@ -533,7 +533,7 @@ class WalletService {
   Future<List<dynamic>> fetchUserWallets() async {
     await loadHeaders();
     final response = await HttpClientHelper.get(
-      Uri.parse('${baseUrl}/user'),
+      Uri.parse('${baseUrl}'),
       headers: headers,
     );
     if (response?.statusCode == 200) {
