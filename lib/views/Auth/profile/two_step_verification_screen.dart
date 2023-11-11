@@ -46,13 +46,12 @@ class TwoStepVerificationScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 32.0),
-                Obx(() {
-                  return InternationalPhoneNumberInput(
-                    onInputChanged: (PhoneNumber number) {
-                      controller.phoneNumber.value = number.phoneNumber!;
-                    },
-                  );
-                }),
+                // Only wrap the widget that needs to update with Obx
+                InternationalPhoneNumberInput(
+                  onInputChanged: (PhoneNumber number) {
+                    controller.phoneNumber.value = number.phoneNumber!;
+                  },
+                ),
                 const SizedBox(height: 32),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(

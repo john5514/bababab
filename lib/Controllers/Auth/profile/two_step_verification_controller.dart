@@ -1,10 +1,13 @@
 import 'package:bicrypto/services/profile_service.dart';
+import 'package:bicrypto/views/Auth/profile/tabbar.dart';
 import 'package:get/get.dart';
 
 class TwoStepVerificationController extends GetxController {
   var isLoading = false.obs;
   var phoneNumber = ''.obs;
   var otpSecret = ''.obs; // Variable to store OTP secret
+  var isTwoFactorAuthEnabled =
+      false.obs; // Reactive state for two-factor authentication status
 
   final ProfileService profileService; // Inject your service
 
@@ -51,8 +54,12 @@ class TwoStepVerificationController extends GetxController {
       isLoading.value = false;
 
       if (response != null && response['status'] == 'success') {
+        // Update the reactive state to reflect that two-factor is enabled
+        isTwoFactorAuthEnabled.value = true;
+
         Get.snackbar('Success', 'OTP verified successfully');
-        // Handle successful verification
+
+        Get.offAll(() => MainSettingsScreen());
       } else {
         // Handle error
         print('Error Response: $response'); // Debug print
