@@ -30,12 +30,12 @@ class ProfileService {
     final Uri url = Uri.parse(_baseUrl);
     final response = await http.get(url, headers: headers);
 
-    print('GET Profile Request Headers: $headers'); // Debug print for headers
-    print('GET Profile Request to URL: $url'); // Debug print for requested URL
+    // print('GET Profile Request Headers: $headers'); // Debug print for headers
+    // print('GET Profile Request to URL: $url'); // Debug print for requested URL
 
     if (response.statusCode == 200) {
-      print(
-          'Profile Data Fetched Successfully: ${response.body}'); // Debug print for success response
+      // print(
+      //     'Profile Data Fetched Successfully: ${response.body}'); // Debug print for success response
       return jsonDecode(response.body);
     } else {
       print(

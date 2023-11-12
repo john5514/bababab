@@ -173,21 +173,6 @@ class WalletController extends GetxController {
     }
   }
 
-  Future<void> fetchFiatTransactions() async {
-    try {
-      isLoading(true);
-      List<dynamic> transactions =
-          await walletService.fetchWalletTransactionsForUserID35();
-      fiatTransactions.assignAll(transactions);
-      // print("Fetched Transactions: $transactions"); // Debugging line
-      calculateBalancesForAllCurrencies();
-    } catch (e) {
-      // print("Error fetching fiat transactions: $e");
-    } finally {
-      isLoading(false);
-    }
-  }
-
   Future<void> createWallet(String currency) async {
     // print(
     //     "Attempting to create wallet with currency: $currency"); // Debugging line
@@ -240,6 +225,21 @@ class WalletController extends GetxController {
           }
         }
       }
+    } finally {
+      isLoading(false);
+    }
+  }
+
+  void fetchFiatTransactions() async {
+    try {
+      isLoading(true);
+      // Assuming 'fiat' is the type for fiat transactions
+      List<dynamic> transactionsList =
+          await walletService.fetchTransactions('FIAT');
+      fiatTransactions.assignAll(transactionsList);
+    } catch (e) {
+      print("Error fetching fiat transactions: $e");
+      fiatTransactions.assignAll([]);
     } finally {
       isLoading(false);
     }

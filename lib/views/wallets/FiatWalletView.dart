@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'package:bicrypto/widgets/wallet/build_transactions.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:bicrypto/Controllers/wallet_controller.dart';
@@ -13,7 +14,42 @@ class FiatWalletView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: buildWalletListView(),
+      body: Column(
+        children: [
+          // Use two-thirds of the space for the wallet list
+          Flexible(
+            flex: 2,
+            child: Obx(() {
+              if (walletController.isLoading.value) {
+                return Center(
+                    child:
+                        CircularProgressIndicator(color: appTheme.hintColor));
+              }
+              if (walletController.fiatWalletInfo.isEmpty) {
+                return Center(
+                  child: Text(
+                    'You do not have a fiat wallet. Please create one.',
+                    style: appTheme.textTheme.bodyLarge,
+                  ),
+                );
+              }
+              return ListView.separated(
+                itemCount: walletController.fiatWalletInfo.length,
+                itemBuilder: (context, index) =>
+                    buildWalletListItem(context, index),
+                separatorBuilder: (context, index) =>
+                    const Divider(color: Colors.grey),
+              );
+            }),
+          ),
+          // Use one-third of the space for the transactions list
+          Flexible(
+            flex: 1,
+            child: TransactionDisplay(
+                transactions: walletController.fiatTransactions),
+          ),
+        ],
+      ),
       floatingActionButton: buildAddWalletButton(context),
     );
   }
@@ -33,99 +69,58 @@ class FiatWalletView extends StatelessWidget {
             ),
           );
         } else {
-          return ListView.builder(
+          // Use ListView.builder directly without wrapping it in Expanded
+          return ListView.separated(
             itemCount: walletController.fiatWalletInfo.length,
-            itemBuilder: (context, index) => buildWalletCard(context, index),
+            itemBuilder: (context, index) =>
+                buildWalletListItem(context, index),
+            separatorBuilder: (context, index) => const Divider(
+                color: Colors.grey, endIndent: 20.0, indent: 20.0),
           );
         }
       },
     );
   }
 
-  Widget buildWalletCard(BuildContext context, int index) {
+  Widget buildWalletListItem(BuildContext context, int index) {
     var walletInfo = walletController.fiatWalletInfo[index];
     String currencySymbol =
         walletController.getCurrencySymbol(walletInfo['currency']);
-    LinearGradient selectedGradient = getProfessionalGradient(index);
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      child: AspectRatio(
-        aspectRatio: 1.586, // Credit card aspect ratio
-        child: InkWell(
-          onTap: () => onCardTap(walletInfo, context),
-          child: buildCard(walletInfo, currencySymbol, selectedGradient),
+    return ListTile(
+      title: Text(
+        '${walletInfo['currency']} ',
+        style: const TextStyle(
+          fontFamily: 'Inter',
+          fontWeight: FontWeight.bold,
+          color: Colors.white,
         ),
       ),
-    );
-  }
-
-  Card buildCard(Map<String, dynamic> walletInfo, String currencySymbol,
-      LinearGradient gradient) {
-    return Card(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15.0)),
-      elevation: 8,
-      shadowColor: appTheme.hintColor.withOpacity(0.5),
-      child: Container(
-        decoration: BoxDecoration(
-          gradient: gradient,
-          borderRadius: BorderRadius.circular(15.0),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              buildChipIcon(),
-              const SizedBox(height: 10),
-              Text(
-                '${walletInfo['currency']} Wallet',
-                style: appTheme.textTheme.bodyLarge?.copyWith(
-                  color: appTheme.secondaryHeaderColor,
-                  fontFamily: 'Inter',
-                  fontWeight: FontWeight.bold,
-                  fontSize: 20,
-                ),
+      trailing: RichText(
+        text: TextSpan(
+          children: [
+            TextSpan(
+              text: '$currencySymbol ',
+              style: const TextStyle(
+                // Gray and not bold
+                color: Colors.orange,
+                fontWeight: FontWeight.normal,
+                fontFamily: 'Inter',
               ),
-              Text(
-                '$currencySymbol ${walletInfo['balance'].toStringAsFixed(2)}',
-                style: appTheme.textTheme.displayLarge?.copyWith(
-                  color: appTheme.secondaryHeaderColor,
-                  fontSize: 24,
-                ),
+            ),
+            TextSpan(
+              text: '${walletInfo['balance'].toStringAsFixed(2)}',
+              style: const TextStyle(
+                // White and bold
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontFamily: 'Inter',
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
-    );
-  }
-
-  LinearGradient getProfessionalGradient(int index) {
-    List<LinearGradient> gradients = [
-      const LinearGradient(
-        begin: Alignment.topLeft,
-        end: Alignment.bottomRight,
-        colors: [
-          Color(0xFF2B2B2B), // Dark grey
-          Color(0xFF383838), // Slightly lighter grey
-        ],
-      ),
-      // You can add more subtle gradients here if you have other card styles
-    ];
-    return gradients[index % gradients.length];
-  }
-
-  Widget buildChipIcon() {
-    return Container(
-      width: 40,
-      height: 30,
-      decoration: BoxDecoration(
-        color: Colors.grey[300],
-        borderRadius: BorderRadius.circular(5),
-      ),
-      child: Icon(Icons.credit_card, size: 24, color: Colors.grey[600]),
+      onTap: () => onCardTap(walletInfo, context),
     );
   }
 

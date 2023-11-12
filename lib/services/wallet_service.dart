@@ -584,24 +584,33 @@ class WalletService {
   }
 
   Future<List<dynamic>> fetchTransactions(String walletType) async {
-    await loadHeaders();
-    final response = await HttpClientHelper.get(
-      Uri.parse('${baseUrl}/transactions?walletType=$walletType'),
-      headers: headers,
-    );
+    try {
+      await loadHeaders();
+      final response = await HttpClientHelper.get(
+        Uri.parse('${baseUrl}/transactions?walletType=$walletType'),
+        headers: headers,
+      );
 
-    if (response?.statusCode == 200) {
-      var decodedResponse = jsonDecode(response!.body);
-      if (decodedResponse['status'] == 'success') {
-        return decodedResponse['data'][
-            'result']; // Assuming the structure is similar to your previous method
+      print(
+          'Response status code: ${response?.statusCode}'); // Log the status code
+      print('Response body: ${response?.body}'); // Log the response body
+
+      if (response?.statusCode == 200) {
+        var decodedResponse = jsonDecode(response!.body);
+        if (decodedResponse['status'] == 'success') {
+          return decodedResponse['data']['result'];
+        } else {
+          throw Exception(
+              'Failed to fetch transactions: ${decodedResponse['message']}');
+        }
       } else {
         throw Exception(
-            'Failed to fetch transactions: ${decodedResponse['message']}');
+            'Failed to fetch transactions. Status Code: ${response?.statusCode}');
       }
-    } else {
-      throw Exception(
-          'Failed to fetch transactions. Status Code: ${response?.statusCode}');
+    } catch (e) {
+      // This will catch any kind of exception related to the request
+      print('Exception caught while fetching transactions: $e');
+      rethrow; // Use rethrow to pass the exception up the stack
     }
   }
 
