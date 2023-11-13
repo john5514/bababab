@@ -14,6 +14,7 @@ class CustomSlider extends StatefulWidget {
   }) : super(key: key);
 
   @override
+  // ignore: library_private_types_in_public_api
   _CustomSliderState createState() => _CustomSliderState();
 }
 
@@ -102,63 +103,80 @@ class SliderPainter extends CustomPainter {
   SliderPainter({
     required this.value,
     required this.divisions,
-    this.padding = 20.0, // Default padding value of 20
+    this.padding = 11.0, // Default padding value of 20
   });
 
   @override
   void paint(Canvas canvas, Size size) {
+    const double trackHeight = 2;
+    const double activeDiamondSize = 14;
+    const double inactiveDiamondSize = 10;
+    const double thumbDiamondSize = 20;
+    const Color activeColor = Colors.white;
+    final Color inactiveColor = Colors.grey.shade600;
     final paddedWidth =
         size.width - (padding * 2); // Adjust the width for padding
 
+    // Paint for the track
     Paint trackPaint = Paint()
-      ..color = Colors.grey.shade700
-      ..strokeWidth = 2;
+      ..color = inactiveColor
+      ..strokeWidth = trackHeight;
 
-    // Draw the inactive track with padding
+    // Paint for the active track
+    Paint activeTrackPaint = Paint()
+      ..color = activeColor
+      ..strokeWidth = trackHeight;
+
+    // Draw the inactive track
     canvas.drawLine(
       Offset(padding, size.height / 2),
       Offset(size.width - padding, size.height / 2),
       trackPaint,
     );
 
-    // Draw the active track with padding
-    trackPaint.color = Colors.green;
+    // Draw the active track
     canvas.drawLine(
       Offset(padding, size.height / 2),
       Offset(padding + paddedWidth * value, size.height / 2),
-      trackPaint,
+      activeTrackPaint,
     );
 
-    // Draw the dividers with padding
+    // Draw the divisions
     for (int i = 0; i <= divisions; i++) {
       double x = padding + (paddedWidth / divisions) * i;
       bool isPassed = (x <= padding + paddedWidth * value);
-      _drawDiamond(canvas, Offset(x, size.height / 2), isPassed);
+      _drawDiamond(
+        canvas,
+        Offset(x, size.height / 2),
+        isPassed ? activeDiamondSize : inactiveDiamondSize,
+        isPassed ? activeColor : inactiveColor,
+      );
     }
 
-    // Draw the thumb with padding
-    Paint thumbPaint = Paint()
-      ..color = Colors.white
-      ..style = PaintingStyle.fill;
-
-    canvas.drawCircle(
+    // Draw the thumb as a diamond shape
+    _drawDiamond(
+      canvas,
       Offset(padding + paddedWidth * value, size.height / 2),
-      12, // Radius of thumb
-      thumbPaint,
+      thumbDiamondSize,
+      activeColor,
     );
   }
 
-  void _drawDiamond(Canvas canvas, Offset position, bool isPassed) {
+  void _drawDiamond(
+    Canvas canvas,
+    Offset position,
+    double size,
+    Color color,
+  ) {
     Paint diamondPaint = Paint()
-      ..color = isPassed ? Colors.white : Colors.grey.shade700
+      ..color = color
       ..style = PaintingStyle.fill;
 
-    double size = 10; // Size of the diamond
     Path path = Path()
-      ..moveTo(position.dx, position.dy - size)
-      ..lineTo(position.dx + size, position.dy)
-      ..lineTo(position.dx, position.dy + size)
-      ..lineTo(position.dx - size, position.dy)
+      ..moveTo(position.dx, position.dy - size / 2)
+      ..lineTo(position.dx + size / 2, position.dy)
+      ..lineTo(position.dx, position.dy + size / 2)
+      ..lineTo(position.dx - size / 2, position.dy)
       ..close();
 
     canvas.drawPath(path, diamondPaint);
