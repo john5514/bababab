@@ -83,9 +83,7 @@ class TradeView extends StatelessWidget {
                                         filled: true,
                                         fillColor: const Color(
                                             0xFF2C2F33), // Specific fill color for dark mode
-                                        prefixIcon: const Icon(
-                                            Icons.attach_money,
-                                            color: Colors.white),
+
                                         contentPadding:
                                             const EdgeInsets.symmetric(
                                                 vertical: 8,
@@ -115,8 +113,7 @@ class TradeView extends StatelessWidget {
                                         filled: true,
                                         fillColor: const Color(
                                             0xFF2C2F33), // Specific fill color for dark mode
-                                        prefixIcon: const Icon(Icons.balance,
-                                            color: Colors.white),
+
                                         contentPadding:
                                             const EdgeInsets.symmetric(
                                                 vertical: 8,
