@@ -21,6 +21,8 @@ class WalletController extends GetxController {
   var isLoading = false.obs;
   var fiatBalance = 0.0.obs;
   var fiatTransactions = [].obs;
+  var fiatWalletTransactions = <dynamic>[].obs;
+
   var currencies = [].obs;
   var selectedCurrency = ''.obs;
   var walletBalance = 0.0.obs;
@@ -32,6 +34,8 @@ class WalletController extends GetxController {
     super.onInit();
     fetchFiatBalance();
     fetchFiatTransactions();
+    fetchFiatWalletTransactions();
+
     fetchWalletBalance();
     fetchCurrencies();
     fetchFiatWalletInfo();
@@ -240,6 +244,21 @@ class WalletController extends GetxController {
     } catch (e) {
       print("Error fetching fiat transactions: $e");
       fiatTransactions.assignAll([]);
+    } finally {
+      isLoading(false);
+    }
+  }
+
+  Future<void> fetchFiatWalletTransactions() async {
+    try {
+      isLoading(true);
+      var transactions = await walletService.fetchFiatWalletTransactions();
+
+      fiatWalletTransactions.value = transactions;
+      // Printing fetched transactions
+    } catch (e) {
+      // Handle the exception
+      print("Error fetching fiat wallet transactions: $e");
     } finally {
       isLoading(false);
     }

@@ -45,8 +45,13 @@ class FiatWalletView extends StatelessWidget {
           // Use one-third of the space for the transactions list
           Flexible(
             flex: 1,
-            child: TransactionDisplay(
-                transactions: walletController.fiatTransactions),
+            child: Obx(() {
+              // Print the number of transactions here (if needed)
+
+              return TransactionDisplay(
+                transactions: walletController.fiatWalletTransactions,
+              );
+            }),
           ),
         ],
       ),

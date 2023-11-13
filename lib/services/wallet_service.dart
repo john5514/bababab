@@ -58,6 +58,27 @@ class WalletService {
     }
   }
 
+  Future<List<dynamic>> fetchFiatWalletTransactions() async {
+    await loadHeaders();
+    final Uri url = Uri.parse('$baseUrl/transactions');
+    final response = await HttpClientHelper.get(url, headers: headers);
+
+    if (response?.statusCode == 200) {
+      List<dynamic> allTransactions =
+          jsonDecode(response!.body)['data']['result'];
+      // Printing entire response
+
+      // Filter for fiat transactions and print them
+      var fiatTransactions = allTransactions
+          .where((transaction) => transaction['wallet']['type'] == 'FIAT')
+          .toList();
+      print('Fiat Transactions: $fiatTransactions');
+      return fiatTransactions;
+    } else {
+      throw Exception('Failed to load fiat wallet transactions');
+    }
+  }
+
   Future<void> createWallet(String currency) async {
     await loadHeaders();
 
