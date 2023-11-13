@@ -1,5 +1,6 @@
 import 'package:bicrypto/Controllers/tarde/trade_controller.dart';
 import 'package:bicrypto/views/market/markethome.dart';
+import 'package:bicrypto/widgets/costomslider.dart';
 import 'package:bicrypto/widgets/tradeorderbook.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_xlider/flutter_xlider.dart';
@@ -457,87 +458,18 @@ class TradeView extends StatelessWidget {
   }
 
   Widget _buildSlider() {
-    return FlutterSlider(
-      values: [_tradeController.sliderValue.value],
-      min: 0,
-      max: 100,
-      onDragging: (handlerIndex, lowerValue, upperValue) {
-        _tradeController.sliderValue.value = lowerValue;
-      },
-      handler: FlutterSliderHandler(
-        decoration: const BoxDecoration(),
-        child: const Material(
-          type: MaterialType.canvas,
-          color:
-              Color.fromARGB(255, 177, 175, 175), // Darker diamond for handler
-          elevation: 0,
-          shape: DiamondShape(), // Custom diamond shape
-          child: SizedBox(
-            width: 16,
-            height: 16,
-          ),
-        ),
-      ),
-      trackBar: FlutterSliderTrackBar(
-        inactiveTrackBar: BoxDecoration(
-          borderRadius: BorderRadius.circular(1),
-          color: Colors.grey[300], // Lighter track color
-        ),
-        activeTrackBar: BoxDecoration(
-          borderRadius: BorderRadius.circular(1),
-          color: Colors
-              .grey[300], // Keep it the same as inactive for consistent look
-        ),
-      ),
-      tooltip: FlutterSliderTooltip(
-        textStyle: const TextStyle(fontSize: 17, color: Colors.white),
-        boxStyle: FlutterSliderTooltipBox(
-          decoration: BoxDecoration(
-            color: Colors.orange,
-            borderRadius: BorderRadius.circular(4),
-          ),
-        ),
-        format: (value) {
-          return "${double.parse(value).toStringAsFixed(0)}%";
+    // Use Obx here to make sure the slider rebuilds whenever sliderValue changes
+    return Obx(() {
+      return CustomSlider(
+        value: _tradeController.sliderValue.value,
+        divisions: 4,
+        onChanged: (newValue) {
+          // When the slider value is changed, update it in the controller
+          _tradeController.sliderValue.value = newValue;
         },
-      ),
-      hatchMark: FlutterSliderHatchMark(
-        smallLine: const FlutterSliderSizedBox(width: 2, height: 10),
-        bigLine: const FlutterSliderSizedBox(width: 2, height: 20),
-        density: 0.04,
-        displayLines: false, // No lines, just the diamonds
-        linesAlignment: FlutterSliderHatchMarkAlignment.right,
-      ),
-    );
+      );
+    });
   }
-}
-
-// Custom diamond shape
-class DiamondShape extends ShapeBorder {
-  const DiamondShape();
-
-  @override
-  EdgeInsetsGeometry get dimensions => const EdgeInsets.all(0);
-
-  @override
-  Path getInnerPath(Rect rect, {TextDirection? textDirection}) =>
-      getOuterPath(rect);
-
-  @override
-  Path getOuterPath(Rect rect, {TextDirection? textDirection}) {
-    return Path()
-      ..moveTo(rect.left + rect.width / 2, rect.top)
-      ..lineTo(rect.right, rect.top + rect.height / 2)
-      ..lineTo(rect.left + rect.width / 2, rect.bottom)
-      ..lineTo(rect.left, rect.top + rect.height / 2)
-      ..close();
-  }
-
-  @override
-  void paint(Canvas canvas, Rect rect, {TextDirection? textDirection}) {}
-
-  @override
-  ShapeBorder scale(double t) => this;
 }
 
 class LeftButtonClipper extends CustomClipper<Path> {
