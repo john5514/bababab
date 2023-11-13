@@ -458,17 +458,14 @@ class TradeView extends StatelessWidget {
   }
 
   Widget _buildSlider() {
-    // Use Obx here to make sure the slider rebuilds whenever sliderValue changes
-    return Obx(() {
-      return CustomSlider(
-        value: _tradeController.sliderValue.value,
-        divisions: 4,
-        onChanged: (newValue) {
-          // When the slider value is changed, update it in the controller
-          _tradeController.sliderValue.value = newValue;
-        },
-      );
-    });
+    return CustomSlider(
+      value: _tradeController.sliderValue, // Assuming this is an RxDouble
+      divisions: 4, // To represent the value as a percentage from 0 to 100
+      onChanged: (newValue) {
+        // When the slider value is changed, update it in the controller
+        _tradeController.sliderValue.value = newValue;
+      },
+    );
   }
 }
 

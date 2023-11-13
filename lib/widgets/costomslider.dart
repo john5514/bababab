@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
-class CustomSlider extends StatelessWidget {
-  final double value;
+class CustomSlider extends StatefulWidget {
+  final RxDouble value;
   final int divisions;
   final ValueChanged<double> onChanged;
 
@@ -13,30 +14,83 @@ class CustomSlider extends StatelessWidget {
   }) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    // This widget uses a GestureDetector to enable sliding functionality.
-    return GestureDetector(
-      onHorizontalDragUpdate: (details) {
-        RenderBox? box = context.findRenderObject() as RenderBox?;
-        if (box != null) {
-          Offset localOffset = box.globalToLocal(details.globalPosition);
-          double newSliderValue = (localOffset.dx / box.size.width) * divisions;
-          if (newSliderValue >= 0 && newSliderValue <= divisions) {
-            onChanged(newSliderValue / divisions);
-          }
-        }
-      },
-      child: Container(
-        width: double.infinity, // Container takes the full width of the parent
-        height: 30, // Height of the slider area
-        child: CustomPaint(
-          painter: SliderPainter(
-            value: value,
-            divisions: divisions,
+  _CustomSliderState createState() => _CustomSliderState();
+}
+
+class _CustomSliderState extends State<CustomSlider> {
+  OverlayEntry? _overlayEntry;
+
+  void _showTooltip(Offset globalPosition, double value) {
+    _overlayEntry?.remove();
+    _overlayEntry = _createOverlayEntry(globalPosition, value);
+    Overlay.of(context)?.insert(_overlayEntry!);
+  }
+
+  void _removeTooltip() {
+    _overlayEntry?.remove();
+    _overlayEntry = null;
+  }
+
+  OverlayEntry _createOverlayEntry(Offset position, double value) {
+    RenderBox renderBox = context.findRenderObject() as RenderBox;
+    var offset = renderBox.localToGlobal(position);
+
+    return OverlayEntry(
+      builder: (context) => Positioned(
+        left: offset.dx - 30, // Center the box on the thumb
+        top: offset.dy - 60, // Show above the slider thumb
+        child: Material(
+          color: Colors.transparent,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            decoration: BoxDecoration(
+              color: Colors.black87,
+              borderRadius: BorderRadius.circular(4),
+            ),
+            child: Text(
+              '${(value * 100).toStringAsFixed(0)}%', // Convert value to percentage
+              style: const TextStyle(color: Colors.white),
+            ),
           ),
         ),
       ),
     );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // Use Obx here to make sure the slider rebuilds whenever sliderValue changes
+    return Obx(() {
+      return GestureDetector(
+        onHorizontalDragUpdate: (details) {
+          RenderBox? box = context.findRenderObject() as RenderBox?;
+          if (box != null) {
+            Offset localOffset = box.globalToLocal(details.globalPosition);
+            double newSliderValue =
+                (localOffset.dx / box.size.width) * widget.divisions;
+            if (newSliderValue >= 0 && newSliderValue <= widget.divisions) {
+              double newValue = newSliderValue / widget.divisions;
+              widget.onChanged(newValue);
+              widget.value.value = newValue; // Update the RxDouble value
+              _showTooltip(localOffset, newValue);
+            }
+          }
+        },
+        onHorizontalDragEnd: (details) {
+          _removeTooltip();
+        },
+        child: SizedBox(
+          width: double.infinity,
+          height: 30,
+          child: CustomPaint(
+            painter: SliderPainter(
+              value: widget.value.value, // Use the RxDouble value here
+              divisions: widget.divisions,
+            ),
+          ),
+        ),
+      );
+    });
   }
 }
 
