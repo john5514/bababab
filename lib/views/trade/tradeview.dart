@@ -164,9 +164,9 @@ class TradeView extends StatelessWidget {
                               }
                             }),
 
-                            const SizedBox(height: 10),
+                            const SizedBox(height: 25),
                             _buildSlider(),
-                            const SizedBox(height: 10),
+                            const SizedBox(height: 20),
                             _buildTakerFees(),
                             const SizedBox(height: 10),
                             _buildTotalExclFees(),
