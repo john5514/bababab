@@ -44,7 +44,32 @@ class FiatWalletView extends StatelessWidget {
             }),
           ),
           // Use one-third of the space for the transactions list
-          Flexible(
+          Container(
+            padding:
+                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            decoration: const BoxDecoration(
+              color: Colors
+                  .black54, // Change this to match the background color in the image
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(16.0),
+                topRight: Radius.circular(16.0),
+              ),
+            ),
+            width: double
+                .infinity, // This will make the container stretch to the full width of the screen
+            child: const Text(
+              'Transactions',
+              style: TextStyle(
+                color: Colors.white, // Adjust text color to match your design
+                fontWeight: FontWeight.bold,
+                fontSize: 18, // Adjust font size as needed
+              ),
+            ),
+          ),
+
+          // Line under the header
+
+          Expanded(
             flex: 3,
             child: Obx(() {
               if (walletController.isLoading.value) {
@@ -60,15 +85,22 @@ class FiatWalletView extends StatelessWidget {
                   ),
                 );
               }
-              return ListView.builder(
-                itemCount: walletController.fiatWalletTransactions.length,
-                itemBuilder: (context, index) {
-                  var transaction =
-                      walletController.fiatWalletTransactions[index];
-                  return TransactionItem(
-                      transaction:
-                          transaction); // Use the TransactionItem widget here
-                },
+              return Container(
+                decoration: const BoxDecoration(
+                  color: Colors
+                      .black54, // Common background color for transactions
+                ),
+                child: ListView.builder(
+                  itemCount: walletController.fiatWalletTransactions.length,
+                  itemBuilder: (context, index) {
+                    var transaction =
+                        walletController.fiatWalletTransactions[index];
+                    return TransactionItem(
+                      transaction: transaction,
+                      // Remove margin to avoid space between items
+                    ); // Use the TransactionItem widget here
+                  },
+                ),
               );
             }),
           ),
