@@ -1,5 +1,6 @@
 // ignore_for_file: invalid_use_of_protected_member
 
+import 'package:bicrypto/Style/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:bicrypto/Controllers/walletinfo_controller.dart';
@@ -16,7 +17,7 @@ class DepositView extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Deposit', style: TextStyle(color: Colors.white)),
-        backgroundColor: Colors.orange,
+        backgroundColor: appTheme.scaffoldBackgroundColor,
       ),
       body: Obx(() {
         if (controller.isLoading.value) {
@@ -48,7 +49,8 @@ class DepositView extends StatelessWidget {
                         'walletInfo': controller.walletInfo.value,
                       });
                     } else {
-                      // Navigate to the selected method page for other methods
+                      print(
+                          "Debugging: selectedMethod in DepositView before navigation = $method");
                       Get.toNamed('/selected-method', arguments: {
                         'method': method,
                         'currencyName': controller.walletName.value,

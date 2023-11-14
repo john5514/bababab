@@ -130,6 +130,8 @@ class WalletInfoView extends StatelessWidget {
                 Get.toNamed('/deposit', arguments: {
                   'walletName': walletInfoController.walletName.value,
                   'walletBalance': walletInfoController.walletBalance.value,
+                  'walletInfo': walletInfoController
+                      .walletInfo.value, // Include walletInfo
                 });
               },
               style: OutlinedButton.styleFrom(

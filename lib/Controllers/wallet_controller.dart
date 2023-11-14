@@ -66,38 +66,26 @@ class WalletController extends GetxController {
   }
 
   Map<String, double> calculateBalanceForCurrency(String currency) {
-    // print("All Transactions: $fiatTransactions");
-    // print("Currency being checked: $currency");
-
-    // // Additional debugging
-    // print(
-    //     "Transactions with type DEPOSIT: ${fiatTransactions.where((trx) => trx['type'] == 'DEPOSIT').toList()}");
-    // print(
-    //     "Transactions with currency $currency: ${fiatTransactions.where((trx) => trx['wallet']['currency'] == currency).toList()}");
-
-    double income = fiatTransactions
+    double income = fiatWalletTransactions
         .where((trx) =>
             trx['type'] == 'DEPOSIT' && trx['wallet']['currency'] == currency)
         .fold(0.0, (sum, trx) => sum + trx['amount']);
 
-    List<dynamic> incomeTransactions = fiatTransactions
+    List<dynamic> incomeTransactions = fiatWalletTransactions
         .where((trx) =>
             trx['type'] == 'DEPOSIT' && trx['wallet']['currency'] == currency)
         .toList();
 
     // Calculate expense and create the expenseTransactions list
-    double expense = fiatTransactions
+    double expense = fiatWalletTransactions
         .where((trx) =>
             trx['type'] != 'DEPOSIT' && trx['wallet']['currency'] == currency)
         .fold(0.0, (sum, trx) => sum + trx['amount']);
 
-    List<dynamic> expenseTransactions = fiatTransactions
+    List<dynamic> expenseTransactions = fiatWalletTransactions
         .where((trx) =>
             trx['type'] != 'DEPOSIT' && trx['wallet']['currency'] == currency)
         .toList();
-
-    // print("Income Transactions: $incomeTransactions");
-    // print("Expense Transactions: $expenseTransactions");
 
     return {
       'income': income,

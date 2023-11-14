@@ -1,20 +1,27 @@
 import 'package:bicrypto/Controllers/walletinfo_controller.dart';
+import 'package:bicrypto/Style/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class SelectedMethodPage extends StatelessWidget {
+class PayoneerSelectedMethodPage extends StatelessWidget {
   final Map<String, dynamic> selectedMethod;
   final String currencyName;
   final Map<String, dynamic> walletInfo;
   final WalletInfoController controller = Get.find();
   final RxBool isAgreedToTOS = false.obs;
 
-  SelectedMethodPage({
+  PayoneerSelectedMethodPage({
     Key? key,
     required this.selectedMethod,
     required this.currencyName,
     required this.walletInfo,
-  }) : super(key: key);
+  }) : super(key: key) {
+    print(
+        "Debugging: selectedMethod in PayoneerSelectedMethodPage = $selectedMethod");
+    print(
+        "Debugging: currencyName in PayoneerSelectedMethodPage = $currencyName");
+    print("Debugging: walletInfo in PayoneerSelectedMethodPage = $walletInfo");
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -22,10 +29,9 @@ class SelectedMethodPage extends StatelessWidget {
       appBar: AppBar(
         title: Text(
           selectedMethod['title'] ?? 'Selected Method',
-          style: const TextStyle(color: Colors.white),
+          style: const TextStyle(color: Colors.orange),
         ),
-        backgroundColor: Colors.orange,
-        shadowColor: Colors.red,
+        backgroundColor: appTheme.scaffoldBackgroundColor,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
@@ -91,19 +97,24 @@ class SelectedMethodPage extends StatelessWidget {
                   )),
             ),
             const SizedBox(height: 20),
-            Obx(() => ElevatedButton(
-                  onPressed: isAgreedToTOS.value
-                      ? () async {
-                          // Call the controller method to post the deposit
-                          await controller.postFiatDepositMethod({
-                            'amount': controller.depositAmount.value.toString(),
-                            'wallet': walletInfo['id'].toString(),
-                            'methodId': selectedMethod['id'],
-                          });
-                        }
-                      : null,
-                  child: const Text('Deposit'),
-                )),
+            Obx(
+              () => ElevatedButton(
+                onPressed: isAgreedToTOS.value
+                    ? () async {
+                        // Call the controller method to post the deposit
+                        await controller.postFiatDepositMethod(
+                            {
+                              'amount':
+                                  controller.depositAmount.value.toString(),
+                              'wallet': walletInfo['id'].toString(),
+                            },
+                            selectedMethod['id']
+                                .toString()); // Convert the methodId to a String
+                      }
+                    : null,
+                child: const Text('Deposit'),
+              ),
+            ),
           ],
         ),
       ),

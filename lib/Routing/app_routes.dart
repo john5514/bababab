@@ -39,16 +39,21 @@ class AppRoutes {
         final arguments = Get.arguments as Map<String, dynamic>;
         final selectedMethod = arguments['method'] as Map<String, dynamic>;
         final currencyName = arguments['currencyName'] as String;
-        final walletInfo = arguments['walletInfo']
-            as Map<String, dynamic>; // Get walletInfo from the arguments
+        final walletInfo = arguments['walletInfo'] as Map<String, dynamic>;
 
-        return SelectedMethodPage(
+        // Add debug statements here
+        print("Debugging: selectedMethod in route = $selectedMethod");
+        print("Debugging: currencyName in route = $currencyName");
+        print("Debugging: walletInfo in route = $walletInfo");
+
+        return PayoneerSelectedMethodPage(
           selectedMethod: selectedMethod,
           currencyName: currencyName,
-          walletInfo: walletInfo, // Pass the walletInfo from the arguments
+          walletInfo: walletInfo,
         );
       },
     ),
+
     GetPage(name: '/stripe_method', page: () => StripeMethodWidget()),
     GetPage(
       name: '/chart',

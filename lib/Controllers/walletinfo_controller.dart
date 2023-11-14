@@ -23,11 +23,10 @@ class WalletInfoController extends GetxController {
     walletInfo.value = info; // set walletInfo
     selectedMethod.value = method; // set selectedMethod
 
-    // Debugging: Print walletInfo and selectedMethod
-    // print("Debugging: walletInfo = $info");
-    // print("Debugging: selectedMethod = $method");
-
-    fetchAllDepositOptions(); // Call the modified method here
+    // Add debug statements
+    print("Debugging: setWalletInfo called");
+    print("Debugging: walletInfo set to = $info");
+    print("Debugging: selectedMethod set to = $method");
   }
 
 // Method to initialize wallet information
@@ -37,6 +36,8 @@ class WalletInfoController extends GetxController {
     double walletBalance = (walletInfo['balance'] is int)
         ? walletInfo['balance'].toDouble()
         : (walletInfo['balance'] ?? 0.0);
+    print(
+        "Debugging: initializeWalletInfo called with walletInfo = $walletInfo and selectedMethod = $selectedMethod");
 
     setWalletInfo(walletName, walletBalance, walletInfo, selectedMethod);
   }
@@ -44,6 +45,8 @@ class WalletInfoController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    print("Debugging: WalletInfoController initialized");
+
     fetchAllDepositOptions(); // Call the new method to fetch and combine deposit options
     fetchFiatWithdrawMethods();
   }
@@ -156,17 +159,17 @@ class WalletInfoController extends GetxController {
     }
   }
 
-  Future<void> postFiatDepositMethod(Map<String, dynamic> payload) async {
+  Future<void> postFiatDepositMethod(
+      Map<String, dynamic> payload, String methodId) async {
     try {
       isLoading(true);
+      print("Debugging: payload in postFiatDepositMethod = $payload");
 
       // Validate input and retrieve necessary parameters
       String walletIdentifier = walletInfo.value['id']?.toString() ?? '';
-      String methodId = selectedMethod.value?['id']?.toString() ?? '';
 
-// Debugging: Print the values of walletIdentifier and methodId
-      // print("Debugging: walletIdentifier = $walletIdentifier");
-      // print("Debugging: methodId = $methodId");
+      print("Debugging: walletIdentifier = $walletIdentifier");
+      print("Debugging: methodId = $methodId");
 
       if (walletIdentifier.isEmpty || methodId.isEmpty) {
         throw Exception('Wallet identifier or method ID is missing');
@@ -175,7 +178,7 @@ class WalletInfoController extends GetxController {
       // Construct and post the deposit payload
       constructAndPostDepositPayload(payload, walletIdentifier, methodId);
     } catch (e) {
-      // print("Failed to post fiat deposit method: $e");
+      print("Failed to post fiat deposit method: $e");
       Get.snackbar('Error', 'Failed to perform deposit: $e',
           snackPosition: SnackPosition.BOTTOM);
     } finally {
@@ -235,7 +238,7 @@ class WalletInfoController extends GetxController {
 
     // Add formatted custom_data to the payload
     payload['custom_data'] = formatCustomData();
-    // print("Final Payload: $payload");
+    print("Final Payload: $payload");
 
     await walletService.postFiatDepositMethod(payload);
     Get.snackbar('Success', 'Deposit successful',
