@@ -24,7 +24,7 @@ class WalletInfoView extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Wallet Info',
+          '${walletInfoController.walletName.value} Wallet',
           style: TextStyle(color: appTheme.secondaryHeaderColor),
         ),
         backgroundColor: appTheme.scaffoldBackgroundColor,

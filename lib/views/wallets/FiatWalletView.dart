@@ -1,6 +1,5 @@
 import 'dart:ui';
 import 'package:bicrypto/widgets/wallet/TransactionItem.dart';
-import 'package:bicrypto/widgets/wallet/build_transactions.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:bicrypto/Controllers/wallet_controller.dart';
