@@ -41,11 +41,6 @@ class AppRoutes {
         final currencyName = arguments['currencyName'] as String;
         final walletInfo = arguments['walletInfo'] as Map<String, dynamic>;
 
-        // Add debug statements here
-        print("Debugging: selectedMethod in route = $selectedMethod");
-        print("Debugging: currencyName in route = $currencyName");
-        print("Debugging: walletInfo in route = $walletInfo");
-
         return PayoneerSelectedMethodPage(
           selectedMethod: selectedMethod,
           currencyName: currencyName,

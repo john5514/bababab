@@ -1,4 +1,5 @@
 import 'package:bicrypto/services/api_service.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:get/get.dart';
 import 'package:bicrypto/services/wallet_service.dart';
@@ -24,9 +25,6 @@ class WalletInfoController extends GetxController {
     selectedMethod.value = method; // set selectedMethod
 
     // Add debug statements
-    print("Debugging: setWalletInfo called");
-    print("Debugging: walletInfo set to = $info");
-    print("Debugging: selectedMethod set to = $method");
   }
 
 // Method to initialize wallet information
@@ -36,8 +34,6 @@ class WalletInfoController extends GetxController {
     double walletBalance = (walletInfo['balance'] is int)
         ? walletInfo['balance'].toDouble()
         : (walletInfo['balance'] ?? 0.0);
-    print(
-        "Debugging: initializeWalletInfo called with walletInfo = $walletInfo and selectedMethod = $selectedMethod");
 
     setWalletInfo(walletName, walletBalance, walletInfo, selectedMethod);
   }
@@ -45,7 +41,6 @@ class WalletInfoController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    print("Debugging: WalletInfoController initialized");
 
     fetchAllDepositOptions(); // Call the new method to fetch and combine deposit options
     fetchFiatWithdrawMethods();
@@ -163,13 +158,9 @@ class WalletInfoController extends GetxController {
       Map<String, dynamic> payload, String methodId) async {
     try {
       isLoading(true);
-      print("Debugging: payload in postFiatDepositMethod = $payload");
 
       // Validate input and retrieve necessary parameters
       String walletIdentifier = walletInfo.value['id']?.toString() ?? '';
-
-      print("Debugging: walletIdentifier = $walletIdentifier");
-      print("Debugging: methodId = $methodId");
 
       if (walletIdentifier.isEmpty || methodId.isEmpty) {
         throw Exception('Wallet identifier or method ID is missing');
@@ -178,7 +169,6 @@ class WalletInfoController extends GetxController {
       // Construct and post the deposit payload
       constructAndPostDepositPayload(payload, walletIdentifier, methodId);
     } catch (e) {
-      print("Failed to post fiat deposit method: $e");
       Get.snackbar('Error', 'Failed to perform deposit: $e',
           snackPosition: SnackPosition.BOTTOM);
     } finally {
@@ -238,10 +228,14 @@ class WalletInfoController extends GetxController {
 
     // Add formatted custom_data to the payload
     payload['custom_data'] = formatCustomData();
-    print("Final Payload: $payload");
 
     await walletService.postFiatDepositMethod(payload);
+    Get.back();
+//style snakbar for darktheme
+
     Get.snackbar('Success', 'Deposit successful',
+        backgroundColor: Colors.grey[850],
+        colorText: Colors.white,
         snackPosition: SnackPosition.BOTTOM);
   }
 
@@ -251,7 +245,6 @@ class WalletInfoController extends GetxController {
       var method = await walletService.fetchFiatDepositMethodById(id);
       return method;
     } catch (e) {
-      // print("Failed to fetch fiat deposit method by id: $e");
       rethrow;
     } finally {
       isLoading(false);
