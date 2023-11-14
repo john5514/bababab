@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'package:bicrypto/widgets/wallet/TransactionItem.dart';
 import 'package:bicrypto/widgets/wallet/build_transactions.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -18,7 +19,7 @@ class FiatWalletView extends StatelessWidget {
         children: [
           // Use two-thirds of the space for the wallet list
           Flexible(
-            flex: 2,
+            flex: 4,
             child: Obx(() {
               if (walletController.isLoading.value) {
                 return Center(
@@ -44,18 +45,37 @@ class FiatWalletView extends StatelessWidget {
           ),
           // Use one-third of the space for the transactions list
           Flexible(
-            flex: 1,
+            flex: 3,
             child: Obx(() {
-              // Print the number of transactions here (if needed)
-
-              return TransactionDisplay(
-                transactions: walletController.fiatWalletTransactions,
+              if (walletController.isLoading.value) {
+                return Center(
+                  child: CircularProgressIndicator(color: appTheme.hintColor),
+                );
+              }
+              if (walletController.fiatWalletTransactions.isEmpty) {
+                return Center(
+                  child: Text(
+                    'No transactions found.',
+                    style: appTheme.textTheme.bodyLarge,
+                  ),
+                );
+              }
+              return ListView.builder(
+                itemCount: walletController.fiatWalletTransactions.length,
+                itemBuilder: (context, index) {
+                  var transaction =
+                      walletController.fiatWalletTransactions[index];
+                  return TransactionItem(
+                      transaction:
+                          transaction); // Use the TransactionItem widget here
+                },
               );
             }),
           ),
         ],
       ),
-      floatingActionButton: buildAddWalletButton(context),
+      floatingActionButton:
+          buildAddWalletButton(context), // Make sure this method is defined
     );
   }
 
