@@ -20,6 +20,7 @@ class WalletService {
       'refresh-token': apiService.tokens['refresh-token'] ?? "",
       'Content-Type': 'application/json',
       'Client-Platform': 'app',
+      'origin': 'https://v3.mash3div.com',
     };
   }
 
