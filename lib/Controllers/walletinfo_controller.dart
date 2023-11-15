@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:get/get.dart';
 import 'package:bicrypto/services/wallet_service.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class WalletInfoController extends GetxController {
   var walletName = ''.obs;
@@ -48,22 +49,28 @@ class WalletInfoController extends GetxController {
 
   Future<void> initiateStripePayment(double amount, String currency) async {
     try {
+      // Calculate surcharge
+      double surcharge = amount * 0.05;
+      double totalAmount = amount + surcharge;
+
       final response = await WalletService(ApiService())
-          .callStripeIpnEndpoint(amount, currency, amount * 0.05);
+          .callStripeIpnEndpoint(totalAmount, currency, surcharge);
       print('Response from Stripe IPN: $response');
+
       if (response != null && response['id'] != null) {
-        await Stripe.instance.initPaymentSheet(
-          paymentSheetParameters: SetupPaymentSheetParameters(
-            paymentIntentClientSecret: response['id'],
-            merchantDisplayName: 'Your Business Name',
-          ),
-        );
-        await Stripe.instance.presentPaymentSheet();
-        print('Stripe payment completed.');
+        // Attempt to construct the full URL  including the fragment.
+        final Uri checkoutUri =
+            Uri.parse('https://checkout.stripe.com/c/pay/${response['id']}');
+
+        if (await canLaunchUrl(checkoutUri)) {
+          await launchUrl(checkoutUri);
+        } else {
+          throw 'Could not launch $checkoutUri';
+        }
       }
     } catch (e) {
       print('Error: $e');
-      Get.snackbar('Error', 'Stripe payment failed: $e',
+      Get.snackbar('Error', 'Stripe payment initiation failed: $e',
           snackPosition: SnackPosition.BOTTOM);
     }
   }

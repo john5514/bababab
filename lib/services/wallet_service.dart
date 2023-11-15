@@ -31,7 +31,7 @@ class WalletService {
     try {
       await loadHeaders();
 
-      final Uri url = Uri.parse('https://v3.mash3div.com/api/ipn/stripe/');
+      final Uri url = Uri.parse('https://v3.mash3div.com/api/ipn/stripe');
       final response = await HttpClientHelper.post(
         url,
         headers: headers,
