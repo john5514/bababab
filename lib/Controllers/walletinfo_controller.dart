@@ -59,8 +59,8 @@ class WalletInfoController extends GetxController {
       print('Response from Stripe IPN: $response');
 
       if (response != null && response['url'] != null) {
-        // Attempt to construct the full URL  including the fragment.
-        final Uri checkoutUri = response['url'];
+        // Parse the URL string into a Uri object.
+        final Uri checkoutUri = Uri.parse(response['url']);
 
         if (await canLaunchUrl(checkoutUri)) {
           await launchUrl(checkoutUri);
