@@ -14,8 +14,9 @@ import 'package:bicrypto/views/wallets/spot/spotDeposit_view.dart';
 import 'package:bicrypto/views/wallets/spot/spotDetail_screen.dart';
 import 'package:bicrypto/views/wallets/spot/spotWithdraw_screen.dart';
 import 'package:bicrypto/views/wallets/walletinfo_view.dart';
-import 'package:bicrypto/views/wallets/withdrowview.dart';
+import 'package:bicrypto/views/wallets/withdrawalview.dart';
 import 'package:bicrypto/widgets/stripe_method_widget.dart';
+import 'package:bicrypto/widgets/wallet/payoneer_withdrow.dart';
 import 'package:get/get.dart';
 
 import '../widgets/payoneer_method_widget.dart';
@@ -29,10 +30,27 @@ class AppRoutes {
     GetPage(name: '/wallet', page: () => WalletView()),
     GetPage(name: '/wallet-info', page: () => WalletInfoView()),
     GetPage(name: '/deposit', page: () => const DepositView()),
-    GetPage(name: '/withdraw', page: () => const WithdrawView()),
+    GetPage(name: '/withdraw', page: () => const WithdrawalView()),
     GetPage(
         name: '/completeDeposit',
         page: () => CompleteDepositView(method: Get.arguments)),
+    GetPage(
+      name:
+          '/payoneer_withdraw', // Add the correct path for Payoneer withdrawal page
+      page: () {
+        final arguments = Get.arguments as Map<String, dynamic>;
+        final selectedMethod = arguments['method'] as Map<String, dynamic>;
+        final currencyName = arguments['currencyName'] as String;
+        final walletInfo = arguments['walletInfo'] as Map<String, dynamic>;
+
+        return PayoneerWithdrawalPage(
+          selectedMethod: selectedMethod,
+          currencyName: currencyName,
+          walletInfo: walletInfo,
+        );
+      },
+    ), // Replace with the correct widget
+
     GetPage(
       name: '/selected-method',
       page: () {

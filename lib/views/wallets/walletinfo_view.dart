@@ -148,16 +148,20 @@ class WalletInfoView extends StatelessWidget {
           Expanded(
             child: OutlinedButton(
               onPressed: () {
-                Get.toNamed('/withdraw');
+                Get.toNamed('/withdraw', arguments: {
+                  'walletName': walletInfoController.walletName.value,
+                  'walletBalance': walletInfoController.walletBalance.value,
+                  'walletInfo': walletInfoController
+                      .walletInfo.value, // Include walletInfo
+                });
               },
               style: OutlinedButton.styleFrom(
                 side: const BorderSide(color: Colors.red),
                 padding: const EdgeInsets.all(15),
               ),
-              child: const Text(
-                'Withdraw',
-                style: TextStyle(color: Colors.red),
-              ),
+              // Rest of the button styling
+              child:
+                  const Text('Withdraw', style: TextStyle(color: Colors.red)),
             ),
           ),
         ],

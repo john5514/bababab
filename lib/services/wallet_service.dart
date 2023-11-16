@@ -83,9 +83,6 @@ class WalletService {
   Future<void> createWallet(String currency) async {
     await loadHeaders();
 
-    // print("Headers before API call: $headers");
-    // print("Attempting to create wallet with currency: $currency");
-
     final payload = jsonEncode({'currency': currency, 'type': 'FIAT'});
     // print("Payload: $payload");
 
@@ -127,13 +124,10 @@ class WalletService {
       Uri.parse('https://v3.mash3div.com/api/currencies'),
       headers: headers,
     );
-    // print(
-    //     "API Response for Currencies: ${response?.body}"); // Log the API response
+
     if (response?.statusCode == 200) {
       return jsonDecode(response!.body);
     } else {
-      // print(
-      //     "Error fetching currencies: ${response?.statusCode}, ${response?.body}");
       throw Exception('Failed to load currencies');
     }
   }
@@ -165,9 +159,6 @@ class WalletService {
       // print("WalletService - Fetched Wallet Balance: $balance");
       return balance;
     } else {
-      // print(
-      //     "Failed to fetch wallet balance with status code: ${response?.statusCode}");
-      // print("Failure response: ${response?.body}");
       throw Exception('Failed to fetch wallet balance');
     }
   }
@@ -479,17 +470,6 @@ class WalletService {
     }
   }
 
-  // Future<void> postSpotWithdraw(Map<String, dynamic> payload) async {
-  //   await loadHeaders();
-  //   final response = await HttpClientHelper.post(
-  //     Uri.parse('${baseUrl}/spot/withdraw'),
-  //     headers: headers,
-  //     body: jsonEncode(payload),
-  //   );
-  //   if (response?.statusCode != 200 && response?.statusCode != 201) {
-  //     throw Exception('Failed to post spot withdraw');
-  //   }
-  // }
   Future<Map<String, dynamic>> withdraw({
     required String currency,
     required String chain,
@@ -575,21 +555,6 @@ class WalletService {
       throw Exception('Failed to fetch user wallets');
     }
   }
-
-  // Future<double> fetchWalletBalance() async {
-  //   await loadHeaders();
-  //   final response = await HttpClientHelper.get(
-  //     Uri.parse('${baseUrl}/balance'),
-  //     headers: headers,
-  //   );
-  //   if (response?.statusCode == 200) {
-  //     var responseBody = jsonDecode(response!.body);
-  //     double balance = responseBody['balance'] ?? 0.0;
-  //     return balance;
-  //   } else {
-  //     throw Exception('Failed to fetch wallet balance');
-  //   }
-  // }
 
   Future<Map<String, dynamic>> fetchWalletTransactionById(
       String referenceId) async {

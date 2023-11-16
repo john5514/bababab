@@ -12,6 +12,7 @@ class WalletInfoController extends GetxController {
   var fiatWithdrawMethods = [].obs;
   var fiatDepositGateways = [].obs;
   var depositAmount = 0.0.obs;
+  var withdrawAmount = 0.0.obs;
   var isLoading = false.obs;
   var selectedMethod = Rx<Map<String, dynamic>?>(null);
   var walletInfo = <String, dynamic>{}.obs;
@@ -150,12 +151,23 @@ class WalletInfoController extends GetxController {
     }
   }
 
-  Future<void> postFiatWithdraw(Map<String, dynamic> payload) async {
+  Future<void> postFiatWithdrawalMethod(
+      Map<String, dynamic> payload, String methodId) async {
     try {
       isLoading(true);
-      await walletService.postFiatWithdraw(payload);
+
+      String walletIdentifier = walletInfo.value['id']?.toString() ?? '';
+      if (walletIdentifier.isEmpty || methodId.isEmpty) {
+        throw Exception('Wallet identifier or method ID is missing');
+      }
+
+      // Construct and post the withdrawal payload
+      constructAndPostWithdrawalPayload(payload, walletIdentifier, methodId);
     } catch (e) {
-      print("Failed to post fiat withdraw: $e");
+      Get.snackbar('Error', 'Failed to perform withdrawal: $e',
+          backgroundColor: Colors.grey[850],
+          colorText: Colors.white,
+          snackPosition: SnackPosition.BOTTOM);
     } finally {
       isLoading(false);
     }
@@ -244,6 +256,62 @@ class WalletInfoController extends GetxController {
         backgroundColor: Colors.grey[850],
         colorText: Colors.white,
         snackPosition: SnackPosition.BOTTOM);
+  }
+
+  void constructAndPostWithdrawalPayload(Map<String, dynamic> payload,
+      String walletIdentifier, String methodId) async {
+    // Use the 'uuid' from the walletInfo
+    payload['wallet'] = walletInfo.value['uuid'].toString();
+
+    // Parse the methodId as an integer
+    payload['methodId'] = int.parse(methodId);
+
+    double amount = double.tryParse(payload['amount']) ?? 0;
+    double fixedFee =
+        (selectedMethod.value?['fixed_fee'] as num?)?.toDouble() ?? 0;
+    double percentageFee =
+        (selectedMethod.value?['percentage_fee'] as num?)?.toDouble() ?? 0;
+
+    // Correctly calculate the total amount including fees
+    double total = amount + fixedFee + (amount * (percentageFee / 100));
+
+    // Check if the user's balance is sufficient
+    if (walletBalance.value < total) {
+      Get.snackbar(
+        'Insufficient Balance',
+        'You do not have enough balance to complete this withdrawal. Please check your balance and try again.',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return; // Stop the execution if balance is insufficient
+    }
+
+    // Add formatted custom_data to the payload
+    payload['custom_data'] = formatCustomData();
+
+    try {
+      await walletService.postFiatWithdraw(payload);
+      Get.back();
+
+      // Display success message
+      Get.snackbar(
+        'Success',
+        'Withdrawal request sent successfully.',
+        backgroundColor: Colors.green,
+        colorText: Colors.white,
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    } catch (e) {
+      // Handle any errors during the withdrawal process
+      Get.snackbar(
+        'Error',
+        'Failed to process withdrawal: $e',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    }
   }
 
   Future<Map<String, dynamic>> fetchFiatDepositMethodById(String id) async {
