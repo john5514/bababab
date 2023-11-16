@@ -3,7 +3,6 @@ import 'package:bicrypto/Style/styles.dart';
 import 'package:bicrypto/services/wallet_service.dart';
 import 'package:bicrypto/views/wallets/spot/SpotTransferView.dart';
 import 'package:bicrypto/views/wallets/spot/spotWithdraw_screen.dart';
-import 'package:bicrypto/views/wallets/withdrowview.dart';
 import 'package:bicrypto/widgets/wallet/build_transactions.dart';
 import 'package:bicrypto/widgets/wallet/defaultDialog.dart';
 import 'package:flutter/material.dart';

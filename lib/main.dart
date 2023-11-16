@@ -28,7 +28,7 @@ void main() async {
   await loginController.init(); // Wait for initialization to complete
 
   Stripe.publishableKey =
-      'pk_test_51LzmB6LGS76IduW6INDwhlf4Y55MHvFL6ldhq51gUkbZPO5l7Itfz8w2vvdzSfXR628ls9eJC8M5IcbI2092oazU00OcA3sfeD';
+      'pk_test_51LPVEfLFyngRnuDVzYJ2cb5yF2BsE4fELcGumnvgjuLCCPWjHpEeDMVz6DOSilTNc2FihuK91zbNurhhyRZT0qTI000Zc1hT5B';
 
   runApp(MyApp());
 }

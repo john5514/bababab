@@ -58,10 +58,9 @@ class WalletInfoController extends GetxController {
           .callStripeIpnEndpoint(totalAmount, currency, surcharge);
       print('Response from Stripe IPN: $response');
 
-      if (response != null && response['id'] != null) {
+      if (response != null && response['url'] != null) {
         // Attempt to construct the full URL  including the fragment.
-        final Uri checkoutUri =
-            Uri.parse('https://checkout.stripe.com/c/pay/${response['id']}');
+        final Uri checkoutUri = response['url'];
 
         if (await canLaunchUrl(checkoutUri)) {
           await launchUrl(checkoutUri);
