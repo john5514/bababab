@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 final ThemeData appTheme = ThemeData(
+  useMaterial3: false,
   fontFamily: 'Inter',
   primaryColor: Colors.black,
   secondaryHeaderColor: Colors.white,

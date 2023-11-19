@@ -3,6 +3,7 @@ import 'package:bicrypto/services/api_service.dart';
 import 'package:bicrypto/services/profile_service.dart';
 import 'package:bicrypto/views/Auth/profile/changepassword_screen.dart';
 import 'package:bicrypto/views/Auth/profile/congratulations_screen.dart';
+import 'package:bicrypto/views/Auth/profile/kyc_screen.dart';
 import 'package:bicrypto/views/Auth/profile/profile_view.dart';
 import 'package:bicrypto/views/Auth/profile/two_step_verification_screen.dart';
 import 'package:flutter/material.dart';
@@ -20,7 +21,7 @@ class _MainSettingsScreenState extends State<MainSettingsScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 4, vsync: this);
     fetchProfile();
   }
 
@@ -61,10 +62,12 @@ class _MainSettingsScreenState extends State<MainSettingsScreen>
         backgroundColor: theme.scaffoldBackgroundColor,
         bottom: TabBar(
           controller: _tabController,
+          isScrollable: true, // Enable horizontal scrolling
           tabs: const [
             Tab(text: 'Profile'),
             Tab(text: 'Change Password'),
             Tab(text: 'Two-Step Verification'),
+            Tab(text: 'KYC Verification'), // New tab for KYC
           ],
         ),
       ),
@@ -76,6 +79,7 @@ class _MainSettingsScreenState extends State<MainSettingsScreen>
           isTwoFactorEnabled
               ? CongratulationsScreen()
               : TwoStepVerificationScreen(),
+          KYCScreen(), // Add the KYC screen here
         ],
       ),
     );

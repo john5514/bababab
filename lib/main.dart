@@ -1,3 +1,4 @@
+import 'package:bicrypto/Controllers/Auth/profile/kyc_controller.dart';
 import 'package:bicrypto/Controllers/Auth/profile/profile_controller.dart';
 import 'package:bicrypto/Controllers/wallets/spot%20wallet/spotWallet_controller.dart';
 import 'package:bicrypto/Routing/app_routes.dart';
@@ -23,6 +24,7 @@ void main() async {
   // Now put WalletSpotController in GetX
   Get.put(WalletSpotController(walletService: Get.find()));
   Get.put<ProfileController>(ProfileController(profileService: Get.find()));
+  Get.put(KYCController(profileService: Get.find()));
 
   final LoginController loginController = Get.put(LoginController());
   await loginController.init(); // Wait for initialization to complete

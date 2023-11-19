@@ -7,6 +7,8 @@ import 'package:path/path.dart';
 
 class ProfileService {
   final String _baseUrl = "https://v3.mash3div.com/api/auth/profile";
+  final String _kycUrl = "https://v3.mash3div.com/api/kyc";
+
   final ApiService apiService;
 
   ProfileService(this.apiService);
@@ -255,6 +257,43 @@ class ProfileService {
     } else {
       // Handle error
       return null;
+    }
+  }
+
+  Future<Map<String, dynamic>?> getKYC() async {
+    await loadHeaders();
+    final Uri url = Uri.parse(_kycUrl);
+    final response = await http.get(url, headers: headers);
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      print('Failed to load KYC data. Status code: ${response.statusCode}');
+      return null;
+    }
+  }
+
+  Future<bool> submitKYC(
+      String templateId, String template, String level) async {
+    await loadHeaders();
+    final Uri url = Uri.parse(_kycUrl);
+
+    final response = await http.post(
+      url,
+      headers: headers,
+      body: jsonEncode({
+        "templateId": templateId,
+        "template": template,
+        "level": level,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      print('KYC submitted successfully: ${response.body}');
+      return true;
+    } else {
+      print('Failed to submit KYC. Status code: ${response.statusCode}');
+      return false;
     }
   }
 }
