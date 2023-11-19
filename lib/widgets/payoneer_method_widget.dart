@@ -43,15 +43,24 @@ class PayoneerSelectedMethodPage extends StatelessWidget {
                   children: [
                     // The Payoneer logo as an asset
                     Container(
-                      height: 56, // Adjust the height as needed
-                      decoration: const BoxDecoration(
-                        // If your logo is not square, you might want to add some padding to align it well
-                        image: DecorationImage(
-                          image: AssetImage('assets/images/PAYO.png'),
-                          fit: BoxFit.fitHeight,
-                        ),
+                      height: 100, // Adjust the height as needed
+                      decoration: BoxDecoration(
+                        // Load the image from the network
+                        image: selectedMethod['image'] != null
+                            ? DecorationImage(
+                                // ignore: prefer_interpolation_to_compose_strings
+                                image: NetworkImage("https://v3.mash3div.com" +
+                                    selectedMethod['image']),
+                                fit: BoxFit.contain,
+                              )
+                            : const DecorationImage(
+                                // Fallback image if the URL is not available
+                                image: AssetImage('assets/images/PAYO.png'),
+                                fit: BoxFit.fitHeight,
+                              ),
                       ),
                     ),
+
                     const SizedBox(height: 20), // Space between image and text
                     Text(
                       'Deposit with Payoneer',
@@ -112,13 +121,7 @@ class PayoneerSelectedMethodPage extends StatelessWidget {
               keyboardType: TextInputType.number,
             ),
             const SizedBox(height: 10),
-            buildTextField(
-              label: 'Transaction ID',
-              hint: 'Enter transaction ID',
-              prefixIcon: Icons.receipt,
-              onChanged: (value) =>
-                  controller.customFieldInputs['Transaction ID'] = value,
-            ),
+            ...buildCustomFields(),
             const SizedBox(height: 20),
             buildInfoRow('Flat Tax',
                 '${selectedMethod['fixed_fee']} $currencyName', theme),
@@ -231,5 +234,30 @@ class PayoneerSelectedMethodPage extends StatelessWidget {
     double total =
         depositAmount + fixedFee + (depositAmount * (percentageFee / 100));
     return total.toStringAsFixed(2); // Formats the total to 2 decimal places
+  }
+
+  List<Widget> buildCustomFields() {
+    List<Widget> customFieldWidgets = [];
+
+    List<dynamic> customFields = selectedMethod['custom_fields'] ?? [];
+
+    for (var field in customFields) {
+      customFieldWidgets.add(
+        buildTextField(
+          label: field['title'],
+          hint: 'Enter ${field['title']}',
+          prefixIcon: Icons.input, // Change as needed
+          onChanged: (value) {
+            // Update the value in the controller
+            controller.customFieldInputs[field['title']] = value;
+          },
+        ),
+      );
+
+      // Add spacing between fields
+      customFieldWidgets.add(SizedBox(height: 10));
+    }
+
+    return customFieldWidgets;
   }
 }

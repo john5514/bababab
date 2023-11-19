@@ -26,7 +26,18 @@ class WalletInfoController extends GetxController {
     walletInfo.value = info; // set walletInfo
     selectedMethod.value = method; // set selectedMethod
 
-    // Add debug statements
+    // Clear existing custom field inputs
+    customFieldInputs.clear();
+
+    // Store custom field data
+    if (method.containsKey('custom_fields')) {
+      for (var field in method['custom_fields']) {
+        if (field['type'] == 'input' && field['required']) {
+          customFieldInputs[field['title']] =
+              ''; // Initialize with empty string
+        }
+      }
+    }
   }
 
 // Method to initialize wallet information
@@ -317,6 +328,10 @@ class WalletInfoController extends GetxController {
     try {
       isLoading(true);
       var method = await walletService.fetchFiatDepositMethodById(id);
+      if (method != null) {
+        setWalletInfo(
+            walletName.value, walletBalance.value, walletInfo.value, method);
+      }
       return method;
     } catch (e) {
       rethrow;
