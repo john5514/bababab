@@ -6,12 +6,12 @@ class TradeController extends GetxController {
   var tradeName = "".obs;
   var change24h = 0.0.obs;
   final ChartController _chartController = Get.find<ChartController>();
-  var activeAction = "Buy".obs;
+  var activeAction = "Buy".obs; // 'Buy' or 'Sell'
   var selectedOrderType = "Limit".obs;
   var sliderValue = 0.0.obs;
-  var takerFees = 0.0.obs; // Defined takerFees
-  var totalExclFees = 0.0.obs; // Defined total excluding fees
-  var cost = 0.0.obs; // Defined cost
+  var takerFees = 0.0.obs;
+  var totalExclFees = 0.0.obs;
+  var cost = 0.0.obs;
 
   final TextEditingController amountController = TextEditingController();
   final TextEditingController priceController = TextEditingController();
@@ -23,41 +23,63 @@ class TradeController extends GetxController {
   void onInit() {
     super.onInit();
 
-    // Fetching initial trade name from the passed arguments
     final Map<String, dynamic> arguments = Get.arguments;
     tradeName.value = arguments['pair'];
 
-    // Listening for changes on the currentMarket
     _chartController.currentMarket.listen((market) {
       if (market != null) {
         change24h.value = market.change;
       }
     });
 
-    // Example logic to calculate fees and cost (You might want to adjust this)
-    // This is a basic example and might not cover your actual use-case.
+    amountController.addListener(_calculateValues);
+    priceController.addListener(_calculateValues);
+
     _calculateValues();
   }
 
+  @override
+  void onClose() {
+    amountController.dispose();
+    priceController.dispose();
+    super.onClose();
+  }
+
   void _calculateValues() {
-    // Example logic for calculations:
     double amount = double.tryParse(amountController.text) ?? 0.0;
     double price = double.tryParse(priceController.text) ?? 0.0;
 
-    takerFees.value = 0.001 * amount * price; // 0.1% taker fee
-    totalExclFees.value = amount - takerFees.value;
-    cost.value = amount * price;
+    // Backend logic replicated
+    double feeRate =
+        activeAction.value == 'Buy' ? 0.1 : 0.2; // Example fee rates
+    takerFees.value = calculateFee(amount, price, feeRate);
+    cost.value = calculateCost(amount, price, feeRate, activeAction.value);
+    totalExclFees.value = cost.value - takerFees.value;
+
+    update();
+  }
+
+  double calculateFee(double amount, double price, double feeRate) {
+    return (amount * price * feeRate) / 100;
+  }
+
+  double calculateCost(
+      double amount, double price, double feeRate, String side) {
+    if (side == 'Buy') {
+      return (amount * price) + calculateFee(amount, price, feeRate);
+    } else {
+      // Sell
+      return amount; // For sell, the cost is just the amount
+    }
   }
 
   void buy() {
-    // Your logic to perform the buying action goes here.
-    // For now, let's just print a message:
+    // Add your buying logic here
     print("Buying ${amountController.text} of ${tradeName.value}");
   }
 
   void sell() {
-    // Your logic to perform the selling action goes here.
-    // For now, let's just print a message:
+    // Add your selling logic here
     print("Selling ${amountController.text} of ${tradeName.value}");
   }
 }

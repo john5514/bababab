@@ -264,10 +264,10 @@ class TradeView extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             const Text("Taker Fees (0.1%)",
-                style: TextStyle(color: Colors.white)), // Updated style
+                style: TextStyle(color: Colors.white)),
             Text(
-                "${_tradeController.takerFees.value} ${_tradeController.firstPairName}",
-                style: const TextStyle(color: Colors.white)), // Updated style
+                "${_tradeController.takerFees.value.toStringAsFixed(2)} ${_tradeController.firstPairName}",
+                style: const TextStyle(color: Colors.white)),
           ],
         ));
   }
@@ -277,10 +277,10 @@ class TradeView extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             const Text("Total (excl. fees)",
-                style: TextStyle(color: Colors.white)), // Updated style
+                style: TextStyle(color: Colors.white)),
             Text(
-                "${_tradeController.totalExclFees.value} ${_tradeController.firstPairName}",
-                style: const TextStyle(color: Colors.white)), // Updated style
+                "${_tradeController.totalExclFees.value.toStringAsFixed(2)} ${_tradeController.firstPairName}",
+                style: const TextStyle(color: Colors.white)),
           ],
         ));
   }
@@ -289,11 +289,10 @@ class TradeView extends StatelessWidget {
     return Obx(() => Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text("Cost",
-                style: TextStyle(color: Colors.white)), // Updated style
+            const Text("Cost", style: TextStyle(color: Colors.white)),
             Text(
-                "${_tradeController.cost.value} ${_tradeController.secondPairName}",
-                style: const TextStyle(color: Colors.white)), // Updated style
+                "${_tradeController.cost.value.toStringAsFixed(2)} ${_tradeController.secondPairName}",
+                style: const TextStyle(color: Colors.white)),
           ],
         ));
   }
