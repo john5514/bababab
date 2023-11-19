@@ -25,7 +25,13 @@ class TradeView extends StatelessWidget {
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         title: Row(
           children: [
-            Obx(() => Text(_tradeController.tradeName.value)),
+            Obx(
+              () => Text(
+                _tradeController.tradeName.value,
+                style:
+                    TextStyle(color: Colors.white), // Set text color to white
+              ),
+            ),
             const SizedBox(width: 8.0),
             Obx(() => Text(
                   "${_tradeController.change24h.value}%",

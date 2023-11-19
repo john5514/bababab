@@ -54,7 +54,10 @@ class _MainSettingsScreenState extends State<MainSettingsScreen>
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Settings'),
+        title: const Text(
+          'Settings',
+          style: TextStyle(color: Colors.white),
+        ),
         backgroundColor: theme.scaffoldBackgroundColor,
         bottom: TabBar(
           controller: _tabController,

@@ -30,16 +30,6 @@ class WebWalletView extends StatelessWidget {
             appBar: AppBar(
               title: const Text('Wallet View'),
             ),
-            body: WebView(
-              initialUrl: 'https://v3.mash3div.com/user/wallets/fiat',
-              javascriptMode: JavascriptMode.unrestricted,
-              onWebViewCreated: (WebViewController webViewController) {
-                webViewController.loadUrl(
-                  'https://v3.mash3div.com/user/wallets/fiat',
-                  headers: snapshot.data!,
-                );
-              },
-            ),
           );
         }
       },

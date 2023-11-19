@@ -87,11 +87,12 @@ class ProfileView extends StatelessWidget {
 
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  primary: theme.hintColor,
+                  backgroundColor: theme.hintColor,
                 ),
                 onPressed:
                     controller.updateProfileData, // Call the method directly
-                child: Text('Update Profile'),
+                child: Text('Update Profile',
+                    style: TextStyle(color: Colors.white)),
               ),
             ],
           ),
