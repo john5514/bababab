@@ -1,8 +1,8 @@
 import 'package:bicrypto/Controllers/Auth/profile/kyc_controller.dart';
 import 'package:bicrypto/Controllers/Auth/profile/profile_controller.dart';
+import 'package:bicrypto/Controllers/home_controller.dart';
 import 'package:bicrypto/Controllers/wallets/spot%20wallet/spotWallet_controller.dart';
 import 'package:bicrypto/Routing/app_routes.dart';
-import 'package:bicrypto/services/CoinGeckoService.dart';
 import 'package:bicrypto/services/api_service.dart';
 import 'package:bicrypto/services/profile_service.dart';
 import 'package:bicrypto/services/wallet_service.dart';
@@ -25,6 +25,7 @@ void main() async {
   Get.put(WalletSpotController(walletService: Get.find()));
   Get.put<ProfileController>(ProfileController(profileService: Get.find()));
   Get.put(KYCController(profileService: Get.find()));
+  Get.put(HomeController());
 
   final LoginController loginController = Get.put(LoginController());
   await loginController.init(); // Wait for initialization to complete
