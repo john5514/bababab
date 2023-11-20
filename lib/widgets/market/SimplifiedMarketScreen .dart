@@ -51,29 +51,6 @@ class SimpleMarketScreen extends StatelessWidget {
               ),
             ],
           ),
-          Positioned(
-            right: 10,
-            bottom: 10,
-            child: TextButton(
-              onPressed: () {
-                // Access HomeController and change the tab index
-                HomeController homeController = Get.find<HomeController>();
-                homeController
-                    .changeTabIndex(1); // Change to the index of MarketScreen
-              },
-              style:
-                  TextButton.styleFrom(padding: const EdgeInsets.only(top: 10)),
-              child: const Text(
-                "View More",
-                style: TextStyle(
-                    color: Colors.orange, // Text color
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold, // Bold text
-                    fontFamily: 'Inter' // Specify the font family
-                    ),
-              ),
-            ),
-          ),
         ],
       ),
     );

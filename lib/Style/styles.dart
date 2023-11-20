@@ -16,7 +16,7 @@ final ThemeData appTheme = ThemeData(
     background: Color(0xFF22262F), // Your specific background color
     onBackground: Colors.white, // Text on background color
     surface: Color(0xFF37474F), // Surface color
-    onSurface: Colors.white, // Text on surface color
+    onSurface: Colors.white, // Primary variant
   ),
 
   // Text Selection Theme

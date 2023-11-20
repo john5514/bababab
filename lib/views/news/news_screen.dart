@@ -1,3 +1,4 @@
+import 'package:bicrypto/Controllers/home_controller.dart';
 import 'package:bicrypto/Controllers/news/news_controller.dart';
 import 'package:bicrypto/widgets/market/SimplifiedMarketScreen%20.dart';
 import 'package:flutter/material.dart';
@@ -46,15 +47,42 @@ class NewsWidget extends StatelessWidget {
                       child: SimpleMarketScreen(),
                     );
                   }
-
                   if (index == 1) {
+                    return Align(
+                      alignment: Alignment.centerRight,
+                      child: Padding(
+                        padding: const EdgeInsets.only(
+                          right: 12.0,
+                        ),
+                        child: TextButton(
+                          onPressed: () {
+                            // Access HomeController and change the tab index
+                            HomeController homeController =
+                                Get.find<HomeController>();
+                            homeController.changeTabIndex(
+                                1); // Change to the index of MarketScreen
+                          },
+                          child: const Text(
+                            "View More",
+                            style: TextStyle(
+                              color: Colors.yellow,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: 'Inter',
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  }
+                  if (index == 2) {
                     return const Divider(
                       color: Colors.grey,
                       thickness: 1,
                     );
                   }
 
-                  var newsIndex = index - 2;
+                  var newsIndex = index - 3;
                   var newsItem = newsController.newsList[newsIndex];
                   var publishedDate = DateTime.fromMillisecondsSinceEpoch(
                       newsItem['published_on'] * 1000);
