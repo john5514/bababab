@@ -11,7 +11,7 @@ final ThemeData appTheme = ThemeData(
     onPrimary: Colors.white, // Text on primary color
     secondary: Color(0xFF66BB6A), // Green shade as secondary color
     onSecondary: Colors.white, // Text on secondary color
-    error: Color(0xFFE57373), // Default error color
+    error: Color.fromARGB(255, 208, 75, 95), // Default error color
     onError: Colors.black, // Text on error color
     background: Color(0xFF22262F), // Your specific background color
     onBackground: Colors.white, // Text on background color

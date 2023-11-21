@@ -104,7 +104,7 @@ class ChartPage extends StatelessWidget {
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(horizontal: 32.0),
                   foregroundColor: Colors.white,
-                  backgroundColor: Colors.green,
+                  backgroundColor: appTheme.colorScheme.secondary,
                   shape:
                       RoundedRectangleBorder(borderRadius: BorderRadius.zero),
                 ),
@@ -126,7 +126,7 @@ class ChartPage extends StatelessWidget {
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(horizontal: 32.0),
                   foregroundColor: Colors.white,
-                  backgroundColor: Colors.red,
+                  backgroundColor: appTheme.colorScheme.error,
                   shape:
                       RoundedRectangleBorder(borderRadius: BorderRadius.zero),
                 ),

@@ -1,4 +1,5 @@
 import 'package:bicrypto/Controllers/tarde/trade_controller.dart';
+import 'package:bicrypto/Style/styles.dart';
 import 'package:bicrypto/views/market/markethome.dart';
 import 'package:bicrypto/widgets/costomslider.dart';
 import 'package:bicrypto/widgets/tradeorderbook.dart';
@@ -309,11 +310,9 @@ class TradeView extends StatelessWidget {
           }
         },
         style: ElevatedButton.styleFrom(
-          primary: isBuy
-              ? const Color.fromARGB(255, 101, 195, 104)
-              : const Color.fromARGB(
-                  255, 246, 84, 72), // Green for buy, red for sell
-        ),
+            backgroundColor: isBuy
+                ? appTheme.colorScheme.secondary
+                : appTheme.colorScheme.error),
         child: Text(
           "${isBuy ? 'Buy' : 'Sell'} ${_tradeController.firstPairName}",
           style: const TextStyle(
@@ -336,13 +335,12 @@ class TradeView extends StatelessWidget {
 
     if (title == "Buy") {
       activeButtonColor =
-          const Color.fromARGB(255, 101, 195, 104); // Active color for Buy
+          appTheme.colorScheme.secondary; // Active color for Buy
       textColor = isActive
           ? Colors.white
           : Colors.white; // White text color for inactive
     } else {
-      activeButtonColor =
-          const Color.fromARGB(255, 246, 84, 72); // Active color for Sell
+      activeButtonColor = appTheme.colorScheme.error; // Active color for Sell
       textColor = isActive
           ? Colors.white
           : Colors.white; // White text color for inactive

@@ -124,9 +124,9 @@ class PairsListView extends StatelessWidget {
               fontWeight: FontWeight.bold,
               fontFamily: 'Inter',
               color: market.change > 0
-                  ? Colors.green
+                  ? appTheme.colorScheme.secondary
                   : market.change < 0
-                      ? Colors.red
+                      ? appTheme.colorScheme.error
                       : Colors.white,
             ),
           ),
@@ -146,23 +146,30 @@ class PairsListView extends StatelessWidget {
     return Expanded(
       flex: 3,
       child: Container(
+        padding: const EdgeInsets.only(
+            left: 16), // Keep the padding to maintain distance from the edge
         alignment: Alignment.centerRight,
-        child: Chip(
-          label: Text(
-            '${market.change.toStringAsFixed(2)}%',
+        child: Container(
+          // Using a Container to mimic a Chip
+          padding: const EdgeInsets.symmetric(
+              horizontal: 8.0, vertical: 8.0), // Adjust padding
+          alignment: Alignment.center, // Center the text inside the container
+          decoration: BoxDecoration(
+            color: market.change > 0
+                ? appTheme.colorScheme.secondary
+                : market.change < 0
+                    ? appTheme.colorScheme.error
+                    : Colors.grey,
+            borderRadius: BorderRadius.circular(5),
+          ),
+          child: Text(
+            '${market.change.toStringAsFixed(2)}%', // The text
             style: const TextStyle(
+              fontFamily: 'RobotoMono', // Use a monospaced font
               color: Colors.white,
               fontWeight: FontWeight.bold,
-              fontFamily: 'Inter',
+              fontSize: 14, // You might want to adjust the font size
             ),
-          ),
-          backgroundColor: market.change > 0
-              ? Colors.green
-              : market.change < 0
-                  ? Colors.red
-                  : Colors.grey,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(5),
           ),
         ),
       ),

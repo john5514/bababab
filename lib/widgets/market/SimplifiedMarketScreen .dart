@@ -86,6 +86,6 @@ class SimpleMarketScreen extends StatelessWidget {
     }
 
     // Limit the list to 20 items
-    return sortedMarkets.take(5).toList();
+    return sortedMarkets.take(6).toList();
   }
 }

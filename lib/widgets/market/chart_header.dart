@@ -1,3 +1,4 @@
+import 'package:bicrypto/Style/styles.dart';
 import 'package:bicrypto/widgets/market/timeframe.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -43,8 +44,8 @@ class ChartHeader extends StatelessWidget {
                                       (_chartController
                                               .currentMarket.value?.price ??
                                           1)
-                                  ? Colors.green
-                                  : Colors.red,
+                                  ? appTheme.colorScheme.secondary
+                                  : appTheme.colorScheme.error,
                         ),
                       ),
                       RichText(
@@ -65,12 +66,12 @@ class ChartHeader extends StatelessWidget {
                                                 .currentMarket.value?.change ??
                                             0) >
                                         0
-                                    ? Colors.green
+                                    ? appTheme.colorScheme.secondary
                                     : (_chartController.currentMarket.value
                                                     ?.change ??
                                                 0) <
                                             0
-                                        ? Colors.red
+                                        ? appTheme.colorScheme.error
                                         : Colors.white,
                               ),
                             ),
