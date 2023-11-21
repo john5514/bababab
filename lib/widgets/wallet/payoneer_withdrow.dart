@@ -10,11 +10,11 @@ class PayoneerWithdrawalPage extends StatelessWidget {
   final RxBool isAgreedToTOS = false.obs;
 
   PayoneerWithdrawalPage({
-    Key? key,
+    super.key,
     required this.selectedMethod,
     required this.currencyName,
     required this.walletInfo,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -42,28 +42,69 @@ class PayoneerWithdrawalPage extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Container(
-                      height: 56,
-                      decoration: const BoxDecoration(
-                        image: DecorationImage(
-                          image: AssetImage('assets/images/PAYO.png'),
-                          fit: BoxFit.fitHeight,
-                        ),
+                      height: 100,
+                      decoration: BoxDecoration(
+                        image: selectedMethod['image'] != null
+                            ? DecorationImage(
+                                // ignore: prefer_interpolation_to_compose_strings
+                                image: NetworkImage("https://v3.mash3div.com" +
+                                    selectedMethod['image']),
+                                fit: BoxFit.contain,
+                              )
+                            : const DecorationImage(
+                                image: AssetImage('assets/images/PAYO.png'),
+                                fit: BoxFit.fitHeight,
+                              ),
                       ),
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 20), // Space between image and text
                     Text(
                       'Withdraw with Payoneer',
                       style: theme.textTheme.headline6
                           ?.copyWith(color: Colors.white),
                     ),
+                    const SizedBox(
+                        height: 10), // Space between title and subtitle
+                    Text(
+                      'After clicking on "Withdraw", your request will be sent to our team for approval. You will receive an email notification once your request has been approved.',
+                      style: theme.textTheme.subtitle1
+                          ?.copyWith(color: Colors.grey[400]),
+                    ),
+                    const SizedBox(
+                        height: 20), // Space at the bottom of the card
+                    // You can add more widgets here, such as buttons or icons, if needed
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+            Card(
+              color: Colors.grey[850],
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Withdrawal Instructions',
+                      style: theme.textTheme.subtitle1
+                          ?.copyWith(color: Colors.orange),
+                    ),
                     const SizedBox(height: 10),
                     Text(
                       selectedMethod['instructions'] ??
                           'No instructions provided.',
-                      style: theme.textTheme.subtitle1
+                      style: theme.textTheme.bodyText2
                           ?.copyWith(color: Colors.grey[400]),
                     ),
                     const SizedBox(height: 20),
+                    Text(
+                      'Minimum Withdraw: ${selectedMethod['min_amount']} $currencyName\n'
+                      'Maximum Withdraw: ${selectedMethod['max_amount']} $currencyName\n'
+                      'Processing Time: ${selectedMethod['processing_time']}',
+                      style: theme.textTheme.bodyText2
+                          ?.copyWith(color: Colors.grey[400]),
+                    ),
                   ],
                 ),
               ),
