@@ -1,10 +1,10 @@
 import 'package:bicrypto/Controllers/tarde/trade_controller.dart';
+import 'package:bicrypto/Controllers/wallets/spot%20wallet/spotWallet_controller.dart';
 import 'package:bicrypto/Style/styles.dart';
-import 'package:bicrypto/views/market/markethome.dart';
+import 'package:bicrypto/services/wallet_service.dart';
 import 'package:bicrypto/widgets/costomslider.dart';
 import 'package:bicrypto/widgets/tradeorderbook.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_xlider/flutter_xlider.dart';
 import 'package:get/get.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'dart:ui';
@@ -13,6 +13,8 @@ class SfSliderThemeData {}
 
 class TradeView extends StatelessWidget {
   final TradeController _tradeController = Get.put(TradeController());
+  final WalletSpotController _walletSpotController =
+      Get.put(WalletSpotController(walletService: Get.find<WalletService>()));
 
   TradeView({super.key});
 
@@ -176,6 +178,9 @@ class TradeView extends StatelessWidget {
                             _buildTotalExclFees(),
                             const SizedBox(height: 10),
                             _buildCost(),
+                            const Divider(
+                                color: Colors.white54), // Divider line
+                            _buildAvailableBalance(), // Display available balance here
                             const SizedBox(height: 20),
                             _buildTradeButton(), // Dropdown for Limit and Market
                           ],
@@ -294,6 +299,21 @@ class TradeView extends StatelessWidget {
             Text(
                 "${_tradeController.cost.value.toStringAsFixed(2)} ${_tradeController.secondPairName}",
                 style: const TextStyle(color: Colors.white)),
+          ],
+        ));
+  }
+
+  _buildAvailableBalance() {
+    return Obx(() => Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Text("Available",
+                style: TextStyle(
+                    color: Colors.grey)), // Smaller, grey text for label
+            Text(
+                "${_walletSpotController.totalEstimatedBalance.value.toStringAsFixed(2)} ${_tradeController.secondPairName}", // Use second part of the trading pair for currency
+                style: const TextStyle(
+                    color: Colors.grey)), // Smaller, grey text for amount
           ],
         ));
   }

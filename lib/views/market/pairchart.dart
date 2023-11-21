@@ -127,8 +127,8 @@ class ChartPage extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(horizontal: 32.0),
                   foregroundColor: Colors.white,
                   backgroundColor: appTheme.colorScheme.error,
-                  shape:
-                      RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+                  shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.zero),
                 ),
                 child: const Text("Sell"),
               ),
