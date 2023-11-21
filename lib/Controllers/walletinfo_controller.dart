@@ -94,17 +94,12 @@ class WalletInfoController extends GetxController {
       var methods = await walletService.fetchFiatDepositMethods();
       var gateways = await walletService.fetchFiatDepositGateways();
 
-      // Since methods support all currencies, no need to filter them
-      var filteredMethods = methods;
+      // Filter out PayPal from gateways
+      var filteredGateways =
+          gateways.where((gateway) => gateway['name'] != 'PayPal').toList();
 
-      // Filter gateways based on the selected wallet's currency
-      var filteredGateways = gateways.where((gateway) {
-        return gateway['currencies'] != null &&
-            gateway['currencies'].containsKey(walletName.value);
-      }).toList();
-
-      // Combine them into a single list
-      var allOptions = [...filteredMethods, ...filteredGateways];
+      // Combine methods and filtered gateways into a single list
+      var allOptions = [...methods, ...filteredGateways];
 
       fiatDepositMethods.assignAll(allOptions);
     } catch (e) {
@@ -142,7 +137,12 @@ class WalletInfoController extends GetxController {
     try {
       isLoading(true);
       var gateways = await walletService.fetchFiatDepositGateways();
-      fiatDepositGateways.assignAll(gateways);
+
+      // Filtering out PayPal
+      var filteredGateways =
+          gateways.where((gateway) => gateway['name'] != 'PayPal').toList();
+
+      fiatDepositGateways.assignAll(filteredGateways);
     } catch (e) {
       print("Error fetching fiat deposit gateways: $e");
     } finally {
