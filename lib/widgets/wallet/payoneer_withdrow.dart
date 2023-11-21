@@ -60,7 +60,7 @@ class PayoneerWithdrawalPage extends StatelessWidget {
                     const SizedBox(height: 20), // Space between image and text
                     Text(
                       'Withdraw with Payoneer',
-                      style: theme.textTheme.headline6
+                      style: theme.textTheme.titleLarge
                           ?.copyWith(color: Colors.white),
                     ),
                     const SizedBox(
@@ -133,7 +133,9 @@ class PayoneerWithdrawalPage extends StatelessWidget {
                 '${selectedMethod['percentage_fee']}%', theme),
             Obx(() => buildInfoRow(
                   'Total Cost ($currencyName)',
-                  '${calculateTotalAmount(controller.withdrawAmount.value.toString(), selectedMethod)}',
+                  calculateTotalAmount(
+                      controller.withdrawAmount.value.toString(),
+                      selectedMethod),
                   theme,
                 )),
             const SizedBox(height: 20),
@@ -177,7 +179,7 @@ class PayoneerWithdrawalPage extends StatelessWidget {
                   child: Center(
                     child: Text(
                       'Withdraw',
-                      style: theme.textTheme.headline6
+                      style: theme.textTheme.titleLarge
                           ?.copyWith(color: Colors.white),
                     ),
                   ),
