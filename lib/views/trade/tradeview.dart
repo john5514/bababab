@@ -304,18 +304,29 @@ class TradeView extends StatelessWidget {
   }
 
   _buildAvailableBalance() {
-    return Obx(() => Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            const Text("Available",
-                style: TextStyle(
-                    color: Colors.grey)), // Smaller, grey text for label
-            Text(
-                "${_walletSpotController.totalEstimatedBalance.value.toStringAsFixed(2)} ${_tradeController.secondPairName}", // Use second part of the trading pair for currency
-                style: const TextStyle(
-                    color: Colors.grey)), // Smaller, grey text for amount
-          ],
-        ));
+    // Obtain the second currency in the trading pair
+    String secondCurrency = _tradeController.secondPairName;
+
+    // Find the balance for the second currency from the spot wallet
+    var currencyBalance = _walletSpotController.currencies.firstWhere(
+        (currency) => currency['currency'] == secondCurrency,
+        orElse: () => {'balance': 0.0} // Default to 0 if not found
+        )['balance'];
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        const Text(
+          "Available",
+          style: TextStyle(color: Colors.grey), // Smaller, grey text for label
+        ),
+        Text(
+          "${currencyBalance.toStringAsFixed(2)} $secondCurrency", // Display balance for the second currency
+          style: const TextStyle(
+              color: Colors.grey), // Smaller, grey text for amount
+        ),
+      ],
+    );
   }
 
   Widget _buildTradeButton() {
