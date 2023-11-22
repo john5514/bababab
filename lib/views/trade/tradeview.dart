@@ -269,11 +269,14 @@ class TradeView extends StatelessWidget {
     return Obx(() => Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text("Taker Fees (0.1%)",
-                style: TextStyle(color: Colors.white)),
             Text(
-                "${_tradeController.takerFees.value.toStringAsFixed(2)} ${_tradeController.firstPairName}",
-                style: const TextStyle(color: Colors.white)),
+              "${_tradeController.activeAction.value == 'Buy' ? 'Taker' : 'Maker'} Fees (${_tradeController.currentFee.toStringAsFixed(3)})",
+              style: const TextStyle(color: Colors.white),
+            ),
+            Text(
+              "${_tradeController.takerFees.value.toStringAsFixed(2)} ${_tradeController.firstPairName}",
+              style: const TextStyle(color: Colors.white),
+            ),
           ],
         ));
   }

@@ -1,6 +1,8 @@
+import 'package:bicrypto/Controllers/market/chart__controller.dart';
+import 'package:bicrypto/Controllers/market/orederbook_controller.dart';
+import 'package:bicrypto/services/market_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:bicrypto/Controllers/market/chart__controller.dart'; // Import the ChartController
 
 class TradeController extends GetxController {
   var tradeName = "".obs;
@@ -15,6 +17,13 @@ class TradeController extends GetxController {
 
   final TextEditingController amountController = TextEditingController();
   final TextEditingController priceController = TextEditingController();
+  final OrderBookController _orderBookController =
+      Get.find<OrderBookController>();
+  final MarketService _marketService =
+      MarketService(); // Instance of MarketService
+
+  final Rx<Market?> _currentMarket = Rx<Market?>(null); // Made observable
+  Market? get currentMarket => _currentMarket.value;
 
   String get firstPairName => tradeName.value.split('/').first;
   String get secondPairName => tradeName.value.split('/').last;
@@ -34,8 +43,37 @@ class TradeController extends GetxController {
 
     amountController.addListener(_calculateValues);
     priceController.addListener(_calculateValues);
+    _orderBookController.currentOrderBook.listen((_) {
+      if (selectedOrderType.value == "Market") {
+        _calculateValues();
+      }
+    });
 
-    _calculateValues();
+    _currentMarket.listen((_) {
+      if (_currentMarket.value != null) {
+        _calculateValues();
+      }
+    });
+
+    _fetchMarketData(); // Fetch market data on init
+  }
+
+  void _fetchMarketData() async {
+    print("Fetching market data...");
+    try {
+      List<Market> marketList = await _marketService.fetchExchangeMarkets();
+      _currentMarket.value = marketList
+          .firstWhereOrNull((market) => market.symbol == tradeName.value);
+      if (_currentMarket.value != null) {
+        print(
+            "Selected Market: Symbol: ${_currentMarket.value!.symbol}, Taker: ${_currentMarket.value!.metadata.taker}, Maker: ${_currentMarket.value!.metadata.maker}");
+        update();
+      } else {
+        print("Market not found for ${tradeName.value}");
+      }
+    } catch (e) {
+      print('Error fetching market data: $e');
+    }
   }
 
   @override
@@ -45,22 +83,46 @@ class TradeController extends GetxController {
     super.onClose();
   }
 
+  double get currentFee {
+    print(
+        "Retrieving fee for ${activeAction.value} action. Current Market: ${_currentMarket.value?.symbol}");
+    double fee = activeAction.value == "Buy"
+        ? _currentMarket.value?.metadata.taker ?? 0.001
+        : _currentMarket.value?.metadata.maker ?? 0.001;
+
+    print("Current Fee: $fee");
+    return fee;
+  }
+
   void _calculateValues() {
     double amount = double.tryParse(amountController.text) ?? 0.0;
-    double price = double.tryParse(priceController.text) ?? 0.0;
+    double price;
 
-    // Backend logic replicated
-    double feeRate =
-        activeAction.value == 'Buy' ? 0.1 : 0.2; // Example fee rates
+    if (selectedOrderType.value == "Market") {
+      if (activeAction.value == 'Buy') {
+        price = _orderBookController.bestAskPrice;
+      } else {
+        price = _orderBookController.bestBidPrice;
+      }
+    } else {
+      price = double.tryParse(priceController.text) ?? 0.0;
+    }
+
+    double feeRate = currentFee;
     takerFees.value = calculateFee(amount, price, feeRate);
-    cost.value = calculateCost(amount, price, feeRate, activeAction.value);
-    totalExclFees.value = cost.value - takerFees.value;
 
+    if (activeAction.value == 'Buy') {
+      cost.value = amount * price * (1 + feeRate);
+    } else {
+      cost.value = amount * price;
+    }
+
+    totalExclFees.value = cost.value - takerFees.value;
     update();
   }
 
   double calculateFee(double amount, double price, double feeRate) {
-    return (amount * price * feeRate) / 100;
+    return (amount * price * feeRate);
   }
 
   double calculateCost(
@@ -68,8 +130,8 @@ class TradeController extends GetxController {
     if (side == 'Buy') {
       return (amount * price) + calculateFee(amount, price, feeRate);
     } else {
-      // Sell
-      return amount; // For sell, the cost is just the amount
+      // For sell, cost doesn't include the fee since the fee is subtracted from the received amount
+      return amount * price;
     }
   }
 

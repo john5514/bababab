@@ -10,6 +10,10 @@ class OrderBookController extends GetxController {
 
   OrderBookController(this.pair);
 
+  // Add getters for best bid and ask prices
+  double get bestAskPrice => currentOrderBook.value?.bestAsk ?? 0.0;
+  double get bestBidPrice => currentOrderBook.value?.bestBid ?? 0.0;
+
   @override
   void onInit() {
     super.onInit();
@@ -30,9 +34,10 @@ class OrderBookController extends GetxController {
 
   void _processOrderBookUpdate(OrderBook updatedOrderBook) {
     currentOrderBook.value = updatedOrderBook;
+    // Since we're using Rx<OrderBook?>, we don't need to call update()
+    // Rx variables automatically update the GetX reactive widgets
     print(
         "Received OrderBook Update: Bids: ${updatedOrderBook.bids.length}, Asks: ${updatedOrderBook.asks.length}");
-    update();
   }
 
   @override

@@ -267,6 +267,36 @@ class MarketService {
       // Optionally: reconnect logic here
     }
   }
+
+  Future<List<Market>> fetchExchangeMarkets() async {
+    final url = Uri.parse('https://v3.mash3div.com/api/exchange/markets');
+    final response = await http.get(url, headers: {
+      'accept': 'application/json',
+      // Include any necessary headers such as authorization tokens
+    });
+
+    if (response.statusCode == 200) {
+      var jsonResponse = json.decode(response.body);
+      print("API ======Response: $jsonResponse"); // Debug print
+      if (jsonResponse['status'] == 'success') {
+        List<Market> markets = (jsonResponse['data']['result'] as List)
+            .map((marketData) =>
+                Market.fromJson(marketData['symbol'], marketData))
+            .toList();
+        markets.forEach((market) {
+          print(
+              "Fetched Market: Symbol: ${market.symbol}, Taker: ${market.metadata.taker}, Maker: ${market.metadata.maker}");
+        });
+
+        return markets;
+      } else {
+        throw Exception('Failed to load exchange markets');
+      }
+    } else {
+      throw Exception(
+          'Failed to fetch exchange markets: ${response.statusCode}');
+    }
+  }
 }
 
 class Market {
@@ -310,8 +340,8 @@ class Market {
       isTrending:
           false, // Not present in the data; using false as a default value
       isHot: false, // Not present in the data; using false as a default value
-      metadata: MarketMetadata.fromJson(
-          {}), // No metadata in the data; using an empty map
+      metadata: MarketMetadata.fromJson(json['metadata'] ?? {}),
+
       status: true, // Not present in the data; using true as a default value
       price: (json['last'] ?? 0.0).toDouble(),
       change: (json['change'] ?? 0.0).toDouble(),

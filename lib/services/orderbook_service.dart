@@ -104,19 +104,33 @@ class OrderBook {
   OrderBook({required this.bids, required this.asks});
 
   factory OrderBook.fromJson(Map<String, dynamic> json) {
+    var bidsList = (json['bids'] as List)
+        .map((e) => [
+              double.tryParse(e[0].toString()) ?? 0.0,
+              double.tryParse(e[1].toString()) ?? 0.0
+            ])
+        .toList();
+    var asksList = (json['asks'] as List)
+        .map((e) => [
+              double.tryParse(e[0].toString()) ?? 0.0,
+              double.tryParse(e[1].toString()) ?? 0.0
+            ])
+        .toList();
+
+    // Sort bids descending (highest price first)
+    bidsList.sort((a, b) => b[0].compareTo(a[0]));
+    // Sort asks ascending (lowest price first)
+    asksList.sort((a, b) => a[0].compareTo(b[0]));
+
     return OrderBook(
-      bids: (json['bids'] as List)
-          .map((e) => [
-                double.tryParse(e[0].toString()) ?? 0.0,
-                double.tryParse(e[1].toString()) ?? 0.0
-              ])
-          .toList(),
-      asks: (json['asks'] as List)
-          .map((e) => [
-                double.tryParse(e[0].toString()) ?? 0.0,
-                double.tryParse(e[1].toString()) ?? 0.0
-              ])
-          .toList(),
+      bids: bidsList,
+      asks: asksList,
     );
   }
+
+  // Best bid is the first element after sorting, which has the highest price
+  double get bestBid => bids.isNotEmpty ? bids.first[0] : 0.0;
+
+  // Best ask is the first element after sorting, which has the lowest price
+  double get bestAsk => asks.isNotEmpty ? asks.first[0] : 0.0;
 }
