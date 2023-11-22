@@ -107,16 +107,32 @@ class TradeController extends GetxController {
       price = double.tryParse(priceController.text) ?? 0.0;
     }
 
+    if (selectedOrderType.value == "Market") {
+      if (activeAction.value == 'Buy') {
+        price = _orderBookController.bestAskPrice;
+      } else {
+        price = _orderBookController.bestBidPrice;
+      }
+    } else {
+      price = double.tryParse(priceController.text) ?? 0.0;
+    }
+
+    // Calculate the fee rate and taker fees
     double feeRate = currentFee;
     takerFees.value = calculateFee(amount, price, feeRate);
 
+    // Calculate cost based on the action type
     if (activeAction.value == 'Buy') {
-      cost.value = amount * price * (1 + feeRate);
+      cost.value = amount * price; // Total TUSD cost before fees
+      // For Buy, the totalExclFees should be the amount of SEI bought minus the SEI fee
+      totalExclFees.value = amount - takerFees.value;
     } else {
-      cost.value = amount * price;
+      cost.value = amount *
+          price; // For Sell, cost is just the price of the amount being sold
+      // For Sell, totalExclFees will be the cost minus the fees, representing the net amount received after fee deduction
+      totalExclFees.value = amount - takerFees.value;
     }
 
-    totalExclFees.value = cost.value - takerFees.value;
     update();
   }
 
