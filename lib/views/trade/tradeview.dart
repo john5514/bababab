@@ -270,11 +270,11 @@ class TradeView extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              "${_tradeController.activeAction.value == 'Buy' ? 'Taker' : 'Maker'} Fees (${_tradeController.currentFee.toStringAsFixed(3)})",
+              "${_tradeController.activeAction.value == 'Buy' ? 'Taker' : 'Maker'} Fees (${_tradeController.currentFee.toStringAsFixed(3)}%)",
               style: const TextStyle(color: Colors.white),
             ),
             Text(
-              "${_tradeController.takerFees.value.toStringAsFixed(2)} ${_tradeController.firstPairName}",
+              "${_tradeController.takerFees.value.toStringAsFixed(4)} ${_tradeController.firstPairName}",
               style: const TextStyle(color: Colors.white),
             ),
           ],

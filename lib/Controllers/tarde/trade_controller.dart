@@ -61,10 +61,8 @@ class TradeController extends GetxController {
   }
 
   Future<void> _fetchMarketData() async {
-    print("Fetching market data...");
     try {
       List<Market> marketList = await _marketService.fetchExchangeMarkets();
-      print("Trade Name: ${tradeName.value}"); // Debug print
 
       // Split tradeName.value to match the format used in Market
       String baseSymbol = tradeName.value.split('/').first;
@@ -87,8 +85,6 @@ class TradeController extends GetxController {
   }
 
   double get currentFee {
-    print(
-        "Retrieving fee for ${activeAction.value} action. Current Market: ${_currentMarket.value?.symbol}");
     double fee = activeAction.value == "Buy"
         ? _currentMarket.value?.metadata.taker ?? 0.002
         : _currentMarket.value?.metadata.maker ?? 0.002;
@@ -125,7 +121,7 @@ class TradeController extends GetxController {
   }
 
   double calculateFee(double amount, double price, double feeRate) {
-    return (amount * price * feeRate);
+    return (amount * price * feeRate) / 100;
   }
 
   double calculateCost(
