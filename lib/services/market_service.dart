@@ -277,16 +277,15 @@ class MarketService {
 
     if (response.statusCode == 200) {
       var jsonResponse = json.decode(response.body);
-      print("API ======Response: $jsonResponse"); // Debug print
       if (jsonResponse['status'] == 'success') {
         List<Market> markets = (jsonResponse['data']['result'] as List)
             .map((marketData) =>
                 Market.fromJson(marketData['symbol'], marketData))
             .toList();
-        markets.forEach((market) {
-          print(
-              "Fetched Market: Symbol: ${market.symbol}, Taker: ${market.metadata.taker}, Maker: ${market.metadata.maker}");
-        });
+        // markets.forEach((market) {
+        //   print(
+        //       "Fetched Market: Symbol: ${market.symbol}, Taker: ${market.metadata.taker}, Maker: ${market.metadata.maker}");
+        // });
 
         return markets;
       } else {

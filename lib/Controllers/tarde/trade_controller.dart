@@ -29,12 +29,16 @@ class TradeController extends GetxController {
   String get secondPairName => tradeName.value.split('/').last;
 
   @override
-  void onInit() {
+  void onInit() async {
     super.onInit();
 
     final Map<String, dynamic> arguments = Get.arguments;
     tradeName.value = arguments['pair'];
 
+    // Await the fetching of market data
+    await _fetchMarketData();
+
+    // Rest of your initialization logic
     _chartController.currentMarket.listen((market) {
       if (market != null) {
         change24h.value = market.change;
@@ -54,23 +58,22 @@ class TradeController extends GetxController {
         _calculateValues();
       }
     });
-
-    _fetchMarketData(); // Fetch market data on init
   }
 
-  void _fetchMarketData() async {
+  Future<void> _fetchMarketData() async {
     print("Fetching market data...");
     try {
       List<Market> marketList = await _marketService.fetchExchangeMarkets();
-      _currentMarket.value = marketList
-          .firstWhereOrNull((market) => market.symbol == tradeName.value);
+      print("Trade Name: ${tradeName.value}"); // Debug print
+
+      // Split tradeName.value to match the format used in Market
+      String baseSymbol = tradeName.value.split('/').first;
+
+      _currentMarket.value =
+          marketList.firstWhereOrNull((market) => market.symbol == baseSymbol);
+
       if (_currentMarket.value != null) {
-        print(
-            "Selected Market: Symbol: ${_currentMarket.value!.symbol}, Taker: ${_currentMarket.value!.metadata.taker}, Maker: ${_currentMarket.value!.metadata.maker}");
-        update();
-      } else {
-        print("Market not found for ${tradeName.value}");
-      }
+      } else {}
     } catch (e) {
       print('Error fetching market data: $e');
     }
@@ -87,8 +90,8 @@ class TradeController extends GetxController {
     print(
         "Retrieving fee for ${activeAction.value} action. Current Market: ${_currentMarket.value?.symbol}");
     double fee = activeAction.value == "Buy"
-        ? _currentMarket.value?.metadata.taker ?? 0.001
-        : _currentMarket.value?.metadata.maker ?? 0.001;
+        ? _currentMarket.value?.metadata.taker ?? 0.002
+        : _currentMarket.value?.metadata.maker ?? 0.002;
 
     print("Current Fee: $fee");
     return fee;
