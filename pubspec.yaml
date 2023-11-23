@@ -83,6 +83,12 @@ dev_dependencies:
 flutter:
   uses-material-design: true
 
+flutter_launcher_icons:
+  android: true
+  ios: true
+  remove_alpha_ios: true # Add this line to remove the alpha channel for iOS icons
+  image_path: "assets/icon/app_icon.png"
+
   # Assets for your application.
   assets:
     - assets/depth.json

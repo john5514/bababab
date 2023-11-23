@@ -135,53 +135,7 @@ class KYCScreen extends StatelessWidget {
               ),
               const SizedBox(height: 10),
 //Extra Info
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Extra Information for your account verification process',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  const Text(
-                    'To verify your identity, we ask you to fill in the following information.',
-                    style: TextStyle(
-                      fontSize: 14,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  Container(
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey),
-                      borderRadius: BorderRadius.circular(5.0),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                      child: TextFormField(
-                        controller: kycController.extraInfoController,
-                        decoration: const InputDecoration(
-                          labelText: 'test',
-                          labelStyle: TextStyle(color: Colors.grey),
-                          hintText: 'Enter your test',
-                          hintStyle: TextStyle(color: Colors.grey),
-                          border: InputBorder.none,
-                        ),
-                        style: const TextStyle(color: Colors.white),
-                        keyboardType: TextInputType.text,
-                        validator: (value) {
-                          if (value == null || value.trim().isEmpty) {
-                            return 'This field cannot be empty';
-                          }
-                          return null;
-                        },
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+              Extrainfo(),
 
               // The 'Submit' button
               const SizedBox(height: 20),
@@ -194,6 +148,56 @@ class KYCScreen extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+
+  Column Extrainfo() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Extra Information for your account verification process',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+          ),
+        ),
+        const SizedBox(height: 8),
+        const Text(
+          'To verify your identity, we ask you to fill in the following information.',
+          style: TextStyle(
+            fontSize: 14,
+          ),
+        ),
+        const SizedBox(height: 16),
+        Container(
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.grey),
+            borderRadius: BorderRadius.circular(5.0),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: TextFormField(
+              controller: kycController.extraInfoController,
+              decoration: const InputDecoration(
+                labelText: 'test',
+                labelStyle: TextStyle(color: Colors.grey),
+                hintText: 'Enter your test',
+                hintStyle: TextStyle(color: Colors.grey),
+                border: InputBorder.none,
+              ),
+              style: const TextStyle(color: Colors.white),
+              keyboardType: TextInputType.text,
+              validator: (value) {
+                if (value == null || value.trim().isEmpty) {
+                  return 'This field cannot be empty';
+                }
+                return null;
+              },
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
