@@ -174,8 +174,8 @@ class TradeView extends StatelessWidget {
                             _buildSlider(),
                             const SizedBox(height: 20),
                             _buildTakerFees(),
-                            const SizedBox(height: 10),
-                            _buildTotalExclFees(),
+                            // const SizedBox(height: 10),
+                            // _buildTotalExclFees(),
                             const SizedBox(height: 10),
                             _buildCost(),
                             const Divider(
@@ -281,18 +281,18 @@ class TradeView extends StatelessWidget {
         ));
   }
 
-  _buildTotalExclFees() {
-    return Obx(() => Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            const Text("Total (excl. fees)",
-                style: TextStyle(color: Colors.white)),
-            Text(
-                "${_tradeController.totalExclFees.value.toStringAsFixed(2)} ${_tradeController.firstPairName}",
-                style: const TextStyle(color: Colors.white)),
-          ],
-        ));
-  }
+  // _buildTotalExclFees() {
+  //   return Obx(() => Row(
+  //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //         children: [
+  //           const Text("Total (excl. fees)",
+  //               style: TextStyle(color: Colors.white)),
+  //           Text(
+  //               "${_tradeController.totalExclFees.value.toStringAsFixed(2)} ${_tradeController.firstPairName}",
+  //               style: const TextStyle(color: Colors.white)),
+  //         ],
+  //       ));
+  // }
 
   _buildCost() {
     return Obx(() => Row(

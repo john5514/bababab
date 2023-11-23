@@ -86,8 +86,8 @@ class TradeController extends GetxController {
 
   double get currentFee {
     double fee = activeAction.value == "Buy"
-        ? _currentMarket.value?.metadata.taker ?? 0.002
-        : _currentMarket.value?.metadata.maker ?? 0.002;
+        ? _currentMarket.value?.metadata.taker ?? 0.001
+        : _currentMarket.value?.metadata.maker ?? 0.001;
 
     print("Current Fee: $fee");
     return fee;
@@ -107,31 +107,13 @@ class TradeController extends GetxController {
       price = double.tryParse(priceController.text) ?? 0.0;
     }
 
-    if (selectedOrderType.value == "Market") {
-      if (activeAction.value == 'Buy') {
-        price = _orderBookController.bestAskPrice;
-      } else {
-        price = _orderBookController.bestBidPrice;
-      }
-    } else {
-      price = double.tryParse(priceController.text) ?? 0.0;
-    }
-
     // Calculate the fee rate and taker fees
     double feeRate = currentFee;
     takerFees.value = calculateFee(amount, price, feeRate);
 
     // Calculate cost based on the action type
-    if (activeAction.value == 'Buy') {
-      cost.value = amount * price; // Total TUSD cost before fees
-      // For Buy, the totalExclFees should be the amount of SEI bought minus the SEI fee
-      totalExclFees.value = amount - takerFees.value;
-    } else {
-      cost.value = amount *
-          price; // For Sell, cost is just the price of the amount being sold
-      // For Sell, totalExclFees will be the cost minus the fees, representing the net amount received after fee deduction
-      totalExclFees.value = amount - takerFees.value;
-    }
+
+    cost.value = calculateCost(amount, price, feeRate, activeAction.value);
 
     update();
   }
@@ -146,7 +128,7 @@ class TradeController extends GetxController {
       return (amount * price) + calculateFee(amount, price, feeRate);
     } else {
       // For sell, cost doesn't include the fee since the fee is subtracted from the received amount
-      return amount * price;
+      return amount;
     }
   }
 
