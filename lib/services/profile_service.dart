@@ -260,9 +260,51 @@ class ProfileService {
     }
   }
 
+  Future<Map<String, dynamic>?> checkKYCStatus() async {
+    await loadHeaders();
+    final Uri url = Uri.parse('https://v3.mash3div.com/api/kyc');
+    final response = await http.get(url, headers: headers);
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body);
+    } else {
+      print('Failed to check KYC status. Status code: ${response.statusCode}');
+      return null;
+    }
+  }
+
+  Future<bool> submitKYCDetails(String templateId, Map<String, dynamic> payload,
+      Map<String, dynamic> template, String level) async {
+    await loadHeaders();
+    final Uri url = Uri.parse('https://v3.mash3div.com/api/kyc');
+
+    final response = await http.post(
+      url,
+      headers: headers,
+      body: jsonEncode({
+        "templateId":
+            int.parse(templateId), // Convert the templateId to an integer
+        "template": template, // Include the template structure
+        "level": int.parse(level), // Include the level as an integer
+        ...payload, // Spread the payload fields directly into the body
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      final responseJson = jsonDecode(response.body);
+      print('KYC details submitted successfully: $responseJson');
+      return responseJson['status'] == 'success';
+    } else {
+      print(
+          'Failed to submit KYC details. Status code: ${response.statusCode}');
+      return false;
+    }
+  }
+
   Future<Map<String, dynamic>?> getKYC() async {
     await loadHeaders();
-    final Uri url = Uri.parse(_kycUrl);
+    // Set your KYC URL to the provided endpoint
+    final Uri url = Uri.parse('https://v3.mash3div.com/api/kyc-template');
     final response = await http.get(url, headers: headers);
 
     if (response.statusCode == 200) {
@@ -270,30 +312,6 @@ class ProfileService {
     } else {
       print('Failed to load KYC data. Status code: ${response.statusCode}');
       return null;
-    }
-  }
-
-  Future<bool> submitKYC(
-      String templateId, String template, String level) async {
-    await loadHeaders();
-    final Uri url = Uri.parse(_kycUrl);
-
-    final response = await http.post(
-      url,
-      headers: headers,
-      body: jsonEncode({
-        "templateId": templateId,
-        "template": template,
-        "level": level,
-      }),
-    );
-
-    if (response.statusCode == 200) {
-      print('KYC submitted successfully: ${response.body}');
-      return true;
-    } else {
-      print('Failed to submit KYC. Status code: ${response.statusCode}');
-      return false;
     }
   }
 }
