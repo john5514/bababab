@@ -296,6 +296,31 @@ class MarketService {
           'Failed to fetch exchange markets: ${response.statusCode}');
     }
   }
+
+  Future<void> createOrder(String symbol, String type, String side,
+      String amount, String price) async {
+    final url = Uri.parse('https://v3.mash3div.com/api/exchange/orders');
+    final response = await http.post(
+      url,
+      headers: {
+        'accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: json.encode({
+        'symbol': symbol,
+        'type': type,
+        'side': side,
+        'amount': amount,
+        'price': price,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      print('Order created successfully');
+    } else {
+      throw Exception('Failed to create order: ${response.statusCode}');
+    }
+  }
 }
 
 class Market {

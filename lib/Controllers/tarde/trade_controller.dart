@@ -132,13 +132,41 @@ class TradeController extends GetxController {
     }
   }
 
-  void buy() {
-    // Add your buying logic here
-    print("Buying ${amountController.text} of ${tradeName.value}");
+  void buy() async {
+    if (amountController.text.isEmpty || priceController.text.isEmpty) {
+      print("Error: Amount or Price is empty");
+      return;
+    }
+    try {
+      await _marketService.createOrder(
+        firstPairName, // symbol
+        selectedOrderType.value, // type (e.g., "Limit")
+        'buy', // side
+        amountController.text, // amount
+        priceController.text, // price
+      );
+      print("Buying ${amountController.text} of ${tradeName.value}");
+    } catch (e) {
+      print('Error creating buy order: $e');
+    }
   }
 
-  void sell() {
-    // Add your selling logic here
-    print("Selling ${amountController.text} of ${tradeName.value}");
+  void sell() async {
+    if (amountController.text.isEmpty || priceController.text.isEmpty) {
+      print("Error: Amount or Price is empty");
+      return;
+    }
+    try {
+      await _marketService.createOrder(
+        firstPairName, // symbol
+        selectedOrderType.value, // type (e.g., "Limit")
+        'sell', // side
+        amountController.text, // amount
+        priceController.text, // price
+      );
+      print("Selling ${amountController.text} of ${tradeName.value}");
+    } catch (e) {
+      print('Error creating sell order: $e');
+    }
   }
 }
