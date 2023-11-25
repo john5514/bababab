@@ -172,6 +172,7 @@ class TradeView extends StatelessWidget {
 
                             const SizedBox(height: 25),
                             _buildSlider(),
+
                             const SizedBox(height: 20),
                             _buildTakerFees(),
                             // const SizedBox(height: 10),
@@ -492,14 +493,29 @@ class TradeView extends StatelessWidget {
   }
 
   Widget _buildSlider() {
-    return CustomSlider(
-      value: _tradeController.sliderValue, // Assuming this is an RxDouble
-      divisions: 4, // To represent the value as a percentage from 0 to 100
-      onChanged: (newValue) {
-        // When the slider value is changed, update it in the controller
-        _tradeController.sliderValue.value = newValue;
-      },
-    );
+    return Obx(() {
+      double maxSliderValue = _walletSpotController.currencies.firstWhere(
+          (currency) => currency['currency'] == _tradeController.secondPairName,
+          orElse: () => {'balance': 0.0})['balance'];
+
+      // Update the available balance in the controller
+      _tradeController.updateAvailableBalance(maxSliderValue);
+
+      if (maxSliderValue <= 0) {
+        _tradeController.sliderValue.value = 0;
+        return const Text('No available balance.');
+      }
+
+      return CustomSlider(
+        value: _tradeController.sliderValue,
+        divisions: 4, // Assuming 100 divisions for granularity
+        onChanged: (newValue) {
+          _tradeController.sliderValue.value =
+              newValue; // Update the RxDouble value
+          _tradeController.updateAmountFromSlider();
+        },
+      );
+    });
   }
 }
 

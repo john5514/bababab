@@ -14,6 +14,8 @@ class TradeController extends GetxController {
   var takerFees = 0.0.obs;
   var totalExclFees = 0.0.obs;
   var cost = 0.0.obs;
+  var currentPrice = 0.0.obs; // Observable for the current price
+  var availableBalance = 0.0.obs; // Observable for the available balance
 
   final TextEditingController amountController = TextEditingController();
   final TextEditingController priceController = TextEditingController();
@@ -45,11 +47,16 @@ class TradeController extends GetxController {
       }
     });
 
-    amountController.addListener(_calculateValues);
-    priceController.addListener(_calculateValues);
-    _orderBookController.currentOrderBook.listen((_) {
-      if (selectedOrderType.value == "Market") {
-        _calculateValues();
+    amountController.addListener(() {
+      double enteredAmount = double.tryParse(amountController.text) ?? 0.0;
+      if (availableBalance.value <= 0) {
+        sliderValue.value = 0;
+        if (enteredAmount > 0) {
+          amountController.text = '0';
+        }
+      } else {
+        sliderValue.value =
+            (enteredAmount / availableBalance.value).clamp(0.0, 1.0);
       }
     });
 
@@ -168,5 +175,26 @@ class TradeController extends GetxController {
     } catch (e) {
       print('Error creating sell order: $e');
     }
+  }
+
+  // In TradeController
+  void updateAmountFromSlider() {
+    if (availableBalance.value <= 0) {
+      sliderValue.value = 0;
+      amountController.text = '0';
+      return;
+    }
+
+    double amount = availableBalance.value * sliderValue.value;
+    amountController.text =
+        amount.toStringAsFixed(2); // Set the calculated amount
+  }
+
+  void updateMarketPrice(double newPrice) {
+    currentPrice.value = newPrice;
+  }
+
+  void updateAvailableBalance(double newBalance) {
+    availableBalance.value = newBalance;
   }
 }
