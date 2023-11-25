@@ -14,7 +14,7 @@ class HomeView extends StatelessWidget {
   final List<Widget> _children = [
     NewsWidget(),
     MarketScreen(),
-    WebViewExample(),
+    WebViewPage(),
     WalletView(),
     MainSettingsScreen(),
   ];

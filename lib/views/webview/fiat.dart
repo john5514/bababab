@@ -1,76 +1,75 @@
-import 'dart:io';
-
+import 'package:bicrypto/services/api_service.dart';
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
-import 'package:webview_cookie_manager/webview_cookie_manager.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
-class WebViewExample extends StatefulWidget {
+class WebViewPage extends StatefulWidget {
   @override
-  WebViewExampleState createState() => WebViewExampleState();
+  _WebViewPageState createState() => _WebViewPageState();
 }
 
-class WebViewExampleState extends State<WebViewExample> {
-  late WebViewController controller;
+class _WebViewPageState extends State<WebViewPage> {
+  final apiService = ApiService();
+  late CookieManager cookieManager;
+  bool isWebViewReady = false;
 
   @override
   void initState() {
     super.initState();
-    // Initialize your WebViewController here
-    initWebView();
+    cookieManager = CookieManager();
+    _setCookies();
   }
 
-  void initWebView() async {
-    controller = WebViewController();
+  Future<void> _setCookies() async {
+    await apiService.loadTokens();
 
-    // Retrieve tokens from SharedPreferences
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? accessToken = prefs.getString('access-token');
-    String? csrfToken = prefs.getString('csrf-token');
-    String? sessionId = prefs.getString('session-id');
-
-    // Print the retrieved tokens for debugging
-    print('-*****-*-*-*--*Access Token: $accessToken');
-    print('CSRF Token: $csrfToken');
-    print('Session ID: $sessionId');
-
-    // Encode the tokens before setting them as cookies
-    if (accessToken != null && csrfToken != null && sessionId != null) {
-      accessToken = Uri.encodeFull(accessToken);
-      csrfToken = Uri.encodeFull(csrfToken);
-      sessionId = Uri.encodeFull(sessionId);
-
-      // Set the cookies in the WebView using WebviewCookieManager
-      final cookieManager = WebviewCookieManager();
-      try {
-        await cookieManager.setCookies([
-          Cookie('access-token', accessToken)
-            ..domain = 'v3.mash3div.com'
-            ..path = '/',
-          Cookie('csrf-token', csrfToken)
-            ..domain = 'v3.mash3div.com'
-            ..path = '/',
-          Cookie('session-id', sessionId)
-            ..domain = 'v3.mash3div.com'
-            ..path = '/',
-        ]);
-        print('Cookies set successfully');
-      } catch (e) {
-        print('Error setting cookies: $e');
+    for (var key in apiService.tokens.keys) {
+      String? value = apiService.tokens[key];
+      if (value != null) {
+        // Remove 'Bearer ' prefix if present
+        if (value.startsWith('Bearer ')) {
+          value = value.substring('Bearer '.length);
+        }
+        print("Setting cookie: $key=$value");
+        await cookieManager.setCookie(
+          WebViewCookie(
+            name: key,
+            value: value,
+            domain: 'v3.mash3div.com', // Verify this with your backend
+            path: '/', // Verify this with your backend
+            // Consider adding other attributes like 'expires', 'secure', etc.
+          ),
+        );
       }
     }
 
-    controller
-      ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..setBackgroundColor(const Color(0x00000000))
-      ..loadRequest(Uri.parse('https://v3.mash3div.com/user/wallets/fiat'));
+    // Delay WebView loading to ensure cookies are set
+    await Future.delayed(Duration(seconds: 2));
+    setState(() {
+      isWebViewReady = true;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Flutter WebView Example')),
-      body: WebViewWidget(controller: controller),
+      appBar: AppBar(
+        title: Text('WebView with Cookies'),
+      ),
+      body: isWebViewReady
+          ? WebView(
+              initialUrl: 'https://v3.mash3div.com/user/wallets/fiat',
+              javascriptMode: JavascriptMode.unrestricted,
+              onPageStarted: (String url) {
+                print("WebView started loading: $url");
+              },
+              onPageFinished: (String url) {
+                print("WebView finished loading: $url");
+              },
+              onWebResourceError: (error) {
+                print("WebView error: ${error.description}");
+              },
+            )
+          : Center(child: CircularProgressIndicator()),
     );
   }
 }
