@@ -47,16 +47,26 @@ class TradeController extends GetxController {
       }
     });
 
+    // Listener for amount input
     amountController.addListener(() {
       double enteredAmount = double.tryParse(amountController.text) ?? 0.0;
-      if (availableBalance.value <= 0) {
+      if (availableBalance.value <= 0 && enteredAmount > 0) {
         sliderValue.value = 0;
-        if (enteredAmount > 0) {
-          amountController.text = '0';
-        }
+        amountController.text = '0';
       } else {
         sliderValue.value =
             (enteredAmount / availableBalance.value).clamp(0.0, 1.0);
+      }
+      _calculateValues(); // Update values based on the entered amount
+    });
+
+    // Listener for price input
+    priceController.addListener(_calculateValues);
+
+    // Listener for order book changes
+    _orderBookController.currentOrderBook.listen((_) {
+      if (selectedOrderType.value == "Market") {
+        _calculateValues();
       }
     });
 
