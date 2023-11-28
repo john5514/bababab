@@ -155,14 +155,14 @@ class TradeController extends GetxController {
       return;
     }
     try {
-      await _marketService.createOrder(
+      String response = await _marketService.createOrder(
         firstPairName, // symbol
         selectedOrderType.value, // type (e.g., "Limit")
         'buy', // side
         amountController.text, // amount
         priceController.text, // price
       );
-      print("Buying ${amountController.text} of ${tradeName.value}");
+      print("Buy Order Response: $response");
     } catch (e) {
       print('Error creating buy order: $e');
     }
@@ -174,14 +174,14 @@ class TradeController extends GetxController {
       return;
     }
     try {
-      await _marketService.createOrder(
+      String response = await _marketService.createOrder(
         firstPairName, // symbol
         selectedOrderType.value, // type (e.g., "Limit")
         'sell', // side
         amountController.text, // amount
         priceController.text, // price
       );
-      print("Selling ${amountController.text} of ${tradeName.value}");
+      print("Sell Order Response: $response");
     } catch (e) {
       print('Error creating sell order: $e');
     }

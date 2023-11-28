@@ -297,7 +297,7 @@ class MarketService {
     }
   }
 
-  Future<void> createOrder(String symbol, String type, String side,
+  Future<String> createOrder(String symbol, String type, String side,
       String amount, String price) async {
     final url = Uri.parse('https://v3.mash3div.com/api/exchange/orders');
     final response = await http.post(
@@ -316,9 +316,10 @@ class MarketService {
     );
 
     if (response.statusCode == 200) {
-      print('Order created successfully');
+      return 'Order created successfully: ${response.body}';
     } else {
-      throw Exception('Failed to create order: ${response.statusCode}');
+      throw Exception(
+          'Failed to create order: ${response.statusCode}, ${response.body}');
     }
   }
 }
