@@ -91,7 +91,7 @@ class LoginController extends GetxController {
       duration: Duration(seconds: 3),
       backgroundColor:
           color ?? Colors.red, // Default to red if color is not provided
-    )..show(context);
+    ).show(context);
   }
 
   void logout() {
