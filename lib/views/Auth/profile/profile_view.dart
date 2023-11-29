@@ -1,9 +1,11 @@
+import 'package:bicrypto/Controllers/Auth/login_controller.dart';
 import 'package:bicrypto/Controllers/Auth/profile/profile_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class ProfileView extends StatelessWidget {
   final ProfileController controller = Get.find<ProfileController>();
+  final LoginController loginController = Get.find<LoginController>();
 
   Widget buildTextField(String label, RxString field, ThemeData theme,
       {bool fullRow = false}) {
@@ -93,6 +95,17 @@ class ProfileView extends StatelessWidget {
                     controller.updateProfileData, // Call the method directly
                 child: Text('Update Profile',
                     style: TextStyle(color: Colors.white)),
+              ),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red, // Red color for logout button
+                ),
+                onPressed: () {
+                  loginController
+                      .logout(); // Call the logout method from LoginController
+                  Get.offAllNamed('/login'); // Redirect to login page
+                },
+                child: Text('Logout', style: TextStyle(color: Colors.white)),
               ),
             ],
           ),
