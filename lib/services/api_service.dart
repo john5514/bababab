@@ -3,8 +3,11 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiService {
-  final String baseUrl =
-      '${const String.fromEnvironment('BASE_DOMAIN', defaultValue: 'https://v3.mash3div.com')}/api/auth/';
+  final String domain = const String.fromEnvironment('BASE_DOMAIN',
+      defaultValue: 'v3.mash3div.com');
+
+  // Build the full URL by prepending 'https://'
+  String get baseUrl => 'https://$domain/api/auth/';
   Map<String, String?> tokens = {
     'access-token': null,
     'refresh-token': null,

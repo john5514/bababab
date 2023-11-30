@@ -6,11 +6,16 @@ import 'package:bicrypto/Controllers/market/chart__controller.dart';
 import 'package:http/http.dart' as http;
 
 class MarketService {
-  final String _wsBaseUrl = "wss://v3.mash3div.com/exchange/";
+  // Extract the domain part from the environment variable
+  final String domain = const String.fromEnvironment('BASE_DOMAIN',
+      defaultValue: 'v3.mash3div.com');
+
+  // Build the full URLs by prepending the appropriate protocol
+  String get baseUrl => 'https://$domain';
+  String get _wsBaseUrl => 'wss://$domain/exchange/';
+
   WebSocket? _webSocket; // Made it nullable
   final _controller = StreamController<List<Market>>.broadcast();
-  final String baseUrl = const String.fromEnvironment('BASE_DOMAIN',
-      defaultValue: 'https://v3.mash3div.com');
 
   Map<String, String?> tokens = {
     'access-token': null,

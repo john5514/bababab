@@ -6,8 +6,13 @@ import 'package:http_parser/http_parser.dart';
 import 'package:path/path.dart';
 
 class ProfileService {
-  final String baseUrl = const String.fromEnvironment('BASE_DOMAIN',
-      defaultValue: 'https://v3.mash3div.com');
+  // Extract the domain part from the environment variable
+  final String domain = const String.fromEnvironment('BASE_DOMAIN',
+      defaultValue: 'v3.mash3div.com');
+
+  // Build the base URL by prepending 'https://'
+  String get baseUrl => 'https://$domain';
+
   final ApiService apiService;
 
   ProfileService(this.apiService);

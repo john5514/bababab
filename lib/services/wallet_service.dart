@@ -6,15 +6,18 @@ import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 
 class WalletService {
-  final String baseUrl = const String.fromEnvironment('BASE_DOMAIN',
-      defaultValue: 'https://v3.mash3div.com');
+  // Extract the domain part from the environment variable
+  final String domain = const String.fromEnvironment('BASE_DOMAIN',
+      defaultValue: 'v3.mash3div.com');
+
+  // Build the base URL by prepending 'https://'
+  String get baseUrl => 'https://$domain';
 
   final ApiService apiService;
 
   WalletService(this.apiService);
 
   Map<String, String> headers = {};
-
   Future<void> loadHeaders() async {
     await apiService.loadTokens(); // Load tokens from ApiService
     headers = {

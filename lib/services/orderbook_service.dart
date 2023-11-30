@@ -3,7 +3,13 @@ import 'dart:async';
 import 'dart:io';
 
 class OrderBookService {
-  final String _wsBaseUrl = "wss://v3.mash3div.com/exchange/trade";
+  // Extract the domain part from the environment variable
+  final String domain = const String.fromEnvironment('BASE_DOMAIN',
+      defaultValue: 'v3.mash3div.com');
+
+  // Build the WebSocket URL by prepending 'wss://'
+  String get _wsBaseUrl => 'wss://$domain/exchange/trade';
+
   WebSocket? _webSocket;
   final _controller = StreamController<OrderBook>.broadcast();
 
