@@ -6,9 +6,8 @@ import 'package:http_parser/http_parser.dart';
 import 'package:path/path.dart';
 
 class ProfileService {
-  final String _baseUrl = "https://v3.mash3div.com/api/auth/profile";
-  final String _kycUrl = "https://v3.mash3div.com/api/kyc";
-
+  final String baseUrl = const String.fromEnvironment('BASE_DOMAIN',
+      defaultValue: 'https://v3.mash3div.com');
   final ApiService apiService;
 
   ProfileService(this.apiService);
@@ -29,7 +28,7 @@ class ProfileService {
 
   Future<Map<String, dynamic>?> getProfile() async {
     await loadHeaders();
-    final Uri url = Uri.parse(_baseUrl);
+    final Uri url = Uri.parse('${baseUrl}/api/auth/profile');
     final response = await http.get(url, headers: headers);
 
     // print('GET Profile Request Headers: $headers'); // Debug print for headers
@@ -50,12 +49,9 @@ class ProfileService {
 
   Future<bool> updateProfile(Map<String, dynamic> profileData) async {
     await loadHeaders();
-    final Uri url = Uri.parse(_baseUrl);
+    final Uri url = Uri.parse('${baseUrl}/api/auth/profile');
 
-    // Wrap the profile data inside a "user" key as the API expects.
-    Map<String, dynamic> wrappedProfileData = {
-      "user": profileData,
-    };
+    Map<String, dynamic> wrappedProfileData = {"user": profileData};
 
     final response = await http.put(
       url,
@@ -79,7 +75,7 @@ class ProfileService {
 
   Future<String?> updateAvatar(File image, String oldAvatarPath) async {
     await loadHeaders();
-    final Uri uploadUrl = Uri.parse('https://v3.mash3div.com/api/upload');
+    final Uri uploadUrl = Uri.parse('${baseUrl}/api/upload');
     print('Updating avatar with image path: ${image.path}');
 
     var request = http.MultipartRequest('POST', uploadUrl)
@@ -110,7 +106,7 @@ class ProfileService {
       if (response.statusCode == 200) {
         // Directly return the response body if it's not JSON.
         print('New avatar path: ${response.body}');
-        return 'https://v3.mash3div.com' + response.body;
+        return '${baseUrl}' + response.body;
       } else {
         print(
             'Avatar update request failed with status code: ${response.statusCode}');
@@ -139,7 +135,7 @@ class ProfileService {
   Future<Map<String, dynamic>> changePassword(
       String currentPassword, String newPassword, String uuid) async {
     await loadHeaders();
-    final Uri url = Uri.parse(_baseUrl);
+    final Uri url = Uri.parse('${baseUrl}/api/auth/profile');
 
     Map<String, dynamic> profileData = {
       'user': {
@@ -172,8 +168,7 @@ class ProfileService {
   Future<Map<String, dynamic>?> generateOTPSecret(String type,
       {String? email, String? phoneNumber}) async {
     await loadHeaders();
-    final Uri url =
-        Uri.parse('https://v3.mash3div.com/api/profile/generateOTPSecret');
+    final Uri url = Uri.parse('${baseUrl}/api/profile/generateOTPSecret');
 
     Map<String, dynamic> requestBody = {
       "type": type,
@@ -204,7 +199,7 @@ class ProfileService {
   Future<Map<String, dynamic>?> verifyOTP(
       String otp, String secret, String type) async {
     await loadHeaders();
-    final Uri url = Uri.parse('https://v3.mash3div.com/api/profile/verifyOTP');
+    final Uri url = Uri.parse('${baseUrl}/api/profile/verifyOTP');
     final response = await http.post(
       url,
       headers: headers,
@@ -225,7 +220,7 @@ class ProfileService {
 
   Future<Map<String, dynamic>?> saveOTP(String secret, String type) async {
     await loadHeaders();
-    final Uri url = Uri.parse('https://v3.mash3div.com/api/profile/saveOTP');
+    final Uri url = Uri.parse('${baseUrl}/api/profile/toggleOtp');
     final response = await http.post(
       url,
       headers: headers,
@@ -245,7 +240,7 @@ class ProfileService {
 
   Future<Map<String, dynamic>?> toggleOtp(String status) async {
     await loadHeaders();
-    final Uri url = Uri.parse('https://v3.mash3div.com/api/profile/toggleOtp');
+    final Uri url = Uri.parse('${baseUrl}/api/kyc');
     final response = await http.post(
       url,
       headers: headers,
@@ -262,7 +257,7 @@ class ProfileService {
 
   Future<Map<String, dynamic>?> checkKYCStatus() async {
     await loadHeaders();
-    final Uri url = Uri.parse('https://v3.mash3div.com/api/kyc');
+    final Uri url = Uri.parse('${baseUrl}/api/kyc');
     final response = await http.get(url, headers: headers);
 
     if (response.statusCode == 200) {
@@ -276,7 +271,7 @@ class ProfileService {
   Future<bool> submitKYCDetails(String templateId, Map<String, dynamic> payload,
       Map<String, dynamic> template, String level) async {
     await loadHeaders();
-    final Uri url = Uri.parse('https://v3.mash3div.com/api/kyc');
+    final Uri url = Uri.parse('${baseUrl}/api/kyc');
 
     final response = await http.post(
       url,
@@ -304,7 +299,7 @@ class ProfileService {
   Future<Map<String, dynamic>?> getKYC() async {
     await loadHeaders();
     // Set your KYC URL to the provided endpoint
-    final Uri url = Uri.parse('https://v3.mash3div.com/api/kyc-template');
+    final Uri url = Uri.parse('${baseUrl}/api/kyc-template');
     final response = await http.get(url, headers: headers);
 
     if (response.statusCode == 200) {

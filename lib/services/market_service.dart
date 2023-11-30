@@ -9,6 +9,8 @@ class MarketService {
   final String _wsBaseUrl = "wss://v3.mash3div.com/exchange/";
   WebSocket? _webSocket; // Made it nullable
   final _controller = StreamController<List<Market>>.broadcast();
+  final String baseUrl = const String.fromEnvironment('BASE_DOMAIN',
+      defaultValue: 'https://v3.mash3div.com');
 
   Map<String, String?> tokens = {
     'access-token': null,
@@ -155,8 +157,8 @@ class MarketService {
         final int since = numCandles * intervalToMilliseconds(interval);
         int sinceTimestamp = toTimestamp - since;
 
-        final String requestUrl =
-            'https://v3.mash3div.com/api/exchange/chart/historical?symbol=$symbol&interval=$interval&from=$sinceTimestamp&to=$toTimestamp&duration=$since';
+        String requestUrl =
+            '${baseUrl}/api/exchange/chart/historical?symbol=$symbol&interval=$interval&from=$sinceTimestamp&to=$toTimestamp&duration=$since';
         print("Making request to: $requestUrl");
 
         // Add the tokens to the headers
@@ -269,7 +271,7 @@ class MarketService {
   }
 
   Future<List<Market>> fetchExchangeMarkets() async {
-    final url = Uri.parse('https://v3.mash3div.com/api/exchange/markets');
+    final url = Uri.parse('${baseUrl}/api/exchange/markets');
     final response = await http.get(url, headers: {
       'accept': 'application/json',
       // Include any necessary headers such as authorization tokens
@@ -299,7 +301,7 @@ class MarketService {
 
   Future<String> createOrder(String symbol, String type, String side,
       String amount, String price) async {
-    final url = Uri.parse('https://v3.mash3div.com/api/exchange/orders');
+    final url = Uri.parse('${baseUrl}/api/exchange/orders');
     final response = await http.post(
       url,
       headers: {

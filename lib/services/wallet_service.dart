@@ -6,10 +6,14 @@ import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 
 class WalletService {
-  final String baseUrl = "https://v3.mash3div.com/api/wallets";
+  final String baseUrl = const String.fromEnvironment('BASE_DOMAIN',
+      defaultValue: 'https://v3.mash3div.com');
+
   final ApiService apiService;
 
   WalletService(this.apiService);
+
+  Map<String, String> headers = {};
 
   Future<void> loadHeaders() async {
     await apiService.loadTokens(); // Load tokens from ApiService
@@ -20,18 +24,16 @@ class WalletService {
       'refresh-token': apiService.tokens['refresh-token'] ?? "",
       'Content-Type': 'application/json',
       'Client-Platform': 'app',
-      'origin': 'https://v3.mash3div.com',
+      'origin': baseUrl,
     };
   }
-
-  Map<String, String> headers = {};
 
   Future<dynamic> callStripeIpnEndpoint(
       double amount, String currency, double taxAmount) async {
     try {
       await loadHeaders();
 
-      final Uri url = Uri.parse('https://v3.mash3div.com/api/ipn/stripe');
+      final Uri url = Uri.parse('${baseUrl}/api/ipn/stripe');
       final response = await HttpClientHelper.post(
         url,
         headers: headers,
@@ -61,7 +63,7 @@ class WalletService {
 
   Future<List<dynamic>> fetchFiatWalletTransactions() async {
     await loadHeaders();
-    final Uri url = Uri.parse('$baseUrl/transactions');
+    final Uri url = Uri.parse('${baseUrl}/api/wallets/transactions');
     final response = await HttpClientHelper.get(url, headers: headers);
 
     if (response?.statusCode == 200) {
@@ -87,7 +89,7 @@ class WalletService {
     // print("Payload: $payload");
 
     final response = await HttpClientHelper.post(
-      Uri.parse('${baseUrl}'),
+      Uri.parse('${baseUrl}/api/wallets'),
       headers: headers,
       body: payload,
     );
@@ -121,7 +123,7 @@ class WalletService {
   Future<dynamic> getCurrencies() async {
     await loadHeaders();
     final response = await HttpClientHelper.get(
-      Uri.parse('https://v3.mash3div.com/api/currencies'),
+      Uri.parse('${baseUrl}/api/currencies'),
       headers: headers,
     );
 
@@ -135,8 +137,7 @@ class WalletService {
   Future<dynamic> getExchangeCurrencies() async {
     await loadHeaders();
     final response = await HttpClientHelper.get(
-      Uri.parse(
-          'https://v3.mash3div.com/api/exchange/currencies'), // Updated URL
+      Uri.parse('${baseUrl}/api/exchange/currencies'), // Updated URL
       headers: headers,
     );
 
@@ -150,7 +151,7 @@ class WalletService {
   Future<double> fetchWalletBalance() async {
     await loadHeaders();
     final response = await HttpClientHelper.get(
-      Uri.parse('${baseUrl}/balance'),
+      Uri.parse('${baseUrl}/api/wallets/balance'),
       headers: headers,
     );
     if (response?.statusCode == 200) {
@@ -166,7 +167,7 @@ class WalletService {
   Future<List<dynamic>> fetchSpotWallets() async {
     await loadHeaders();
     final response = await HttpClientHelper.get(
-      Uri.parse('${baseUrl}'),
+      Uri.parse('${baseUrl}/api/wallets'),
       headers: headers,
     );
     if (response?.statusCode == 200) {
@@ -191,7 +192,7 @@ class WalletService {
   Future<Map<String, dynamic>> verifySpotDeposit(String transactionId) async {
     await loadHeaders();
     final response = await HttpClientHelper.get(
-      Uri.parse('${baseUrl}/spot/deposit/verify/$transactionId'),
+      Uri.parse('${baseUrl}/api/wallets/spot/deposit/verify/$transactionId'),
       headers: headers,
     );
     if (response?.statusCode == 200) {
@@ -205,7 +206,7 @@ class WalletService {
   Future<Map<String, dynamic>> cancelSpotDeposit(String referenceId) async {
     await loadHeaders();
     // Update the endpoint to use the transaction reference ID
-    String endpoint = '${baseUrl}/spot/deposit/cancel/$referenceId';
+    String endpoint = '${baseUrl}/api/wallets/spot/deposit/cancel/$referenceId';
     // Make sure to use the POST method
     final response = await HttpClientHelper.post(
       Uri.parse(endpoint),
@@ -228,7 +229,7 @@ class WalletService {
   }) async {
     await loadHeaders(); // Make sure headers are loaded with tokens
 
-    final Uri transferUri = Uri.parse('${baseUrl}/transfer');
+    final Uri transferUri = Uri.parse('${baseUrl}/api/wallets/transfer');
     final response = await http.post(
       transferUri,
       headers: headers,
@@ -259,7 +260,7 @@ class WalletService {
   Future<List<dynamic>> fetchFiatDepositMethods() async {
     await loadHeaders();
     final response = await HttpClientHelper.get(
-      Uri.parse('${baseUrl}/fiat/deposit/methods'),
+      Uri.parse('${baseUrl}/api/wallets/fiat/deposit/methods'),
       headers: headers,
     );
     if (response?.statusCode == 200) {
@@ -282,7 +283,7 @@ class WalletService {
   Future<Map<String, dynamic>> fetchFiatDepositMethodById(String id) async {
     await loadHeaders();
     final response = await HttpClientHelper.get(
-      Uri.parse('${baseUrl}/fiat/deposit/methods/$id'),
+      Uri.parse('${baseUrl}/api/wallets/fiat/deposit/methods/$id'),
       headers: headers,
     );
     if (response?.statusCode == 200) {
@@ -295,7 +296,7 @@ class WalletService {
   Future<List<dynamic>> fetchFiatDepositGateways() async {
     await loadHeaders();
     final response = await HttpClientHelper.get(
-      Uri.parse('${baseUrl}/fiat/deposit/gateways'),
+      Uri.parse('${baseUrl}/api/wallets/fiat/deposit/gateways'),
       headers: headers,
     );
     if (response?.statusCode == 200) {
@@ -317,7 +318,7 @@ class WalletService {
   Future<List<dynamic>> fetchFiatWithdrawMethods() async {
     await loadHeaders();
     final response = await HttpClientHelper.get(
-      Uri.parse('${baseUrl}/fiat/withdraw/methods'),
+      Uri.parse('${baseUrl}/api/wallets/fiat/withdraw/methods'),
       headers: headers,
     );
     if (response?.statusCode == 200) {
@@ -338,7 +339,7 @@ class WalletService {
   Future<Map<String, dynamic>> fetchFiatWithdrawMethodById(String id) async {
     await loadHeaders();
     final response = await HttpClientHelper.get(
-      Uri.parse('${baseUrl}/fiat/withdraw/methods/$id'),
+      Uri.parse('${baseUrl}/api/wallets/fiat/withdraw/methods/$id'),
       headers: headers,
     );
     if (response?.statusCode == 200) {
@@ -351,7 +352,7 @@ class WalletService {
   Future<void> postFiatDeposit(Map<String, dynamic> payload) async {
     await loadHeaders();
     final response = await HttpClientHelper.post(
-      Uri.parse('${baseUrl}/fiat/deposit'),
+      Uri.parse('${baseUrl}/api/wallets/fiat/deposit'),
       headers: headers,
       body: jsonEncode(payload),
     );
@@ -363,7 +364,7 @@ class WalletService {
   Future<void> postFiatWithdraw(Map<String, dynamic> payload) async {
     await loadHeaders();
     final response = await HttpClientHelper.post(
-      Uri.parse('${baseUrl}/fiat/withdraw'),
+      Uri.parse('${baseUrl}/api/wallets/fiat/withdraw'),
       headers: headers,
       body: jsonEncode(payload),
     );
@@ -380,7 +381,7 @@ class WalletService {
       print("Debugging: Sending payload = $payload");
 
       final response = await HttpClientHelper.post(
-        Uri.parse('${baseUrl}/fiat/deposit/method'),
+        Uri.parse('${baseUrl}/api/wallets/fiat/deposit/method'),
         headers: headers,
         body: jsonEncode(payload),
       );
@@ -400,7 +401,7 @@ class WalletService {
   Future<Map<String, dynamic>> fetchSpotWallet(String currency) async {
     await loadHeaders();
     final response = await HttpClientHelper.get(
-      Uri.parse('${baseUrl}/spot/$currency'),
+      Uri.parse('${baseUrl}/api/wallets/spot/$currency'),
       headers: headers,
     );
     if (response?.statusCode == 200) {
@@ -413,7 +414,7 @@ class WalletService {
   Future<void> postSpotWallet(String currency) async {
     await loadHeaders();
     final response = await HttpClientHelper.post(
-      Uri.parse('${baseUrl}/spot/$currency'),
+      Uri.parse('${baseUrl}/api/wallets/spot/$currency'),
       headers: headers,
       body: jsonEncode({'currency': currency}), // Assuming the API needs this
     );
@@ -425,7 +426,7 @@ class WalletService {
   Future<List<dynamic>> fetchSpotTransactions(String trx) async {
     await loadHeaders();
     final response = await HttpClientHelper.get(
-      Uri.parse('${baseUrl}/spot/transactions/$trx'),
+      Uri.parse('${baseUrl}/api/wallets/spot/transactions/$trx'),
       headers: headers,
     );
     if (response?.statusCode == 200) {
@@ -442,7 +443,7 @@ class WalletService {
     print('Payload for request: $payload'); // Log the payload
 
     final response = await HttpClientHelper.post(
-      Uri.parse('$baseUrl/spot/deposit'),
+      Uri.parse('${baseUrl}/api/wallets/spot/deposit'),
       headers: headers,
       body: jsonEncode(payload),
     );
@@ -462,7 +463,7 @@ class WalletService {
   Future<void> postSpotDepositVerify(String trx) async {
     await loadHeaders();
     final response = await HttpClientHelper.post(
-      Uri.parse('${baseUrl}/spot/deposit/verify/$trx'),
+      Uri.parse('${baseUrl}/api/wallets/spot/deposit/verify/$trx'),
       headers: headers,
     );
     if (response?.statusCode != 200 && response?.statusCode != 201) {
@@ -490,7 +491,7 @@ class WalletService {
 
     // Use the POST method to initiate a withdrawal
     final response = await HttpClientHelper.post(
-      Uri.parse('$baseUrl/spot/withdraw'),
+      Uri.parse('${baseUrl}/api/wallets/spot/withdraw'),
       headers: headers,
       body: body,
     );
@@ -510,7 +511,7 @@ class WalletService {
   Future<List<dynamic>> fetchAllWallets() async {
     await loadHeaders();
     final response = await HttpClientHelper.get(
-      Uri.parse('${baseUrl}'),
+      Uri.parse('${baseUrl}/api/wallets'),
       headers: headers,
     );
     if (response?.statusCode == 200) {
@@ -523,7 +524,7 @@ class WalletService {
   Future<void> createStoreWallet(Map<String, dynamic> payload) async {
     await loadHeaders();
     final response = await HttpClientHelper.post(
-      Uri.parse('${baseUrl}'),
+      Uri.parse('${baseUrl}/api/wallets'),
       headers: headers,
       body: jsonEncode(payload),
     );
@@ -535,7 +536,7 @@ class WalletService {
   Future<List<dynamic>> fetchUserWallets() async {
     await loadHeaders();
     final response = await HttpClientHelper.get(
-      Uri.parse('${baseUrl}'),
+      Uri.parse('${baseUrl}/api/wallets'),
       headers: headers,
     );
     if (response?.statusCode == 200) {
@@ -560,7 +561,7 @@ class WalletService {
       String referenceId) async {
     await loadHeaders();
     final response = await HttpClientHelper.get(
-      Uri.parse('${baseUrl}/transactions/$referenceId'),
+      Uri.parse('${baseUrl}/api/wallets/transactions/$referenceId'),
       headers: headers,
     );
     if (response?.statusCode == 200) {
@@ -574,7 +575,7 @@ class WalletService {
     try {
       await loadHeaders();
       final response = await HttpClientHelper.get(
-        Uri.parse('${baseUrl}/transactions?walletType=$walletType'),
+        Uri.parse('${baseUrl}/api/wallets/transactions?walletType=$walletType'),
         headers: headers,
       );
 
@@ -604,7 +605,7 @@ class WalletService {
   Future<List<dynamic>> fetchWalletTransactionsForUserID35() async {
     await loadHeaders();
     final response = await HttpClientHelper.get(
-      Uri.parse('${baseUrl}/transactions'),
+      Uri.parse('${baseUrl}/api/wallets/transactions'),
       headers: headers,
     );
 
