@@ -1,74 +1,72 @@
-import 'package:bicrypto/Controllers/Auth/profile/two_step_verification_controller.dart';
-import 'package:bicrypto/services/profile_service.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:intl_phone_number_input/intl_phone_number_input.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:bicrypto/services/api_service.dart';
 
-class TwoStepVerificationScreen extends StatelessWidget {
+class TwoStepVerificationScreen extends StatefulWidget {
   @override
-  Widget build(BuildContext context) {
-    final controller = Get.put(
-      TwoStepVerificationController(Get.find<ProfileService>()),
-    ); // Initialize your controller
+  _WebViewPageState createState() => _WebViewPageState();
+}
 
-    // Ensure the theme is appropriate for dark mode
-    ColorScheme colorScheme = Theme.of(context).colorScheme;
+class _WebViewPageState extends State<TwoStepVerificationScreen>
+    with AutomaticKeepAliveClientMixin {
+  final apiService = ApiService();
+  InAppWebViewController? _webViewController;
 
-    return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Center(
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Icon(
-                  Icons.phone_android, // Phone icon
-                  size: 48,
-                  color: colorScheme.onBackground, // Icon color for dark mode
-                ),
-                const SizedBox(height: 16.0),
-                Text(
-                  'Enter your Phone Number',
-                  style: TextStyle(
-                    fontSize: 24.0,
-                    fontWeight: FontWeight.bold,
-                    color: colorScheme.onBackground, // Text color for dark mode
-                  ),
-                ),
-                const SizedBox(height: 8.0),
-                Text(
-                  'Enter the required information to continue',
-                  style: TextStyle(
-                    fontSize: 16.0,
-                    color: colorScheme.onBackground, // Text color for dark mode
-                  ),
-                ),
-                const SizedBox(height: 32.0),
-                // Only wrap the widget that needs to update with Obx
-                InternationalPhoneNumberInput(
-                  onInputChanged: (PhoneNumber number) {
-                    controller.phoneNumber.value = number.phoneNumber!;
-                  },
-                ),
-                const SizedBox(height: 32),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    primary: Colors
-                        .deepPurple, // Use a color that matches your design
-                    onPrimary: Colors.white,
-                    minimumSize: const Size(double.infinity,
-                        50), // Full-width button with fixed height
-                  ),
-                  onPressed: controller.sendOTP,
-                  child: const Text('Send OTP'),
-                ),
-              ],
-            ),
-          ),
-        ),
+  @override
+  void initState() {
+    super.initState();
+    apiService.loadTokens(); // Load the tokens initially.
+  }
+
+  Future<void> _setCookies(InAppWebViewController controller) async {
+    await apiService.loadTokens(); // Ensure the latest tokens are loaded.
+
+    CookieManager cookieManager = CookieManager.instance();
+
+    for (var entry in apiService.tokens.entries) {
+      var key = entry.key;
+      var value = entry.value;
+
+      if (value != null && value.isNotEmpty) {
+        await cookieManager.setCookie(
+          url: Uri.parse('https://v3.mash3div.com'),
+          name: key,
+          value: value,
+          domain: 'v3.mash3div.com',
+          path: '/',
+          isHttpOnly: false,
+          isSecure: true,
+          sameSite: HTTPCookieSameSitePolicy.LAX,
+        );
+      }
+    }
+
+    controller.loadUrl(
+      urlRequest: URLRequest(
+        url: Uri.parse('https://v3.mash3div.com/user/flutter/two-factor'),
       ),
     );
   }
+
+  @override
+  Widget build(BuildContext context) {
+    super.build(context);
+    return Scaffold(
+      body: InAppWebView(
+        initialOptions: InAppWebViewGroupOptions(
+          crossPlatform: InAppWebViewOptions(
+            javaScriptEnabled: true,
+          ),
+        ),
+        onWebViewCreated: (InAppWebViewController controller) {
+          _webViewController = controller;
+          _setCookies(controller);
+        },
+        // Other callback handlers can be removed if they are not used for anything else
+      ),
+    );
+  }
+
+  @override
+  bool get wantKeepAlive => true;
 }
