@@ -28,6 +28,9 @@ class WalletView extends StatelessWidget {
           ),
         ),
         body: TabBarView(
+          physics:
+              const NeverScrollableScrollPhysics(), // Disable swipe navigation
+
           children: [
             FiatWalletView(), // Your FiatWalletView goes here
             WalletSpotView(), // Placeholder for Spot Wallets

@@ -124,7 +124,7 @@ class ApiService {
         throw Exception('Failed to send reset link');
       }
     } catch (e) {
-      print('Error occurred: $e');
+      // print('Error occurred: $e');
       return false;
     }
   }

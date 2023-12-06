@@ -14,6 +14,9 @@ class MarketService {
   String get baseUrl => 'https://$domain';
   String get _wsBaseUrl => 'wss://$domain/exchange/';
 
+  int _reconnectAttempts = 0;
+  static const int _maxReconnectAttempts = 5;
+
   WebSocket? _webSocket; // Made it nullable
   final _controller = StreamController<List<Market>>.broadcast();
 
@@ -47,11 +50,34 @@ class MarketService {
   }
 
   // Initialize the WebSocket connection
+  void _reconnect(String link) {
+    if (_reconnectAttempts >= _maxReconnectAttempts) {
+      print("Max reconnection attempts reached.");
+      return;
+    }
+
+    final delay = _calculateExponentialBackoff(_reconnectAttempts);
+    Future.delayed(Duration(seconds: delay), () {
+      print("Attempting to reconnect... Attempt: ${_reconnectAttempts + 1}");
+      connect(link);
+      _reconnectAttempts++;
+    });
+  }
+
+  int _calculateExponentialBackoff(int attempt) {
+    return (1 << attempt) * 2; // Exponential backoff formula
+  }
+
+  // Initialize the WebSocket connection
   void connect(String link) async {
     final fullUrl = "$_wsBaseUrl$link";
+    _wasClosedIntentionally = false;
 
     try {
       _webSocket = await WebSocket.connect(fullUrl);
+      _reconnectAttempts =
+          0; // Reset the attempt counter on successful connection
+
       _webSocket!.listen(
         (data) {
           if (_webSocket == null || _webSocket!.readyState != WebSocket.open) {
@@ -65,7 +91,6 @@ class MarketService {
 
             if (tickersData is Map<String, dynamic>) {
               final markets = tickersData.entries.map((e) {
-                // Pass both the key (e.g., "BTC/USDT") and the associated data to Market.fromJson
                 return Market.fromJson(e.key, e.value);
               }).toList();
               _controller.add(markets);
@@ -78,33 +103,18 @@ class MarketService {
         },
         onError: (error) {
           print("WebSocket error: $error");
-          // Trying to reconnect
-          if (_webSocket == null || _webSocket!.readyState != WebSocket.open) {
-            Future.delayed(Duration(seconds: 5), () {
-              print("Attempting to reconnect...");
-              connect(link);
-            });
-          }
+          _reconnect(link);
         },
         onDone: () {
           print("WebSocket closed for $link");
-          if (!_wasClosedIntentionally &&
-              (_webSocket == null ||
-                  _webSocket!.readyState != WebSocket.open)) {
-            Future.delayed(Duration(seconds: 5), () {
-              print("Attempting to reconnect...");
-              connect(link);
-            });
+          if (!_wasClosedIntentionally) {
+            _reconnect(link);
           }
         },
       );
     } catch (e) {
       print("Error connecting to WebSocket: $e");
-      // Trying to reconnect after a delay
-      Future.delayed(Duration(seconds: 5), () {
-        print("Attempting to reconnect...");
-        connect(link);
-      });
+      _reconnect(link);
     }
   }
 

@@ -73,6 +73,9 @@ class _MainSettingsScreenState extends State<MainSettingsScreen>
       ),
       body: TabBarView(
         controller: _tabController,
+        physics:
+            const NeverScrollableScrollPhysics(), // Disable swipe navigation
+
         children: [
           ProfileView(),
           ChangePasswordScreen(),
