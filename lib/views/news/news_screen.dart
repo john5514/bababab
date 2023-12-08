@@ -140,7 +140,7 @@ class NewsWidget extends StatelessWidget {
                         newsItem['imageurl'] != null
                             ? GestureDetector(
                                 onTap: () {
-                                  // Open URL or other action when the image is tapped
+                                  showNewsDetailsPopup(context, newsItem);
                                 },
                                 child: Container(
                                   padding: const EdgeInsets.symmetric(
@@ -183,4 +183,47 @@ class NewsWidget extends StatelessWidget {
       }
     });
   }
+}
+
+void showNewsDetailsPopup(BuildContext context, dynamic newsItem) {
+  showDialog(
+    context: context,
+    barrierColor: Colors.black.withOpacity(0.7), // semi-transparent barrier
+    builder: (BuildContext context) {
+      return AlertDialog(
+        backgroundColor: Colors.grey[850], // Dark background for the dialog
+        title: Text(
+          newsItem['title'],
+          style: TextStyle(color: Colors.white), // White text for dark mode
+        ),
+        content: SingleChildScrollView(
+          child: ListBody(
+            children: <Widget>[
+              if (newsItem['imageurl'] != null) // Check if there's an image
+                Image.network(newsItem['imageurl']),
+              Padding(
+                padding: const EdgeInsets.only(top: 8.0),
+                child: Text(
+                  newsItem['body'],
+                  style: TextStyle(color: Colors.grey[300]), // Light grey text
+                ),
+              ),
+              // Add additional details here please
+            ],
+          ),
+        ),
+        actions: <Widget>[
+          TextButton(
+            child: Text(
+              'Close',
+              style: TextStyle(color: Colors.yellow), // Stylish button text
+            ),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+        ],
+      );
+    },
+  );
 }
