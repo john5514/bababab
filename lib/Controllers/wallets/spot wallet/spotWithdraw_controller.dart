@@ -19,7 +19,7 @@ class SpotWithdrawController extends GetxController {
     super.onInit();
     var arguments = Get.arguments as Map<String, dynamic>?;
     String currency = arguments?['currency'] ?? 'default_currency_value';
-    print('onInit - Currency: $currency'); // Print currency on init
+    // print('onInit - Currency: $currency'); // Print currency on init
     fetchChainsAndFees(currency);
   }
 
@@ -37,7 +37,7 @@ class SpotWithdrawController extends GetxController {
         var chainInfos = wallet['chains'] as List<dynamic>;
         var chainNames = chainInfos.map((chain) => chain['network']).toList();
         chains(chainNames.cast<String>());
-        print('fetchChainsAndFees - Chains set: ${chains.value}');
+        // print('fetchChainsAndFees - Chains set: ${chains.value}');
         if (chainNames.isNotEmpty) {
           // If we have chain names, automatically select the first one
           setChain(chainNames.first);
@@ -45,7 +45,7 @@ class SpotWithdrawController extends GetxController {
       }
     } catch (e) {
       chains.clear();
-      print('fetchChainsAndFees - Error fetching chains: $e');
+      // print('fetchChainsAndFees - Error fetching chains: $e');
       Get.snackbar('Error', 'Failed to fetch chains and fees: $e');
     } finally {
       isLoading(false);
@@ -53,7 +53,7 @@ class SpotWithdrawController extends GetxController {
   }
 
   void setChain(String chain) {
-    print('setChain - Chain selected: $chain');
+    // print('setChain - Chain selected: $chain');
     selectedChain(chain);
 
     // Access the chain info for the fee from the 'chains' array within the selected wallet
@@ -63,9 +63,9 @@ class SpotWithdrawController extends GetxController {
 
     if (chainInfo != null) {
       withdrawFee(chainInfo['withdrawFee']?.toString() ?? 'Fee not available');
-      print('setChain - Withdraw fee: ${withdrawFee.value}');
+      // print('setChain - Withdraw fee: ${withdrawFee.value}');
     } else {
-      print('setChain - No chain info found for chain: $chain');
+      // print('setChain - No chain info found for chain: $chain');
       withdrawFee('Fee not available');
     }
   }

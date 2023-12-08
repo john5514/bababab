@@ -83,7 +83,6 @@ class OrderBookService {
         "method": "SUBSCRIBE",
         "params": {"symbol": symbol, "type": "watchOrderBook", "limit": limit}
       };
-      print("Sending WebSocket subscription request: ${json.encode(data)}");
       _webSocket!.add(json.encode(data));
     } else {
       print("WebSocket not initialized or not open.");

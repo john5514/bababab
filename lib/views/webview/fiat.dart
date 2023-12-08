@@ -42,9 +42,9 @@ class _WebViewPageState extends State<WebViewPage> {
           // expiresDate: ... // If you need to set an expiration date
         )
             .then((result) {
-          print('Cookie set: $key=$value');
+          // print('Cookie set: $key=$value');
         }).catchError((error) {
-          print('Error setting cookie $key: $error');
+          // print('Error setting cookie $key: $error');
         });
       }
     }
@@ -71,17 +71,17 @@ class _WebViewPageState extends State<WebViewPage> {
           _setCookies(controller); // Set cookies when web view is created.
         },
         onLoadStart: (controller, url) {
-          print("WebView started loading: $url");
+          // print("WebView started loading: $url");
         },
         onLoadStop: (controller, url) {
-          print("WebView finished loading: $url");
+          // print("WebView finished loading: $url");
         },
         onLoadError: (controller, url, code, message) {
-          print(
-              "WebView error: URL: $url, Error Code: $code, Error Message: $message");
+          // print(
+          //     "WebView error: URL: $url, Error Code: $code, Error Message: $message");
         },
         onConsoleMessage: (controller, consoleMessage) {
-          print("Console message: ${consoleMessage.message}");
+          // print("Console message: ${consoleMessage.message}");
         },
       ),
     );

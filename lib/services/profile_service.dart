@@ -44,10 +44,10 @@ class ProfileService {
       //     'Profile Data Fetched Successfully: ${response.body}'); // Debug print for success response
       return jsonDecode(response.body);
     } else {
-      print(
-          'Failed to load profile. Status code: ${response.statusCode}'); // Debug print for status code on failure
-      print(
-          'Error Response Body: ${response.body}'); // Debug print for error response body
+      // print(
+      //     'Failed to load profile. Status code: ${response.statusCode}'); // Debug print for status code on failure
+      // print(
+      //     'Error Response Body: ${response.body}'); // Debug print for error response body
       return null; // or throw an exception based on your error handling policies
     }
   }
@@ -64,16 +64,16 @@ class ProfileService {
       body: jsonEncode(wrappedProfileData),
     );
 
-    print('PUT Profile Request Headers: $headers');
-    print('PUT Profile Request to URL: $url');
-    print('PUT Profile Request Body: ${jsonEncode(wrappedProfileData)}');
+    // print('PUT Profile Request Headers: $headers');
+    // print('PUT Profile Request to URL: $url');
+    // print('PUT Profile Request Body: ${jsonEncode(wrappedProfileData)}');
 
     if (response.statusCode == 200) {
-      print('Profile Updated Successfully: ${response.body}');
+      // print('Profile Updated Successfully: ${response.body}');
       return true; // Profile updated successfully
     } else {
-      print('Failed to update profile. Status code: ${response.statusCode}');
-      print('Error: ${response.body}');
+      // print('Failed to update profile. Status code: ${response.statusCode}');
+      // print('Error: ${response.body}');
       return false; // or throw an exception based on your error handling policies
     }
   }
@@ -81,7 +81,7 @@ class ProfileService {
   Future<String?> updateAvatar(File image, String oldAvatarPath) async {
     await loadHeaders();
     final Uri uploadUrl = Uri.parse('${baseUrl}/api/upload');
-    print('Updating avatar with image path: ${image.path}');
+    // print('Updating avatar with image path: ${image.path}');
 
     var request = http.MultipartRequest('POST', uploadUrl)
       ..headers.addAll(headers)
@@ -99,22 +99,22 @@ class ProfileService {
         ),
       );
 
-    print('Sending avatar update request...');
+    // print('Sending avatar update request...');
     try {
       var streamedResponse = await request.send();
-      print('Avatar update request sent. Awaiting response...');
+      // print('Avatar update request sent. Awaiting response...');
 
       var response = await http.Response.fromStream(streamedResponse);
-      print('Avatar update response status code: ${response.statusCode}');
-      print('Avatar update response body: ${response.body}');
+      // print('Avatar update response status code: ${response.statusCode}');
+      // print('Avatar update response body: ${response.body}');
 
       if (response.statusCode == 200) {
         // Directly return the response body if it's not JSON.
-        print('New avatar path: ${response.body}');
+        // print('New avatar path: ${response.body}');
         return '${baseUrl}' + response.body;
       } else {
-        print(
-            'Avatar update request failed with status code: ${response.statusCode}');
+        // print(
+        //     'Avatar update request failed with status code: ${response.statusCode}');
         return null;
       }
     } catch (e) {

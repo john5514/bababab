@@ -76,7 +76,7 @@ class ChartController extends GetxController {
   }
 
   void updateChartData(String timeframe) {
-    print("Called updateChartData with timeframe: $timeframe");
+    // print("Called updateChartData with timeframe: $timeframe");
 
     errorMsg.value = ''; // Reset the error message on user-initiated update
     _isInitialLoad = false; // Set to false as this is a manual update by user
@@ -92,8 +92,8 @@ class ChartController extends GetxController {
   void _loadHistoricalData([String timeframe = '1h']) async {
     // If timeframe is 1s, clear the kLineData, add an initial entry, and refresh the chart.
     if (timeframe == '1s') {
-      print(
-          "Timeframe is 1s. Clearing kLineData, adding initial entry, and refreshing chart.");
+      // print(
+      //     "Timeframe is 1s. Clearing kLineData, adding initial entry, and refreshing chart.");
 
       // Clear the kLineData
       kLineData.clear();
@@ -120,7 +120,7 @@ class ChartController extends GetxController {
 
     errorMsg.value = ''; // Reset the error message at the start
     isLoading.value = true; // Start the loading indicator
-    print("Called _loadHistoricalData with timeframe: $timeframe");
+    // print("Called _loadHistoricalData with timeframe: $timeframe");
 
     try {
       final historicalData = await _marketService
@@ -130,7 +130,7 @@ class ChartController extends GetxController {
       kLineData.addAll(historicalData);
 
       if (historicalData.isNotEmpty) {
-        print("Last historical candle: ${historicalData.last}");
+        // print("Last historical candle: ${historicalData.last}");
 
         high24h.value =
             historicalData.map((e) => e.high).reduce((a, b) => a > b ? a : b);
@@ -140,7 +140,7 @@ class ChartController extends GetxController {
 
       isLoading.value = false; // Stop the loading indicator
     } catch (e) {
-      print("Error loading historical data: $e");
+      // print("Error loading historical data: $e");
 
       if (_isInitialLoad) {
         currentFallbackIndex++;
@@ -149,7 +149,7 @@ class ChartController extends GetxController {
           currentTimeFrame.value = fallbackTimeFrames[currentFallbackIndex];
           _loadHistoricalData(currentTimeFrame.value);
         } else {
-          print("All timeframes failed!");
+          // print("All timeframes failed!");
           errorMsg.value = "Failed to fetch data for all timeframes.";
           isLoading.value = false; // Stop the loading indicator
         }
@@ -161,14 +161,14 @@ class ChartController extends GetxController {
   }
 
   void _initializeWebSocket() {
-    print("WebSocket initialized");
+    // print("WebSocket initialized");
     _marketService.connect('tickers');
     _marketSubscription =
         _marketService.marketUpdates.listen(_processMarketUpdate);
   }
 
   void _startTimer(Duration duration) {
-    print("Starting timer with duration: $duration");
+    // print("Starting timer with duration: $duration");
     _timer = Timer.periodic(duration, (timer) {
       if (_currentKLineEntity != null) {
         // Remove this block to not limit kLineData to 500
@@ -205,7 +205,7 @@ class ChartController extends GetxController {
       currentMarket.value = specificMarket;
 
       if (kLineData.isEmpty) {
-        print("kLineData is empty! Cannot access last element.");
+        // print("kLineData is empty! Cannot access last element.");
         return; // exit the function if the list is empty
       }
 
@@ -222,7 +222,7 @@ class ChartController extends GetxController {
         close: specificMarket.price,
         vol: adjustedVolume,
       );
-      print("New WebSocket candle: $newEntry"); // Add this line
+      // print("New WebSocket candle: $newEntry"); // Add this line
 
       if (kLineData.isEmpty) {
         kLineData.add(newEntry);
@@ -289,18 +289,18 @@ class ChartController extends GetxController {
   }
 
   Duration _getUpdateInterval(String timeframe) {
-    print("Timeframe selected: $timeframe");
+    // print("Timeframe selected: $timeframe");
     switch (timeframe) {
       case '1s':
-        print("Timeframe selected: $timeframe");
+        // print("Timeframe selected: $timeframe");
 
         return Duration(seconds: 1);
       case '1m':
-        print("Timeframe selected: $timeframe");
+        // print("Timeframe selected: $timeframe");
 
         return Duration(minutes: 1);
       case '3m':
-        print("Timeframe selected: $timeframe");
+        // print("Timeframe selected: $timeframe");
 
         return Duration(minutes: 3);
       case '15m':

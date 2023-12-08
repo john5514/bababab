@@ -67,7 +67,7 @@ class WalletInfoController extends GetxController {
 
       final response = await WalletService(ApiService())
           .callStripeIpnEndpoint(totalAmount, currency, surcharge);
-      print('Response from Stripe IPN: $response');
+      // print('Response from Stripe IPN: $response');
 
       if (response != null && response['url'] != null) {
         // Parse the URL string into a Uri object.

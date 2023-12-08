@@ -15,7 +15,7 @@ class SpotWalletDetailController extends GetxController {
         details['transactions'] is List) {
       transactions.assignAll(details['transactions']);
     } else {
-      print("No transactions found in the wallet details");
+      // print("No transactions found in the wallet details");
     }
   }
 

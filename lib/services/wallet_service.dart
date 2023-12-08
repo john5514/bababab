@@ -47,11 +47,11 @@ class WalletService {
           'taxAmount': (taxAmount * 100).toInt(), // Convert to integer
         }),
       );
-      print('Loaded Headers: $headers');
+      // print('Loaded Headers: $headers');
 
-      print(
-          'Response Status Code from Stripe IPN============: ${response?.statusCode}');
-      print('Response Body from Stripe IPN===============: ${response?.body}');
+      // print(
+      //     'Response Status Code from Stripe IPN============: ${response?.statusCode}');
+      // print('Response Body from Stripe IPN===============: ${response?.body}');
 
       if (response?.statusCode == 200) {
         return jsonDecode(response!.body);
@@ -78,7 +78,7 @@ class WalletService {
       var fiatTransactions = allTransactions
           .where((transaction) => transaction['wallet']['type'] == 'FIAT')
           .toList();
-      print('Fiat Transactions: $fiatTransactions');
+      // print('Fiat Transactions: $fiatTransactions');
       return fiatTransactions;
     } else {
       throw Exception('Failed to load fiat wallet transactions');
@@ -389,10 +389,10 @@ class WalletService {
         body: jsonEncode(payload),
       );
       if (response?.statusCode != 200 && response?.statusCode != 201) {
-        print('Response Body: ${response?.body}');
+        // print('Response Body: ${response?.body}');
         throw Exception('Failed to post fiat deposit method');
       } else {
-        print('Deposit Method Successful. Response Body: ${response?.body}');
+        // print('Deposit Method Successful. Response Body: ${response?.body}');
       }
     } catch (e) {
       print("Error in postFiatDepositMethod: $e");
@@ -442,8 +442,8 @@ class WalletService {
   Future<Map<String, dynamic>> postSpotDeposit(
       Map<String, dynamic> payload) async {
     await loadHeaders();
-    print('Headers for request: $headers'); // Log the headers
-    print('Payload for request: $payload'); // Log the payload
+    // print('Headers for request: $headers'); // Log the headers
+    // print('Payload for request: $payload'); // Log the payload
 
     final response = await HttpClientHelper.post(
       Uri.parse('${baseUrl}/api/wallets/spot/deposit'),
@@ -451,8 +451,8 @@ class WalletService {
       body: jsonEncode(payload),
     );
 
-    print('Status code: ${response?.statusCode}'); // Log the status code
-    print('Response body: ${response?.body}'); // Log the response body
+    // print('Status code: ${response?.statusCode}'); // Log the status code
+    // print('Response body: ${response?.body}'); // Log the response body
 
     if (response?.statusCode == 200 || response?.statusCode == 201) {
       // If the call to the server was successful, parse the JSON
@@ -582,9 +582,9 @@ class WalletService {
         headers: headers,
       );
 
-      print(
-          'Response status code: ${response?.statusCode}'); // Log the status code
-      print('Response body: ${response?.body}'); // Log the response body
+      // print(
+      //     'Response status code: ${response?.statusCode}'); // Log the status code
+      // print('Response body: ${response?.body}'); // Log the response body
 
       if (response?.statusCode == 200) {
         var decodedResponse = jsonDecode(response!.body);

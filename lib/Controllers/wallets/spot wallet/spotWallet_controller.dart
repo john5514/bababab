@@ -105,7 +105,7 @@ class WalletSpotController extends GetxController {
       total += price * amount;
     }
     totalEstimatedBalance.value = total;
-    print("Calculated total balance: $total");
+    // print("Calculated total balance: $total");
   }
 
   void handleCurrencyTap(String currencyCode) async {

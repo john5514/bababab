@@ -96,13 +96,13 @@ class ProfileController extends GetxController {
   // This method in ProfileController needs to be corrected
   void updateAvatar(File image, String oldAvatarPath) async {
     isLoading(true);
-    print('Begin updateAvatar');
+    // print('Begin updateAvatar');
 
     try {
       // Pass the old avatar path to the updateAvatar function
       var newAvatarUrl =
           await profileService.updateAvatar(image, oldAvatarPath);
-      print('New avatar URL after upload: $newAvatarUrl');
+      // print('New avatar URL after upload: $newAvatarUrl');
 
       if (newAvatarUrl != null) {
         var saved = await profileService.saveAvatarUrl(newAvatarUrl);

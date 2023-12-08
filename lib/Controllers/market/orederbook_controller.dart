@@ -36,8 +36,8 @@ class OrderBookController extends GetxController {
     currentOrderBook.value = updatedOrderBook;
     // Since we're using Rx<OrderBook?>, we don't need to call update()
     // Rx variables automatically update the GetX reactive widgets
-    print(
-        "Received OrderBook Update: Bids: ${updatedOrderBook.bids.length}, Asks: ${updatedOrderBook.asks.length}");
+    // print(
+    //     "Received OrderBook Update: Bids: ${updatedOrderBook.bids.length}, Asks: ${updatedOrderBook.asks.length}");
   }
 
   @override

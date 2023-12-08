@@ -113,7 +113,7 @@ class TradeController extends GetxController {
         ? _currentMarket.value?.metadata.taker ?? 0.001
         : _currentMarket.value?.metadata.maker ?? 0.001;
 
-    print("Current Fee: $fee");
+    // print("Current Fee: $fee");
     return fee;
   }
 

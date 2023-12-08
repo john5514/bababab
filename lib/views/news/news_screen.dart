@@ -66,7 +66,7 @@ class NewsWidget extends StatelessWidget {
                             "View More",
                             style: TextStyle(
                               color: Colors.yellow,
-                              fontSize: 16,
+                              fontSize: 12,
                               fontWeight: FontWeight.bold,
                               fontFamily: 'Inter',
                             ),
@@ -77,8 +77,8 @@ class NewsWidget extends StatelessWidget {
                   }
                   if (index == 2) {
                     return const Divider(
-                      color: Colors.grey,
-                      thickness: 1,
+                      color: Color.fromARGB(150, 158, 158, 158),
+                      thickness: 0.7,
                     );
                   }
 
