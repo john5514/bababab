@@ -1,11 +1,17 @@
 import 'dart:async';
 import 'dart:math';
+import 'package:bicrypto/services/api_service.dart';
 import 'package:bicrypto/services/market_service.dart';
 import 'package:get/get.dart';
 import 'package:k_chart/flutter_k_chart.dart';
 import 'package:flutter/material.dart'; // <-- Added this line for UniqueKey
 
 class ChartController extends GetxController {
+  late final MarketService _marketService;
+
+  ChartController(this.pair) {
+    _marketService = MarketService(Get.find<ApiService>());
+  }
   final Rx<Market?> currentMarket = Rx<Market?>(null);
   final Rx<Market?> lastMarket = Rx<Market?>(null);
   final RxDouble high24h = 0.0.obs;
@@ -16,7 +22,6 @@ class ChartController extends GetxController {
   final Rx<UniqueKey> chartKey = UniqueKey().obs; // <-- Added this line
 
   final String pair;
-  final MarketService _marketService = MarketService();
   var kLineData = <CustomKLineEntity>[].obs;
   StreamSubscription? _marketSubscription;
   Timer? _timer;
@@ -26,7 +31,6 @@ class ChartController extends GetxController {
   final RxString currentTimeFrame = '1h'.obs;
   double _previous24hVolume = 0; // To store the previous 24-hour volume
 
-  ChartController(this.pair);
   bool _isInitialLoad = true;
 
   List<String> fallbackTimeFrames = [

@@ -1,11 +1,13 @@
 import 'dart:convert';
 import 'dart:async';
 import 'dart:io';
+import 'package:bicrypto/services/api_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:bicrypto/Controllers/market/chart__controller.dart';
 import 'package:http/http.dart' as http;
 
 class MarketService {
+  late final ApiService apiService;
   // Extract the domain part from the environment variable
   final String domain = const String.fromEnvironment('BASE_DOMAIN',
       defaultValue: 'v3.mash3div.com');
@@ -19,6 +21,7 @@ class MarketService {
 
   WebSocket? _webSocket; // Made it nullable
   final _controller = StreamController<List<Market>>.broadcast();
+  MarketService(this.apiService);
 
   Map<String, String?> tokens = {
     'access-token': null,
@@ -43,11 +46,19 @@ class MarketService {
 
   // Load tokens from shared preferences
   Future<void> loadTokens() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    for (var key in tokens.keys) {
-      tokens[key] = prefs.getString(key);
-    }
+    await apiService.loadTokens();
   }
+
+  // Use consistent header setup method
+  Map<String, String> get headers => {
+        'access-token': apiService.tokens['access-token'] ?? "",
+        'refresh-token': apiService.tokens['refresh-token'] ??
+            "", // Keep the 'Bearer ' prefix
+        'csrf-token': apiService.tokens['csrf-token'] ?? "",
+        'session-id': apiService.tokens['session-id'] ?? "",
+        'Content-Type': 'application/json',
+        'Client-Platform': 'app',
+      };
 
   // Initialize the WebSocket connection
   void _reconnect(String link) {
@@ -317,12 +328,12 @@ class MarketService {
   Future<String> createOrder(String symbol, String type, String side,
       String amount, String price) async {
     final url = Uri.parse('${baseUrl}/api/exchange/orders');
+
+    await loadTokens(); // Load tokens
+
     final response = await http.post(
       url,
-      headers: {
-        'accept': 'application/json',
-        'Content-Type': 'application/json',
-      },
+      headers: headers, // Use consistent headers
       body: json.encode({
         'symbol': symbol,
         'type': type,
@@ -332,8 +343,16 @@ class MarketService {
       }),
     );
 
+    Map<String, dynamic> responseBody = json.decode(response.body);
+
     if (response.statusCode == 200) {
-      return 'Order created successfully: ${response.body}';
+      if (responseBody['status'] == 'fail') {
+        // The order was not created successfully, return the error message
+        return responseBody['error']['message'];
+      } else {
+        // The order was created successfully, return a success message
+        return 'Order created successfully';
+      }
     } else {
       throw Exception(
           'Failed to create order: ${response.statusCode}, ${response.body}');

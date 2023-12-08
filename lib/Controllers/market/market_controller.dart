@@ -1,9 +1,14 @@
 import 'dart:async';
+import 'package:bicrypto/services/api_service.dart';
 import 'package:bicrypto/services/market_service.dart';
 import 'package:get/get.dart';
 
 class MarketController extends GetxController {
-  final MarketService _marketService = MarketService();
+  late final MarketService _marketService;
+
+  MarketController() {
+    _marketService = MarketService(Get.find<ApiService>());
+  }
   var markets = <Market>[].obs;
   var isLoading = true.obs;
 

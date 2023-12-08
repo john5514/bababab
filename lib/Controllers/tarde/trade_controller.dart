@@ -1,5 +1,8 @@
+import 'dart:convert';
+
 import 'package:bicrypto/Controllers/market/chart__controller.dart';
 import 'package:bicrypto/Controllers/market/orederbook_controller.dart';
+import 'package:bicrypto/services/api_service.dart';
 import 'package:bicrypto/services/market_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -21,8 +24,12 @@ class TradeController extends GetxController {
   final TextEditingController priceController = TextEditingController();
   final OrderBookController _orderBookController =
       Get.find<OrderBookController>();
-  final MarketService _marketService =
-      MarketService(); // Instance of MarketService
+
+  late final MarketService _marketService;
+
+  TradeController() {
+    _marketService = MarketService(Get.find<ApiService>());
+  }
 
   final Rx<Market?> _currentMarket = Rx<Market?>(null); // Made observable
   Market? get currentMarket => _currentMarket.value;
@@ -151,40 +158,52 @@ class TradeController extends GetxController {
 
   void buy() async {
     if (amountController.text.isEmpty || priceController.text.isEmpty) {
-      print("Error: Amount or Price is empty");
+      _showSnackbar("Error", "Amount or Price is empty");
       return;
     }
     try {
-      String response = await _marketService.createOrder(
-        firstPairName, // symbol
-        selectedOrderType.value, // type (e.g., "Limit")
-        'buy', // side
-        amountController.text, // amount
-        priceController.text, // price
+      String message = await _marketService.createOrder(
+        tradeName.value,
+        selectedOrderType.value,
+        'buy',
+        amountController.text,
+        priceController.text,
       );
-      print("Buy Order Response: $response");
+      _showSnackbar("Buy Order", message);
     } catch (e) {
-      print('Error creating buy order: $e');
+      _showSnackbar("Error", 'Error creating buy order: $e');
     }
   }
 
   void sell() async {
     if (amountController.text.isEmpty || priceController.text.isEmpty) {
-      print("Error: Amount or Price is empty");
+      _showSnackbar("Error", "Amount or Price is empty");
       return;
     }
     try {
-      String response = await _marketService.createOrder(
-        firstPairName, // symbol
-        selectedOrderType.value, // type (e.g., "Limit")
-        'sell', // side
-        amountController.text, // amount
-        priceController.text, // price
+      String message = await _marketService.createOrder(
+        tradeName.value, // Make sure this is the symbol in the correct format
+        selectedOrderType
+            .value, // 'Limit' or other types as expected by your API
+        'sell', // 'sell' for selling
+        amountController.text, // The amount to sell
+        priceController.text, // The price at which to sell
       );
-      print("Sell Order Response: $response");
+      _showSnackbar("Sell Order", message);
     } catch (e) {
-      print('Error creating sell order: $e');
+      _showSnackbar("Error", 'Error creating sell order: $e');
     }
+  }
+
+  void _showSnackbar(String title, String message) {
+    Get.snackbar(
+      title,
+      message,
+      snackPosition: SnackPosition.BOTTOM,
+      backgroundColor: Colors.red,
+      colorText: Colors.white,
+      duration: Duration(seconds: 3),
+    );
   }
 
   // In TradeController
