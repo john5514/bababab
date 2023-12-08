@@ -208,15 +208,19 @@ class TradeController extends GetxController {
 
   // In TradeController
   void updateAmountFromSlider() {
-    if (availableBalance.value <= 0) {
+    if (availableBalance.value <= 0 || currentPrice.value <= 0) {
       sliderValue.value = 0;
       amountController.text = '0';
+      update();
       return;
     }
 
-    double amount = availableBalance.value * sliderValue.value;
-    amountController.text =
-        amount.toStringAsFixed(2); // Set the calculated amount
+    double amount =
+        (availableBalance.value / currentPrice.value) * sliderValue.value;
+
+    amountController.text = amount
+        .toStringAsFixed(2); // Set the calculated amount to 2 decimal places
+    update();
   }
 
   void updateMarketPrice(double newPrice) {

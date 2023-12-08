@@ -78,6 +78,14 @@ class TradeView extends StatelessWidget {
                                     TextFormField(
                                       controller:
                                           _tradeController.priceController,
+                                      onChanged: (value) {
+                                        // When the user changes the price, update it in the controller
+                                        var price = double.tryParse(value);
+                                        if (price != null) {
+                                          _tradeController
+                                              .updateMarketPrice(price);
+                                        }
+                                      },
                                       decoration: InputDecoration(
                                         labelText: 'Price',
                                         floatingLabelBehavior:
@@ -342,22 +350,25 @@ class TradeView extends StatelessWidget {
           if (isBuy) {
             _tradeController.buy();
           } else {
-            _tradeController.sell(); // Implement this method in your controller
+            _tradeController.sell();
           }
         },
         style: ElevatedButton.styleFrom(
-            backgroundColor: isBuy
-                ? appTheme.colorScheme.secondary
-                : appTheme.colorScheme.error),
-        child: Text(
-          "${isBuy ? 'Buy' : 'Sell'} ${_tradeController.firstPairName}",
-          style: const TextStyle(
-            color: Colors.white,
-            fontFamily: 'Inter',
+          backgroundColor: isBuy
+              ? appTheme.colorScheme.secondary
+              : appTheme.colorScheme.error,
+          padding: const EdgeInsets.symmetric(
+              horizontal: 20, vertical: 10), // Smaller padding
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(4), // Slightly rounded corners
+          ),
+          textStyle: const TextStyle(
+            fontSize: 16,
             fontWeight: FontWeight.bold,
-            fontSize: 16.0,
           ),
         ),
+        child:
+            Text("${isBuy ? 'Buy' : 'Sell'} ${_tradeController.firstPairName}"),
       );
     });
   }
