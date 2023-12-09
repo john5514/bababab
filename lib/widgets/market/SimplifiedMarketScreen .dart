@@ -1,9 +1,10 @@
-import 'package:bicrypto/Controllers/home_controller.dart';
 import 'package:bicrypto/Controllers/market/market_controller.dart';
+import 'package:bicrypto/Style/styles.dart';
 import 'package:bicrypto/services/market_service.dart';
 import 'package:bicrypto/widgets/market/simple_pairlist.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:buttons_tabbar/buttons_tabbar.dart';
 
 class SimpleMarketScreen extends StatelessWidget {
   final MarketController _marketController = Get.put(MarketController());
@@ -12,47 +13,61 @@ class SimpleMarketScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 4,
-      child: Stack(
-        children: [
-          Column(
+    // Access the app's theme data
+    final ThemeData themeData = appTheme;
+
+    // Define the border colors for each tab using the theme's color scheme
+    final List<Color> tabBorderColors = [
+      themeData.colorScheme.secondary, // Green shade for 'Top Gainers'
+      themeData.colorScheme.error, // Red shade for 'Top Losers'
+      themeData.colorScheme.primary, // Orange shade for 'Trending'
+      Colors.orange, // Additional color for 'Hot', update as needed
+    ];
+
+    return Column(
+      children: <Widget>[
+        Obx(() {
+          // Use Obx to listen to tabIndex changes and rebuild the ButtonsTabBar
+          return ButtonsTabBar(
+            controller: _marketController.tabController,
+            backgroundColor: themeData
+                .scaffoldBackgroundColor, // Use the scaffold background color
+            unselectedBackgroundColor: themeData
+                .scaffoldBackgroundColor, // Use the scaffold background color
+            labelStyle: themeData.textTheme.bodyLarge!.copyWith(
+                color:
+                    themeData.colorScheme.onSurface), // Use the onSurface color
+            unselectedLabelStyle: themeData.textTheme.bodyLarge!
+                .copyWith(color: Colors.white.withOpacity(0.6)),
+            borderWidth: 2,
+            borderColor: tabBorderColors[_marketController.tabIndex.value],
+
+            unselectedBorderColor:
+                appTheme.colorScheme.onSurface.withOpacity(0.1),
+            radius: 8,
+            contentPadding: const EdgeInsets.symmetric(horizontal: 11),
+            buttonMargin: const EdgeInsets.symmetric(horizontal: 4),
+            physics: const BouncingScrollPhysics(),
+            tabs: const [
+              Tab(icon: Icon(Icons.trending_up), text: 'Top Gainers'),
+              Tab(icon: Icon(Icons.trending_down), text: 'Top Losers'),
+              Tab(icon: Icon(Icons.trending_flat), text: 'Trending'),
+              Tab(icon: Icon(Icons.whatshot), text: 'Hot'),
+            ],
+          );
+        }),
+        Expanded(
+          child: TabBarView(
+            controller: _marketController.tabController,
             children: [
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: TabBar(
-                  isScrollable: true,
-                  tabs: const [
-                    Tab(text: 'Top Gainers'),
-                    Tab(text: 'Top Losers'),
-                    Tab(text: 'Trending'),
-                    Tab(text: 'Hot'),
-                  ],
-                  labelColor: Colors.white,
-                  unselectedLabelColor: Colors.grey[400],
-                  indicator: BoxDecoration(
-                    color: Colors.grey[800], // Dark gray filled color
-                    borderRadius: BorderRadius.circular(10), // Rounded corners
-                  ),
-                  indicatorPadding:
-                      const EdgeInsets.all(6), // Padding around the text
-                  indicatorSize: TabBarIndicatorSize.tab, // Indicator size
-                ),
-              ),
-              Expanded(
-                child: TabBarView(
-                  children: [
-                    Obx(() => _buildMarketList(category: 'gainers')),
-                    Obx(() => _buildMarketList(category: 'losers')),
-                    Obx(() => _buildMarketList(category: 'trending')),
-                    Obx(() => _buildMarketList(category: 'hot')),
-                  ],
-                ),
-              ),
+              Obx(() => _buildMarketList(category: 'gainers')),
+              Obx(() => _buildMarketList(category: 'losers')),
+              Obx(() => _buildMarketList(category: 'trending')),
+              Obx(() => _buildMarketList(category: 'hot')),
             ],
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
