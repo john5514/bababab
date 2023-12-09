@@ -35,8 +35,8 @@ class MarketScreen extends StatelessWidget {
           ),
           bottom: TabBar(
             tabs: const [
-              Tab(text: 'Top Gainers'),
-              Tab(text: 'Top Losers'),
+              Tab(text: 'Gainers'),
+              Tab(text: 'Losers'),
               Tab(text: 'Trending'), // New Tab for Trending
               Tab(text: 'Hot'), // New Tab for Hot
             ],
