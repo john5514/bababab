@@ -2,6 +2,7 @@ import 'package:bicrypto/Controllers/tarde/trade_controller.dart';
 import 'package:bicrypto/Controllers/wallets/spot%20wallet/spotWallet_controller.dart';
 import 'package:bicrypto/Style/styles.dart';
 import 'package:bicrypto/services/wallet_service.dart';
+import 'package:bicrypto/views/wallets/spot/spot_currency.dart';
 import 'package:bicrypto/widgets/costomslider.dart';
 import 'package:bicrypto/widgets/tradeorderbook.dart';
 import 'package:flutter/material.dart';
@@ -191,7 +192,8 @@ class TradeView extends StatelessWidget {
                                 color: Colors.white54), // Divider line
                             _buildAvailableBalance(), // Display available balance here
                             const SizedBox(height: 20),
-                            _buildTradeButton(), // Dropdown for Limit and Market
+                            _buildTradeButton(
+                                context), // Dropdown for Limit and Market
                           ],
                         ),
                       ),
@@ -331,44 +333,85 @@ class TradeView extends StatelessWidget {
       children: [
         const Text(
           "Available",
-          style: TextStyle(color: Colors.grey), // Smaller, grey text for label
+          style: TextStyle(color: Colors.grey),
         ),
         Text(
-          "${currencyBalance.toStringAsFixed(2)} $secondCurrency", // Display balance for the second currency
-          style: const TextStyle(
-              color: Colors.grey), // Smaller, grey text for amount
+          "${currencyBalance.toStringAsFixed(2)} $secondCurrency",
+          style: const TextStyle(color: Colors.grey),
         ),
       ],
     );
   }
 
-  Widget _buildTradeButton() {
+  Widget _buildTradeButton(BuildContext context) {
     return Obx(() {
       var isBuy = _tradeController.activeAction.value == "Buy";
-      return ElevatedButton(
-        onPressed: () {
-          if (isBuy) {
-            _tradeController.buy();
-          } else {
-            _tradeController.sell();
-          }
-        },
-        style: ElevatedButton.styleFrom(
-          backgroundColor: isBuy
-              ? appTheme.colorScheme.secondary
-              : appTheme.colorScheme.error,
-          padding: const EdgeInsets.symmetric(
-              horizontal: 20, vertical: 10), // Smaller padding
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(4), // Slightly rounded corners
+      String currencyCode =
+          _tradeController.firstPairName; // Assuming this is the currency code
+
+      // Wrap both buttons in a Row widget
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          // OutlinedButton for the plus icon
+          OutlinedButton(
+            onPressed: () {
+              // Navigate to CurrencySpotView when the button is pressed
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) =>
+                      CurrencySpotView(currencyCode: currencyCode),
+                ),
+              );
+            },
+            style: OutlinedButton.styleFrom(
+              foregroundColor: isBuy
+                  ? appTheme.colorScheme.secondary
+                  : appTheme.colorScheme.error,
+              side: BorderSide(
+                  color: isBuy
+                      ? appTheme.colorScheme.secondary
+                      : appTheme.colorScheme.error), // Border color
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(4),
+              ),
+            ),
+            child: const Icon(Icons.add,
+                color: Colors.white), // Plus icon with white color
           ),
-          textStyle: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
+          const SizedBox(
+              width: 8), // Space between the plus button and the buy button
+
+          // Expanded to make the buy button take up the rest of the space
+          Expanded(
+            child: ElevatedButton(
+              onPressed: () {
+                if (isBuy) {
+                  _tradeController.buy();
+                } else {
+                  _tradeController.sell();
+                }
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: isBuy
+                    ? appTheme.colorScheme.secondary
+                    : appTheme.colorScheme.error,
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                textStyle: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              child: Text(
+                  "${isBuy ? 'Buy' : 'Sell'} ${_tradeController.firstPairName}"),
+            ),
           ),
-        ),
-        child:
-            Text("${isBuy ? 'Buy' : 'Sell'} ${_tradeController.firstPairName}"),
+        ],
       );
     });
   }

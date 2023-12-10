@@ -67,7 +67,7 @@ final ThemeData appTheme = ThemeData(
       backgroundColor: Color(0xFFFFA726), // Primary color background
       foregroundColor: Colors.white, // Text color on buttons
       elevation: 6.0,
-      padding: EdgeInsets.symmetric(vertical: 12.0, horizontal: 20.0),
+      padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 20.0),
     ),
   ),
 

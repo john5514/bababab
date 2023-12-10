@@ -30,6 +30,7 @@ class _SearchScreenState extends State<SearchScreen> {
       appBar: AppBar(
         title: CupertinoSearchTextField(
           placeholder: 'Search Coin Pairs',
+          style: const TextStyle(color: Colors.white),
           onChanged: (text) {
             setState(() {
               query = text;

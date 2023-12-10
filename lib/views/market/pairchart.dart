@@ -1,4 +1,5 @@
 import 'package:bicrypto/Controllers/market/customizechart_controller.dart';
+import 'package:bicrypto/Controllers/wallets/spot%20wallet/spotWallet_controller.dart';
 import 'package:bicrypto/Style/styles.dart';
 import 'package:bicrypto/widgets/market/chart_header.dart';
 import 'package:bicrypto/widgets/market/costomize%20_chart.dart';
@@ -15,7 +16,27 @@ class ChartPage extends StatelessWidget {
       Get.put(CustomizeChartController());
 
   ChartPage({super.key, required this.pair})
-      : _chartController = Get.put(ChartController(pair));
+      : _chartController =
+            Get.put(ChartController(pair)); // Ensure only one instance is used
+
+  void handleTradeButtonPress(String pair, String type) async {
+    String currencyCode = getPrimarySymbol(pair);
+    try {
+      // Use _chartController to ensure wallet exists
+      await _chartController.handleTradeAction(currencyCode);
+
+      // Navigate to trade screen
+      Get.toNamed('/trade', arguments: {
+        'pair': pair,
+        'change24h': _chartController.currentMarket.value?.change ?? 0.0,
+        'type': type // 'buy' or 'sell'
+      });
+    } catch (e) {
+      print('Error in handleTradeButtonPress: $e');
+      // Handle the error, maybe show a dialog or toast
+    }
+  }
+
   String formatVolume(double volume) {
     if (volume >= 1e9) {
       return '${(volume / 1e9).toStringAsFixed(2)} B';
@@ -87,20 +108,13 @@ class ChartPage extends StatelessWidget {
         color: appTheme.scaffoldBackgroundColor,
       ),
       child: Row(
-        mainAxisAlignment:
-            MainAxisAlignment.spaceEvenly, // Fill the space evenly
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           Expanded(
             child: ClipPath(
               clipper: LeftButtonClipper(),
               child: ElevatedButton(
-                onPressed: () {
-                  Get.toNamed('/trade', arguments: {
-                    'pair': pair,
-                    'change24h':
-                        _chartController.currentMarket.value?.change ?? 0.0
-                  });
-                },
+                onPressed: () => handleTradeButtonPress(pair, 'buy'),
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(horizontal: 32.0),
                   foregroundColor: Colors.white,
@@ -116,13 +130,7 @@ class ChartPage extends StatelessWidget {
             child: ClipPath(
               clipper: RightButtonClipper(),
               child: ElevatedButton(
-                onPressed: () {
-                  Get.toNamed('/trade', arguments: {
-                    'pair': pair,
-                    'change24h':
-                        _chartController.currentMarket.value?.change ?? 0.0
-                  });
-                },
+                onPressed: () => handleTradeButtonPress(pair, 'sell'),
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(horizontal: 32.0),
                   foregroundColor: Colors.white,

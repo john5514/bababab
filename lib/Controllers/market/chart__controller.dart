@@ -2,12 +2,14 @@ import 'dart:async';
 import 'dart:math';
 import 'package:bicrypto/services/api_service.dart';
 import 'package:bicrypto/services/market_service.dart';
+import 'package:bicrypto/services/wallet_service.dart';
 import 'package:get/get.dart';
 import 'package:k_chart/flutter_k_chart.dart';
 import 'package:flutter/material.dart'; // <-- Added this line for UniqueKey
 
 class ChartController extends GetxController {
   late final MarketService _marketService;
+  final WalletService walletService = Get.find<WalletService>();
 
   ChartController(this.pair) {
     _marketService = MarketService(Get.find<ApiService>());
@@ -58,6 +60,38 @@ class ChartController extends GetxController {
     _marketService.dispose();
     _timer?.cancel();
     super.onClose();
+  }
+
+  Future<void> handleTradeAction(String currencyCode) async {
+    isLoading(true);
+    try {
+      Map<String, dynamic> walletInfo =
+          await walletService.fetchSpotWallet(currencyCode);
+
+      if (walletInfo['status'] == 'success' &&
+          walletInfo['data']['result'] != null) {
+        // Wallet exists
+      } else {
+        // Wallet doesn't exist, attempt to create it
+
+        await walletService.postSpotWallet(currencyCode);
+
+        // Re-fetch the wallet info after creation
+        walletInfo = await walletService.fetchSpotWallet(currencyCode);
+        if (walletInfo['status'] == 'success' &&
+            walletInfo['data']['result'] != null) {
+        } else {
+          print(
+              "================Failed to create or fetch wallet for $currencyCode");
+          throw Exception("Failed to create or fetch wallet");
+        }
+      }
+    } catch (e) {
+      print('Error handling trade action: $e');
+      // Optionally, you can handle the error in a user-friendly way
+    } finally {
+      isLoading(false);
+    }
   }
 
   Future<void> fetch24hVolume() async {
