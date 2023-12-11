@@ -47,173 +47,181 @@ class TradeView extends StatelessWidget {
           ],
         ),
       ),
-      body: LayoutBuilder(
-        builder: (BuildContext context, BoxConstraints constraints) {
-          return SingleChildScrollView(
-            child: Column(
-              children: [
-                Row(
-                  children: [
-                    // Buy and Sell Buttons and Dropdown
-                    Expanded(
-                      flex: 7, // 7 parts out of 10
-                      child: Padding(
-                        padding: const EdgeInsets.fromLTRB(10, 25, 10, 15),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            Obx(() => Row(
-                                  children: [
-                                    _buildActionButton(context, 'Buy'),
-                                    _buildActionButton(context, 'Sell'),
-                                  ],
-                                )),
-                            const SizedBox(height: 10), // spacing
-                            _buildDropdown(),
-                            const SizedBox(height: 10), // spacing
-                            Obx(() {
-                              if (_tradeController.selectedOrderType.value ==
-                                  "Limit") {
-                                return Column(
-                                  children: [
-                                    TextFormField(
-                                      controller:
-                                          _tradeController.priceController,
-                                      onChanged: (value) {
-                                        // When the user changes the price, update it in the controller
-                                        var price = double.tryParse(value);
-                                        if (price != null) {
-                                          _tradeController
-                                              .updateMarketPrice(price);
-                                        }
-                                      },
-                                      decoration: InputDecoration(
-                                        labelText: 'Price',
-                                        floatingLabelBehavior:
-                                            FloatingLabelBehavior.always,
-                                        labelStyle: const TextStyle(
-                                            color: Colors.white),
-                                        border: OutlineInputBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(15.0),
-                                          borderSide: BorderSide.none,
+      body: RefreshIndicator(
+        onRefresh: () => _tradeController.refreshTradeData(),
+        child: LayoutBuilder(
+          builder: (BuildContext context, BoxConstraints constraints) {
+            return SingleChildScrollView(
+              child: Column(
+                children: [
+                  Row(
+                    children: [
+                      // Buy and Sell Buttons and Dropdown
+                      Expanded(
+                        flex: 7, // 7 parts out of 10
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(10, 25, 10, 15),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              Obx(() => Row(
+                                    children: [
+                                      _buildActionButton(context, 'Buy'),
+                                      _buildActionButton(context, 'Sell'),
+                                    ],
+                                  )),
+                              const SizedBox(height: 10), // spacing
+                              _buildDropdown(),
+                              const SizedBox(height: 10), // spacing
+                              Obx(() {
+                                if (_tradeController.selectedOrderType.value ==
+                                    "Limit") {
+                                  return Column(
+                                    children: [
+                                      TextFormField(
+                                        controller:
+                                            _tradeController.priceController,
+                                        onChanged: (value) {
+                                          // When the user changes the price, update it in the controller
+                                          var price = double.tryParse(value);
+                                          if (price != null) {
+                                            _tradeController
+                                                .updateMarketPrice(price);
+                                          }
+                                        },
+                                        decoration: InputDecoration(
+                                          labelText: 'Price',
+                                          floatingLabelBehavior:
+                                              FloatingLabelBehavior.always,
+                                          labelStyle: const TextStyle(
+                                              color: Colors.white),
+                                          border: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(15.0),
+                                            borderSide: BorderSide.none,
+                                          ),
+                                          filled: true,
+                                          fillColor: const Color(
+                                              0xFF2C2F33), // Specific fill color for dark mode
+
+                                          contentPadding:
+                                              const EdgeInsets.symmetric(
+                                                  vertical: 8,
+                                                  horizontal:
+                                                      12), // Reduced padding
                                         ),
-                                        filled: true,
-                                        fillColor: const Color(
-                                            0xFF2C2F33), // Specific fill color for dark mode
-
-                                        contentPadding:
-                                            const EdgeInsets.symmetric(
-                                                vertical: 8,
-                                                horizontal:
-                                                    12), // Reduced padding
+                                        keyboardType: TextInputType.number,
+                                        style: const TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 14), // Smaller font size
                                       ),
-                                      keyboardType: TextInputType.number,
-                                      style: const TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 14), // Smaller font size
-                                    ),
-                                    const SizedBox(height: 10),
-                                    TextFormField(
-                                      controller:
-                                          _tradeController.amountController,
-                                      decoration: InputDecoration(
-                                        labelText: 'Amount',
-                                        floatingLabelBehavior:
-                                            FloatingLabelBehavior.always,
-                                        labelStyle: const TextStyle(
-                                            color: Colors.white),
-                                        border: OutlineInputBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(15.0),
-                                          borderSide: BorderSide.none,
+                                      const SizedBox(height: 10),
+                                      TextFormField(
+                                        controller:
+                                            _tradeController.amountController,
+                                        decoration: InputDecoration(
+                                          labelText: 'Amount',
+                                          floatingLabelBehavior:
+                                              FloatingLabelBehavior.always,
+                                          labelStyle: const TextStyle(
+                                              color: Colors.white),
+                                          border: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(15.0),
+                                            borderSide: BorderSide.none,
+                                          ),
+                                          filled: true,
+                                          fillColor: const Color(
+                                              0xFF2C2F33), // Specific fill color for dark mode
+
+                                          contentPadding:
+                                              const EdgeInsets.symmetric(
+                                                  vertical: 8,
+                                                  horizontal:
+                                                      12), // Reduced padding
                                         ),
-                                        filled: true,
-                                        fillColor: const Color(
-                                            0xFF2C2F33), // Specific fill color for dark mode
-
-                                        contentPadding:
-                                            const EdgeInsets.symmetric(
-                                                vertical: 8,
-                                                horizontal:
-                                                    12), // Reduced padding
+                                        keyboardType: TextInputType.number,
+                                        style: const TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 14), // Smaller font size
                                       ),
-                                      keyboardType: TextInputType.number,
-                                      style: const TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 14), // Smaller font size
+                                    ],
+                                  );
+                                } else if (_tradeController
+                                        .selectedOrderType.value ==
+                                    "Market") {
+                                  return TextFormField(
+                                    controller:
+                                        _tradeController.amountController,
+                                    decoration: InputDecoration(
+                                      labelText: 'Amount',
+                                      floatingLabelBehavior:
+                                          FloatingLabelBehavior.always,
+                                      labelStyle:
+                                          const TextStyle(color: Colors.white),
+                                      border: OutlineInputBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(15.0),
+                                        borderSide: BorderSide.none,
+                                      ),
+                                      filled: true,
+                                      fillColor: const Color(
+                                          0xFF2C2F33), // Specific fill color for dark mode
+                                      prefixIcon: const Icon(Icons.balance,
+                                          color: Colors.white),
+                                      contentPadding:
+                                          const EdgeInsets.symmetric(
+                                              vertical: 8,
+                                              horizontal:
+                                                  12), // Reduced padding
                                     ),
-                                  ],
-                                );
-                              } else if (_tradeController
-                                      .selectedOrderType.value ==
-                                  "Market") {
-                                return TextFormField(
-                                  controller: _tradeController.amountController,
-                                  decoration: InputDecoration(
-                                    labelText: 'Amount',
-                                    floatingLabelBehavior:
-                                        FloatingLabelBehavior.always,
-                                    labelStyle:
-                                        const TextStyle(color: Colors.white),
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(15.0),
-                                      borderSide: BorderSide.none,
-                                    ),
-                                    filled: true,
-                                    fillColor: const Color(
-                                        0xFF2C2F33), // Specific fill color for dark mode
-                                    prefixIcon: const Icon(Icons.balance,
-                                        color: Colors.white),
-                                    contentPadding: const EdgeInsets.symmetric(
-                                        vertical: 8,
-                                        horizontal: 12), // Reduced padding
-                                  ),
-                                  keyboardType: TextInputType.number,
-                                  style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 14), // Smaller font size
-                                );
-                              } else {
-                                return Container();
-                              }
-                            }),
+                                    keyboardType: TextInputType.number,
+                                    style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 14), // Smaller font size
+                                  );
+                                } else {
+                                  return Container();
+                                }
+                              }),
 
-                            const SizedBox(height: 25),
-                            _buildSlider(),
+                              const SizedBox(height: 25),
+                              _buildSlider(),
 
-                            const SizedBox(height: 20),
-                            _buildTakerFees(),
-                            // const SizedBox(height: 10),
-                            // _buildTotalExclFees(),
-                            const SizedBox(height: 10),
-                            _buildCost(),
-                            const Divider(
-                                color: Colors.white54), // Divider line
-                            _buildAvailableBalance(), // Display available balance here
-                            const SizedBox(height: 20),
-                            _buildTradeButton(
-                                context), // Dropdown for Limit and Market
-                          ],
+                              const SizedBox(height: 20),
+                              _buildTakerFees(),
+                              // const SizedBox(height: 10),
+                              // _buildTotalExclFees(),
+                              const SizedBox(height: 10),
+                              _buildCost(),
+                              const Divider(
+                                  color: Colors.white54), // Divider line
+                              _buildAvailableBalance(), // Display available balance here
+                              const SizedBox(height: 20),
+                              _buildTradeButton(
+                                  context), // Dropdown for Limit and Market
+                            ],
+                          ),
                         ),
                       ),
-                    ),
-                    // OrderBook
-                    Expanded(
-                      flex: 4, // 4 parts out of 10
-                      child: TradeOrderBookWidget(pair: arguments['pair']),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 10), // Some padding beneath the main row
-                SizedBox(
-                  height: constraints.maxHeight - 300,
-                  child: _buildRecentTrades(),
-                ),
-              ],
-            ),
-          );
-        },
+                      // OrderBook
+                      Expanded(
+                        flex: 4, // 4 parts out of 10
+                        child: TradeOrderBookWidget(pair: arguments['pair']),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(
+                      height: 10), // Some padding beneath the main row
+                  SizedBox(
+                    height: constraints.maxHeight - 300,
+                    child: _buildRecentTrades(),
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
       ),
     );
   }

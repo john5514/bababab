@@ -14,7 +14,7 @@ class HomeView extends StatelessWidget {
   final List<Widget> _children = [
     NewsWidget(),
     MarketScreen(),
-    WebViewPage(),
+    // WebViewPage(),
     WalletView(),
     MainSettingsScreen(),
   ];
@@ -80,11 +80,11 @@ class HomeView extends StatelessWidget {
                 selectedIcon: Icon(Icons.pie_chart),
                 label: 'Market',
               ),
-              NavigationDestination(
-                icon: Icon(Icons.show_chart),
-                selectedIcon: Icon(Icons.show_chart),
-                label: 'Charts',
-              ),
+              // NavigationDestination(
+              //   icon: Icon(Icons.show_chart),
+              //   selectedIcon: Icon(Icons.show_chart),
+              //   label: 'Charts',
+              // ),
               NavigationDestination(
                 icon: Icon(Icons.account_balance_wallet_outlined),
                 selectedIcon: Icon(Icons.account_balance_wallet),

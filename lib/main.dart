@@ -1,6 +1,7 @@
 import 'package:bicrypto/Controllers/Auth/profile/kyc_controller.dart';
 import 'package:bicrypto/Controllers/Auth/profile/profile_controller.dart';
 import 'package:bicrypto/Controllers/home_controller.dart';
+import 'package:bicrypto/Controllers/market/orederbook_controller.dart';
 import 'package:bicrypto/Controllers/wallets/spot%20wallet/spotWallet_controller.dart';
 import 'package:bicrypto/Routing/app_routes.dart';
 import 'package:bicrypto/services/api_service.dart';
@@ -20,7 +21,6 @@ void main() async {
   Get.put(WalletService(apiService));
   Get.put(ApiService());
   Get.put<ProfileService>(ProfileService(apiService));
-
   // Now put WalletSpotController in GetX
   Get.put(WalletSpotController(walletService: Get.find()));
   Get.put<ProfileController>(ProfileController(profileService: Get.find()));

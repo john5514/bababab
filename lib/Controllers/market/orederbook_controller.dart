@@ -40,6 +40,21 @@ class OrderBookController extends GetxController {
     //     "Received OrderBook Update: Bids: ${updatedOrderBook.bids.length}, Asks: ${updatedOrderBook.asks.length}");
   }
 
+  Future<void> fetchOrderBookData(String pair) async {
+    try {
+      // Unsubscribe from the current order book updates
+      _orderBookService.unsubscribeFromOrderBook(this.pair);
+
+      // Subscribe to the order book updates for the new pair
+      _orderBookService.subscribeToOrderBook(pair);
+
+      // Optionally, you can also fetch the initial state of the order book here
+      // and update currentOrderBook.value accordingly
+    } catch (e) {
+      print("Error fetching order book data: $e");
+    }
+  }
+
   @override
   void onClose() {
     _orderBookSubscription?.cancel();

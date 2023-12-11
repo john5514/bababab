@@ -84,6 +84,29 @@ class TradeController extends GetxController {
     });
   }
 
+  Future<void> refreshTradeData() async {
+    try {
+      // Clearing input fields
+      amountController.clear();
+      priceController.clear();
+
+      // Resetting other relevant fields
+      sliderValue.value = 0.0;
+      takerFees.value = 0.0;
+      totalExclFees.value = 0.0;
+      cost.value = 0.0;
+
+      // Refresh market and order book data
+      await _fetchMarketData();
+      await _orderBookController.fetchOrderBookData(tradeName.value);
+
+      // Any additional refresh logic can be placed here
+    } catch (e) {
+      print("Error during trade data refresh: $e");
+      // Handle error if needed
+    }
+  }
+
   Future<void> _fetchMarketData() async {
     try {
       List<Market> marketList = await _marketService.fetchExchangeMarkets();
