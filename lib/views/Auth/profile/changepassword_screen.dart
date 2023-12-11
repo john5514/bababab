@@ -8,6 +8,14 @@ class ChangePasswordScreen extends StatelessWidget {
       Get.put(ChangePasswordController());
 
   ChangePasswordScreen({super.key});
+  Future<void> _onRefresh() async {
+    // Reset the form fields
+    controller.oldPassword('');
+    controller.newPassword('');
+    controller.repeatNewPassword('');
+    controller.errorMessage('');
+    controller.successMessage('');
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -15,70 +23,75 @@ class ChangePasswordScreen extends StatelessWidget {
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Center(
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: <Widget>[
-                SizedBox(
-                  height: 150,
-                  child: Lottie.asset('assets/animations/passwordreset.json'),
-                ),
-                // Old Password TextField
-                _buildPasswordInputField(
-                  label: 'Old Password',
-                  onChanged: (value) => controller.oldPassword.value = value,
-                  obscureText: true,
-                ),
-                const SizedBox(height: 16),
-                // New Password TextField
-                _buildPasswordInputField(
-                  label: 'New Password',
-                  onChanged: (value) {
-                    controller.newPassword.value = value;
-                    controller.validateNewPassword(value); // Validate on change
-                  },
-                  obscureText: true,
-                  suffixIcon: Obx(() => IconButton(
-                        icon: Icon(
-                          Icons.info_outline,
-                          // Change color based on the overall validity
-                          color: controller.allCriteriaMet
-                              ? Colors.green
-                              : Colors.red,
-                        ),
-                        onPressed: () {
-                          // Show the criteria in a dialog or modal bottom sheet
-                          _showPasswordCriteria(context);
-                        },
-                      )),
-                ),
-                const SizedBox(height: 16),
-                // Repeat New Password TextField
-                _buildPasswordInputField(
-                  label: 'Repeat New Password',
-                  onChanged: (value) =>
-                      controller.repeatNewPassword.value = value,
-                  obscureText: true,
-                ),
-                const SizedBox(height: 24),
-                // Change Password Button
-                ElevatedButton(
-                  onPressed: controller.isLoading.value
-                      ? null
-                      : controller.changePassword,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor:
-                        Colors.deepPurple, // Theme color for buttons
-                    minimumSize:
-                        const Size(double.infinity, 50), // Full width button
+          child: RefreshIndicator(
+            onRefresh: _onRefresh,
+            child: SingleChildScrollView(
+              physics: AlwaysScrollableScrollPhysics(),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: <Widget>[
+                  SizedBox(
+                    height: 150,
+                    child: Lottie.asset('assets/animations/passwordreset.json'),
                   ),
-                  child: Text(controller.isLoading.value
-                      ? 'Changing...'
-                      : 'Change Password'),
-                ),
-                // Success and Error Messages
-                // _buildSuccessAndErrorMessage(),
-              ],
+                  // Old Password TextField
+                  _buildPasswordInputField(
+                    label: 'Old Password',
+                    onChanged: (value) => controller.oldPassword.value = value,
+                    obscureText: true,
+                  ),
+                  const SizedBox(height: 16),
+                  // New Password TextField
+                  _buildPasswordInputField(
+                    label: 'New Password',
+                    onChanged: (value) {
+                      controller.newPassword.value = value;
+                      controller
+                          .validateNewPassword(value); // Validate on change
+                    },
+                    obscureText: true,
+                    suffixIcon: Obx(() => IconButton(
+                          icon: Icon(
+                            Icons.info_outline,
+                            // Change color based on the overall validity
+                            color: controller.allCriteriaMet
+                                ? Colors.green
+                                : Colors.red,
+                          ),
+                          onPressed: () {
+                            // Show the criteria in a dialog or modal bottom sheet
+                            _showPasswordCriteria(context);
+                          },
+                        )),
+                  ),
+                  const SizedBox(height: 16),
+                  // Repeat New Password TextField
+                  _buildPasswordInputField(
+                    label: 'Repeat New Password',
+                    onChanged: (value) =>
+                        controller.repeatNewPassword.value = value,
+                    obscureText: true,
+                  ),
+                  const SizedBox(height: 24),
+                  // Change Password Button
+                  ElevatedButton(
+                    onPressed: controller.isLoading.value
+                        ? null
+                        : controller.changePassword,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor:
+                          Colors.deepPurple, // Theme color for buttons
+                      minimumSize:
+                          const Size(double.infinity, 50), // Full width button
+                    ),
+                    child: Text(controller.isLoading.value
+                        ? 'Changing...'
+                        : 'Change Password'),
+                  ),
+                  // Success and Error Messages
+                  // _buildSuccessAndErrorMessage(),
+                ],
+              ),
             ),
           ),
         ),
