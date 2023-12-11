@@ -280,6 +280,19 @@ class ChartController extends GetxController {
     }
   }
 
+  Future<void> refreshData() async {
+    isLoading(true);
+    try {
+      _loadHistoricalData(currentTimeFrame.value);
+      // Add any additional data refresh logic here (e.g., for the order book)
+    } catch (e) {
+      print("Error during data refresh: $e");
+      // Handle error if needed
+    } finally {
+      isLoading(false);
+    }
+  }
+
   bool _isWithinCurrentInterval(int timestamp) {
     DateTime dateTime =
         DateTime.fromMillisecondsSinceEpoch(timestamp, isUtc: true);

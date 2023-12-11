@@ -76,24 +76,27 @@ class ChartPage extends StatelessWidget {
       ),
       body: Obx(
         () {
-          return ListView(
-            children: [
-              ChartHeader(_chartController, pair),
-              SizedBox(
-                height: MediaQuery.of(context).size.height * 0.45,
-                child: tryRenderChart(),
-              ),
-              const Divider(color: Colors.grey),
+          return RefreshIndicator(
+            onRefresh: () => _chartController.refreshData(),
+            child: ListView(
+              children: [
+                ChartHeader(_chartController, pair),
+                SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.45,
+                  child: tryRenderChart(),
+                ),
+                const Divider(color: Colors.grey),
 
-              SizedBox(
-                height: 25,
-                child: buildControlButtons(),
-              ),
-              //gray devider
-              const Divider(color: Colors.grey),
+                SizedBox(
+                  height: 25,
+                  child: buildControlButtons(),
+                ),
+                //gray devider
+                const Divider(color: Colors.grey),
 
-              OrderBookWidget(pair: pair),
-            ],
+                OrderBookWidget(pair: pair),
+              ],
+            ),
           );
         },
       ),
