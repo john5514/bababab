@@ -11,11 +11,22 @@ class _WebViewPageState extends State<TwoStepVerificationScreen>
     with AutomaticKeepAliveClientMixin {
   final apiService = ApiService();
   InAppWebViewController? _webViewController;
+  PullToRefreshController? _pullToRefreshController;
 
   @override
   void initState() {
     super.initState();
     apiService.loadTokens(); // Load the tokens initially.
+    _pullToRefreshController = PullToRefreshController(
+      options: PullToRefreshOptions(
+        color: Colors.blue,
+      ),
+      onRefresh: () async {
+        if (_webViewController != null) {
+          _webViewController!.reload();
+        }
+      },
+    );
   }
 
   Future<void> _setCookies(InAppWebViewController controller) async {
@@ -58,11 +69,19 @@ class _WebViewPageState extends State<TwoStepVerificationScreen>
             javaScriptEnabled: true,
           ),
         ),
+        pullToRefreshController: _pullToRefreshController,
         onWebViewCreated: (InAppWebViewController controller) {
           _webViewController = controller;
           _setCookies(controller);
         },
-        // Other callback handlers can be removed if they are not used for anything else
+        onLoadStop: (controller, url) {
+          _pullToRefreshController?.endRefreshing();
+        },
+        onProgressChanged: (controller, progress) {
+          if (progress == 100) {
+            _pullToRefreshController?.endRefreshing();
+          }
+        },
       ),
     );
   }

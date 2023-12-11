@@ -15,11 +15,23 @@ class _CurrencySpotViewState extends State<CurrencySpotView>
     with AutomaticKeepAliveClientMixin {
   final apiService = ApiService();
   InAppWebViewController? _webViewController;
+  PullToRefreshController? _pullToRefreshController;
 
   @override
   void initState() {
     super.initState();
     apiService.loadTokens();
+
+    _pullToRefreshController = PullToRefreshController(
+      options: PullToRefreshOptions(
+        color: Colors.blue,
+      ),
+      onRefresh: () async {
+        if (_webViewController != null) {
+          _webViewController!.reload();
+        }
+      },
+    );
   }
 
   Future<void> _setCookies(InAppWebViewController controller) async {
@@ -67,11 +79,19 @@ class _CurrencySpotViewState extends State<CurrencySpotView>
               javaScriptEnabled: true,
             ),
           ),
+          pullToRefreshController: _pullToRefreshController,
           onWebViewCreated: (InAppWebViewController controller) {
             _webViewController = controller;
             _setCookies(controller);
           },
-          // Additional event handlers can be added if needed
+          onLoadStop: (controller, url) {
+            _pullToRefreshController?.endRefreshing();
+          },
+          onProgressChanged: (controller, progress) {
+            if (progress == 100) {
+              _pullToRefreshController?.endRefreshing();
+            }
+          },
         ),
       ),
     );
