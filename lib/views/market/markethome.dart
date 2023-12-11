@@ -54,23 +54,27 @@ class MarketScreen extends StatelessWidget {
         ),
         body: TabBarView(
           children: [
-            Obx(() => _buildMarketList(category: 'gainers')),
-            Obx(() => _buildMarketList(category: 'losers')),
-            Obx(() => _buildMarketList(category: 'trending')),
-            Obx(() => _buildMarketList(category: 'hot')),
+            _buildMarketTab('gainers'),
+            _buildMarketTab('losers'),
+            _buildMarketTab('trending'),
+            _buildMarketTab('hot'),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildMarketList({required String category}) {
-    List<Market> filteredMarkets =
-        _filterAndLimitMarkets(_marketController.markets.value, category);
-
-    return _marketController.isLoading.value
-        ? const Center(child: CircularProgressIndicator())
-        : PairsListView(markets: filteredMarkets);
+  Widget _buildMarketTab(String category) {
+    return Obx(() {
+      return RefreshIndicator(
+        onRefresh: () => _marketController.refreshMarkets(),
+        child: _marketController.isLoading.value
+            ? const Center(child: CircularProgressIndicator())
+            : PairsListView(
+                markets: _filterAndLimitMarkets(
+                    _marketController.markets.value, category)),
+      );
+    });
   }
 
   List<Market> _filterAndLimitMarkets(List<Market> markets, String category) {

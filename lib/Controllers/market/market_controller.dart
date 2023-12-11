@@ -36,6 +36,21 @@ class MarketController extends GetxController
     _initializeWebSocket();
   }
 
+  Future<void> refreshMarkets() async {
+    isLoading(true);
+    try {
+      // Restart the WebSocket connection and wait for completion
+      await Future(() {
+        _marketService.restartWebSocket('tickers', () {
+          isLoading(false); // Stop loading after the WebSocket has reconnected
+        });
+      });
+    } catch (e) {
+      print("Error during market refresh: $e");
+      isLoading(false); // Stop loading in case of an error
+    }
+  }
+
   void startWebSocket() {
     _initializeWebSocket();
   }

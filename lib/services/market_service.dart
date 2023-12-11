@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:async';
 import 'dart:io';
+import 'dart:ui';
 import 'package:bicrypto/services/api_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:bicrypto/Controllers/market/chart__controller.dart';
@@ -8,20 +9,20 @@ import 'package:http/http.dart' as http;
 
 class MarketService {
   late final ApiService apiService;
-  // Extract the domain part from the environment variable
   final String domain = const String.fromEnvironment('BASE_DOMAIN',
       defaultValue: 'v3.mash3div.com');
-
-  // Build the full URLs by prepending the appropriate protocol
   String get baseUrl => 'https://$domain';
   String get _wsBaseUrl => 'wss://$domain/exchange/';
 
   int _reconnectAttempts = 0;
   static const int _maxReconnectAttempts = 5;
 
-  WebSocket? _webSocket; // Made it nullable
-  final _controller = StreamController<List<Market>>.broadcast();
-  MarketService(this.apiService);
+  WebSocket? _webSocket;
+  late StreamController<List<Market>> _controller;
+
+  MarketService(this.apiService) {
+    _controller = StreamController<List<Market>>.broadcast();
+  }
 
   Map<String, String?> tokens = {
     'access-token': null,
@@ -29,20 +30,6 @@ class MarketService {
     'csrf-token': null,
     'session-id': null,
   };
-
-  Stream<List<Market>> get marketUpdates => _controller.stream;
-
-  // This is the new getter to check if the StreamController is closed
-  bool get isControllerClosed => _controller.isClosed;
-  bool _wasClosedIntentionally = false;
-
-  void dispose() {
-    _wasClosedIntentionally = true; // set to true when disposing
-    if (_webSocket != null) {
-      _webSocket!.close();
-    }
-    _controller.close();
-  }
 
   // Load tokens from shared preferences
   Future<void> loadTokens() async {
@@ -61,50 +48,80 @@ class MarketService {
       };
 
   // Initialize the WebSocket connection
+
+  Stream<List<Market>> get marketUpdates => _controller.stream;
+  bool get isControllerClosed => _controller.isClosed;
+  bool _wasClosedIntentionally = false;
+
+  void dispose() {
+    _wasClosedIntentionally = true;
+    _webSocket?.close();
+    _webSocket = null;
+    _controller.close();
+  }
+
+  void restartWebSocket(String link, VoidCallback onCompleted) {
+    _wasClosedIntentionally = true;
+    _webSocket?.close();
+    _webSocket = null;
+
+    // Wait for a brief moment before reconnecting
+    Future.delayed(Duration(milliseconds: 500), () {
+      _wasClosedIntentionally = false;
+      connect(link);
+      onCompleted(); // Call the completion callback after reconnecting
+    });
+  }
+
   void _reconnect(String link) {
     if (_reconnectAttempts >= _maxReconnectAttempts) {
       print("Max reconnection attempts reached.");
       return;
     }
 
-    final delay = _calculateExponentialBackoff(_reconnectAttempts);
+    // Close the existing WebSocket if it's open
+    if (_webSocket != null) {
+      _wasClosedIntentionally = true;
+      _webSocket!.close();
+      _webSocket = null;
+    }
+
+    // Increment reconnection attempts
+    _reconnectAttempts++;
+
+    final delay = _calculateExponentialBackoff(_reconnectAttempts - 1);
     Future.delayed(Duration(seconds: delay), () {
-      print("Attempting to reconnect... Attempt: ${_reconnectAttempts + 1}");
+      print("Attempting to reconnect... Attempt: $_reconnectAttempts");
       connect(link);
-      _reconnectAttempts++;
     });
   }
 
   int _calculateExponentialBackoff(int attempt) {
-    return (1 << attempt) * 2; // Exponential backoff formula
+    return (1 << attempt) * 2;
   }
 
-  // Initialize the WebSocket connection
   void connect(String link) async {
     final fullUrl = "$_wsBaseUrl$link";
     _wasClosedIntentionally = false;
 
     try {
       _webSocket = await WebSocket.connect(fullUrl);
-      _reconnectAttempts =
-          0; // Reset the attempt counter on successful connection
+      _reconnectAttempts = 0;
 
-      _webSocket!.listen(
+      _webSocket?.listen(
         (data) {
           if (_webSocket == null || _webSocket!.readyState != WebSocket.open) {
-            // If WebSocket is not open, just return and don't process data
             return;
           }
           try {
             final decoded = json.decode(data);
-
             final tickersData = decoded['watchTickers'];
 
             if (tickersData is Map<String, dynamic>) {
               final markets = tickersData.entries.map((e) {
                 return Market.fromJson(e.key, e.value);
               }).toList();
-              _controller.add(markets);
+              _safeAddToController(markets);
             } else {
               print("Unexpected data structure received.");
             }
@@ -126,6 +143,12 @@ class MarketService {
     } catch (e) {
       print("Error connecting to WebSocket: $e");
       _reconnect(link);
+    }
+  }
+
+  void _safeAddToController(List<Market> markets) {
+    if (!_controller.isClosed) {
+      _controller.add(markets);
     }
   }
 
