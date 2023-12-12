@@ -84,6 +84,12 @@ dev_dependencies:
 
 # The following section is specific to Flutter packages.
 flutter:
+  assets:
+    - assets/animations/
+    - assets/images/
+
+    # - images/a_dot_burr.jpeg
+    # - images/a_dot_ham.jpeg
   uses-material-design: true
 
 flutter_launcher_icons:
@@ -95,14 +101,6 @@ flutter_launcher_icons:
   adaptive_icon_foreground: "assets/icon/app_icon.png" # For Android adaptive icons
 
   # Assets for your application.
-  assets:
-    - assets/depth.json
-    - assets/chatData.json
-    - assets/animations/
-    - assets/images/
-
-    # - images/a_dot_burr.jpeg
-    # - images/a_dot_ham.jpeg
 
   # Custom fonts for your application.
   fonts:

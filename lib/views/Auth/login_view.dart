@@ -1,6 +1,7 @@
 import 'package:bicrypto/Controllers/Auth/login_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:lottie/lottie.dart';
 
 class LoginView extends StatelessWidget {
   final LoginController authController = Get.put(LoginController());
@@ -22,6 +23,10 @@ class LoginView extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                Lottie.asset(
+                  'assets/animations/marketplace.json',
+                  fit: BoxFit.contain,
+                ),
                 Text(
                   'Login',
                   style: Theme.of(context).textTheme.displayLarge,
