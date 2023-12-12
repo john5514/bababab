@@ -9,75 +9,83 @@ class LoginController extends GetxController {
   var isLoading = false.obs;
   var emailErrorMessage = ''.obs; // Specific to email
   var passwordErrorMessage = ''.obs; // Specific to password
+  var trustFor14Days = false.obs; // New property for "Trust for 14 days"
+
   final ApiService apiService = ApiService();
 
+  @override
+  void onInit() {
+    super.onInit();
+    init();
+  }
+
   Future<void> init() async {
-    await apiService
-        .loadTokens(); // Load the cookie when the controller is initialized
-    if (apiService.tokens.isNotEmpty &&
-        apiService.tokens.containsKey('access-token') &&
-        apiService.tokens['access-token'] != null &&
-        apiService.tokens['access-token'] != '' &&
-        apiService.tokens.containsKey('session-id') &&
-        apiService.tokens['session-id'] != null &&
-        apiService.tokens['session-id'] != '' &&
-        apiService.tokens.containsKey('csrf-token') &&
-        apiService.tokens['csrf-token'] != null &&
-        apiService.tokens['csrf-token'] != '' &&
-        apiService.tokens.containsKey('refresh-token') &&
-        apiService.tokens['refresh-token'] != null &&
-        apiService.tokens['refresh-token'] != '') {
-      isLoggedIn.value = true; // Update isLoggedIn based on the cookie status
+    await apiService.loadTokens();
+    // First, check if we should auto-logout the user due to the 12-day inactivity
+    if (await apiService.shouldAutoLogout()) {
+      logout();
+    } else {
+      // Next, check if all required tokens are present and valid
+      if (apiService.tokens.isNotEmpty &&
+          apiService.tokens['access-token'] != null &&
+          apiService.tokens['access-token']!.isNotEmpty &&
+          apiService.tokens['session-id'] != null &&
+          apiService.tokens['session-id']!.isNotEmpty &&
+          apiService.tokens['csrf-token'] != null &&
+          apiService.tokens['csrf-token']!.isNotEmpty &&
+          apiService.tokens['refresh-token'] != null &&
+          apiService.tokens['refresh-token']!.isNotEmpty) {
+        isLoggedIn.value = true; // Update isLoggedIn based on the token status
+      } else {
+        isLoggedIn.value =
+            false; // If any token is missing or invalid, set isLoggedIn to false
+      }
     }
   }
 
-  Future<void> login(
-      String email, String password, BuildContext context) async {
+  Future<void> login(String email, String password, bool trustFor14Days,
+      BuildContext context) async {
+    isLoading.value = true;
+    emailErrorMessage.value = '';
+    passwordErrorMessage.value = '';
+
+    bool hasError = false;
+
+    if (email.isEmpty) {
+      emailErrorMessage.value = 'Please enter your email';
+      hasError = true;
+    }
+
+    if (password.isEmpty) {
+      passwordErrorMessage.value = 'Please enter your password';
+      hasError = true;
+    }
+
+    if (!GetUtils.isEmail(email)) {
+      emailErrorMessage.value = 'Invalid email format';
+      hasError = true;
+    }
+
+    if (hasError) {
+      showFlushbar("Error", 'Please correct the errors', context);
+      return;
+    }
+
     try {
-      isLoading.value = true;
-      emailErrorMessage.value = '';
-      passwordErrorMessage.value = '';
-
-      bool hasError = false;
-
-      if (email.isEmpty) {
-        emailErrorMessage.value = 'Please enter your email';
-        hasError = true;
-      }
-
-      if (password.isEmpty) {
-        passwordErrorMessage.value = 'Please enter your password';
-        hasError = true;
-      }
-
-      if (!GetUtils.isEmail(email)) {
-        emailErrorMessage.value = 'Invalid email format';
-        hasError = true;
-      }
-
-      if (hasError) {
-        showFlushbar("Error", 'Please correct the errors', context);
-        return;
-      }
-
-      final String? error = await apiService.login(email, password);
+      final String? error =
+          await apiService.login(email, password, trustDevice: trustFor14Days);
 
       if (error == null) {
+        await apiService.saveLoginTimestamp(); // Save the login timestamp
         isLoggedIn.value = true;
         userEmail.value = email;
         Get.offAllNamed('/home');
         showFlushbar("Success", "Login successful!", context, Colors.blue);
       } else {
-        if (error.toLowerCase().contains("password")) {
-          passwordErrorMessage.value = error;
-        } else {
-          emailErrorMessage.value = error;
-        }
-        showFlushbar("Error", error, context);
+        handleLoginError(error, context);
       }
     } catch (e) {
-      emailErrorMessage.value = e.toString();
-      showFlushbar("Error", e.toString(), context);
+      handleLoginError(e.toString(), context);
     } finally {
       isLoading.value = false;
     }
@@ -94,9 +102,19 @@ class LoginController extends GetxController {
     ).show(context);
   }
 
-  void logout() {
+  void handleLoginError(String error, BuildContext context) {
+    if (error.toLowerCase().contains("password")) {
+      passwordErrorMessage.value = error;
+    } else {
+      emailErrorMessage.value = error;
+    }
+    showFlushbar("Error", error, context);
+  }
+
+  Future<void> logout() async {
     isLoggedIn.value = false;
     userEmail.value = '';
-    apiService.logout(); // Clear the cookie
+    await apiService.logout(); // Call logout from the ApiService
+    Get.offAllNamed('/login'); // Navigate to the login screen
   }
 }

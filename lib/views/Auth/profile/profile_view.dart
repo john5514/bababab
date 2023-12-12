@@ -14,17 +14,16 @@ class ProfileView extends StatelessWidget {
       decoration: InputDecoration(
         labelText: label,
         border: const OutlineInputBorder(),
-        labelStyle: TextStyle(color: theme.hintColor),
+        labelStyle: TextStyle(color: theme.primaryColor),
       ),
       onChanged: (value) => field(value),
     );
 
-    // If fullRow is true, the TextField takes the full width
     return fullRow ? textField : Expanded(child: textField);
   }
 
   Future<void> _onRefresh() async {
-    controller.fetchProfileData(); // Refresh the profile data
+    controller.fetchProfileData();
   }
 
   @override
@@ -92,26 +91,49 @@ class ProfileView extends StatelessWidget {
                 const SizedBox(height: 16),
                 buildTextField('Bio', controller.bio, theme, fullRow: true),
                 const SizedBox(height: 24),
-
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: theme.hintColor,
-                  ),
-                  onPressed:
-                      controller.updateProfileData, // Call the method directly
-                  child: Text('Update Profile',
-                      style: TextStyle(color: Colors.white)),
-                ),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.red, // Red color for logout button
-                  ),
-                  onPressed: () {
-                    loginController
-                        .logout(); // Call the logout method from LoginController
-                    Get.offAllNamed('/login'); // Redirect to login page
-                  },
-                  child: Text('Logout', style: TextStyle(color: Colors.white)),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    Expanded(
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          primary: theme.primaryColor,
+                          padding: const EdgeInsets.symmetric(vertical: 15),
+                        ),
+                        onPressed: controller.updateProfileData,
+                        child: const Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.update, color: Colors.white),
+                            SizedBox(width: 10),
+                            Text('Update Profile',
+                                style: TextStyle(color: Colors.white)),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 16), // Spacing between the buttons
+                    Expanded(
+                      child: TextButton(
+                        style: TextButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 15),
+                        ),
+                        onPressed: () {
+                          loginController.logout();
+                          Get.offAllNamed('/login');
+                        },
+                        child: const Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Icon(Icons.exit_to_app, color: Colors.white),
+                            SizedBox(width: 10),
+                            Text('Logout',
+                                style: TextStyle(color: Colors.white)),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),

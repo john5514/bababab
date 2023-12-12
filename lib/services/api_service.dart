@@ -14,6 +14,30 @@ class ApiService {
     'csrf-token': null,
     'session-id': null,
   };
+  Future<void> saveLoginTimestamp() async {
+    final prefs = await SharedPreferences.getInstance();
+    final timestamp = DateTime.now().millisecondsSinceEpoch;
+    await prefs.setInt('login_timestamp', timestamp);
+  }
+
+  Future<bool> shouldAutoLogout() async {
+    final prefs = await SharedPreferences.getInstance();
+    final loginTimestamp = prefs.getInt('login_timestamp');
+    if (loginTimestamp != null) {
+      final loginDate = DateTime.fromMillisecondsSinceEpoch(loginTimestamp);
+      final currentDate = DateTime.now();
+      if (currentDate.difference(loginDate).inDays >= 12) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  Future<void> checkAndPerformAutoLogout() async {
+    if (await shouldAutoLogout()) {
+      await logout();
+    }
+  }
 
   Future<void> updateTokensFromHeaders(Map<String, String> headers) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -32,15 +56,23 @@ class ApiService {
     }
   }
 
-  Future<String?> login(String email, String password) async {
+  Future<String?> login(String email, String password,
+      {bool trustDevice = false}) async {
     try {
       final response = await http.post(
         Uri.parse('${baseUrl}login'),
         headers: {
           'Content-Type': 'application/json',
           'client-platform': 'app',
+          // Optionally, if your backend uses a header:
+          // 'Trust-Device': trustDevice ? 'true' : 'false',
         },
-        body: jsonEncode({'email': email, 'password': password}),
+        body: jsonEncode({
+          'email': email,
+          'password': password,
+          // Assuming the backend expects a boolean flag within the body:
+          'trust_device': trustDevice,
+        }),
       );
 
       await updateTokensFromHeaders(response.headers);
@@ -98,8 +130,9 @@ class ApiService {
   }
 
   Future<void> logout() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('login_timestamp'); // Clear the login timestamp
     // Clear all tokens
-    SharedPreferences prefs = await SharedPreferences.getInstance();
     for (var key in tokens.keys) {
       prefs.remove(key);
       tokens[key] = null;
