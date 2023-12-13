@@ -24,13 +24,12 @@ class LoginView extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Lottie.asset(
-                  'assets/animations/marketplace.json',
-                  fit: BoxFit.contain,
+                  'assets/animations/coin.json',
                 ),
-                Text(
-                  'Login',
-                  style: Theme.of(context).textTheme.displayLarge,
-                ),
+                // Text(
+                //   'Login',
+                //   style: Theme.of(context).textTheme.displayLarge,
+                // ),
                 const SizedBox(height: 20),
                 Obx(
                   () => TextField(
