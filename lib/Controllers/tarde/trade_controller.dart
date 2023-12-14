@@ -19,6 +19,9 @@ class TradeController extends GetxController {
   var cost = 0.0.obs;
   var currentPrice = 0.0.obs; // Observable for the current price
   var availableBalance = 0.0.obs; // Observable for the available balance
+  var openOrders = <Order>[].obs;
+  var orderHistory = <Order>[].obs;
+  var orders = <Order>[].obs;
 
   final TextEditingController amountController = TextEditingController();
   final TextEditingController priceController = TextEditingController();
@@ -82,6 +85,30 @@ class TradeController extends GetxController {
         _calculateValues();
       }
     });
+    fetchOrders();
+  }
+
+  void fetchOrders() async {
+    try {
+      List<Order> newOrders = await _marketService.fetchOrders();
+      openOrders.assignAll(newOrders.where((order) => order.status == 'OPEN'));
+      orderHistory
+          .assignAll(newOrders.where((order) => order.status != 'OPEN'));
+      print(
+          "Open Orders: ${openOrders.length}, Order History: ${orderHistory.length}"); // Debugging
+    } catch (e) {
+      print("Error fetching orders: $e");
+    }
+  }
+
+  Future<void> refreshOrders() async {
+    try {
+      var newOrders = await _marketService.fetchOrders();
+      orders.value = newOrders;
+    } catch (e) {
+      print("Error fetching orders: $e");
+      // Handle error if needed
+    }
   }
 
   Future<void> refreshTradeData() async {
@@ -99,6 +126,7 @@ class TradeController extends GetxController {
       // Refresh market and order book data
       await _fetchMarketData();
       await _orderBookController.fetchOrderBookData(tradeName.value);
+      await refreshOrders(); // Add this line to refresh orders
 
       // Any additional refresh logic can be placed here
     } catch (e) {

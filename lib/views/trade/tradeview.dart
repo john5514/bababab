@@ -1,6 +1,7 @@
 import 'package:bicrypto/Controllers/tarde/trade_controller.dart';
 import 'package:bicrypto/Controllers/wallets/spot%20wallet/spotWallet_controller.dart';
 import 'package:bicrypto/Style/styles.dart';
+import 'package:bicrypto/services/market_service.dart';
 import 'package:bicrypto/services/wallet_service.dart';
 import 'package:bicrypto/views/wallets/spot/spot_currency.dart';
 import 'package:bicrypto/widgets/costomslider.dart';
@@ -10,12 +11,15 @@ import 'package:get/get.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'dart:ui';
 
+import 'package:intl/intl.dart';
+
 class SfSliderThemeData {}
 
 class TradeView extends StatelessWidget {
   final TradeController _tradeController = Get.put(TradeController());
   final WalletSpotController _walletSpotController =
       Get.put(WalletSpotController(walletService: Get.find<WalletService>()));
+  final MarketService _marketService = Get.find<MarketService>();
 
   TradeView({super.key});
 
@@ -23,204 +27,233 @@ class TradeView extends StatelessWidget {
   Widget build(BuildContext context) {
     final Map<String, dynamic> arguments = Get.arguments;
 
-    return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      appBar: AppBar(
+    return DefaultTabController(
+      length: 2,
+      child: Scaffold(
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        title: Row(
-          children: [
-            Obx(
-              () => Text(
-                _tradeController.tradeName.value,
-                style:
-                    TextStyle(color: Colors.white), // Set text color to white
-              ),
-            ),
-            const SizedBox(width: 8.0),
-            Obx(() => Text(
-                  "${_tradeController.change24h.value}%",
+        appBar: AppBar(
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          title: Row(
+            children: [
+              Obx(
+                () => Text(
+                  _tradeController.tradeName.value,
                   style: const TextStyle(
-                    fontSize: 20,
-                    color: Colors.green,
-                  ),
-                )),
-          ],
+                      color: Colors.white), // Set text color to white
+                ),
+              ),
+              const SizedBox(width: 8.0),
+              Obx(() => Text(
+                    "${_tradeController.change24h.value}%",
+                    style: const TextStyle(
+                      fontSize: 20,
+                      color: Colors.green,
+                    ),
+                  )),
+            ],
+          ),
         ),
-      ),
-      body: RefreshIndicator(
-        onRefresh: () => _tradeController.refreshTradeData(),
-        child: LayoutBuilder(
-          builder: (BuildContext context, BoxConstraints constraints) {
-            return SingleChildScrollView(
-              child: Column(
-                children: [
-                  Row(
-                    children: [
-                      // Buy and Sell Buttons and Dropdown
-                      Expanded(
-                        flex: 7, // 7 parts out of 10
-                        child: Padding(
-                          padding: const EdgeInsets.fromLTRB(10, 25, 10, 15),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              Obx(() => Row(
-                                    children: [
-                                      _buildActionButton(context, 'Buy'),
-                                      _buildActionButton(context, 'Sell'),
-                                    ],
-                                  )),
-                              const SizedBox(height: 10), // spacing
-                              _buildDropdown(),
-                              const SizedBox(height: 10), // spacing
-                              Obx(() {
-                                if (_tradeController.selectedOrderType.value ==
-                                    "Limit") {
-                                  return Column(
-                                    children: [
-                                      TextFormField(
-                                        controller:
-                                            _tradeController.priceController,
-                                        onChanged: (value) {
-                                          // When the user changes the price, update it in the controller
-                                          var price = double.tryParse(value);
-                                          if (price != null) {
-                                            _tradeController
-                                                .updateMarketPrice(price);
-                                          }
-                                        },
-                                        decoration: InputDecoration(
-                                          labelText: 'Price',
-                                          floatingLabelBehavior:
-                                              FloatingLabelBehavior.always,
-                                          labelStyle: const TextStyle(
-                                              color: Colors.white),
-                                          border: OutlineInputBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(15.0),
-                                            borderSide: BorderSide.none,
+        body: RefreshIndicator(
+          onRefresh: () => _tradeController.refreshTradeData(),
+          child: LayoutBuilder(
+            builder: (BuildContext context, BoxConstraints constraints) {
+              return SingleChildScrollView(
+                child: Column(
+                  children: [
+                    Row(
+                      children: [
+                        // Buy and Sell Buttons and Dropdown
+                        Expanded(
+                          flex: 7, // 7 parts out of 10
+                          child: Padding(
+                            padding: const EdgeInsets.fromLTRB(10, 25, 10, 15),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                Obx(() => Row(
+                                      children: [
+                                        _buildActionButton(context, 'Buy'),
+                                        _buildActionButton(context, 'Sell'),
+                                      ],
+                                    )),
+                                const SizedBox(height: 10), // spacing
+                                _buildDropdown(),
+                                const SizedBox(height: 10), // spacing
+                                Obx(() {
+                                  if (_tradeController
+                                          .selectedOrderType.value ==
+                                      "Limit") {
+                                    return Column(
+                                      children: [
+                                        TextFormField(
+                                          controller:
+                                              _tradeController.priceController,
+                                          onChanged: (value) {
+                                            // When the user changes the price, update it in the controller
+                                            var price = double.tryParse(value);
+                                            if (price != null) {
+                                              _tradeController
+                                                  .updateMarketPrice(price);
+                                            }
+                                          },
+                                          decoration: InputDecoration(
+                                            labelText: 'Price',
+                                            floatingLabelBehavior:
+                                                FloatingLabelBehavior.always,
+                                            labelStyle: const TextStyle(
+                                                color: Colors.white),
+                                            border: OutlineInputBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(15.0),
+                                              borderSide: BorderSide.none,
+                                            ),
+                                            filled: true,
+                                            fillColor: const Color(
+                                                0xFF2C2F33), // Specific fill color for dark mode
+
+                                            contentPadding:
+                                                const EdgeInsets.symmetric(
+                                                    vertical: 8,
+                                                    horizontal:
+                                                        12), // Reduced padding
                                           ),
-                                          filled: true,
-                                          fillColor: const Color(
-                                              0xFF2C2F33), // Specific fill color for dark mode
-
-                                          contentPadding:
-                                              const EdgeInsets.symmetric(
-                                                  vertical: 8,
-                                                  horizontal:
-                                                      12), // Reduced padding
+                                          keyboardType: TextInputType.number,
+                                          style: const TextStyle(
+                                              color: Colors.white,
+                                              fontSize:
+                                                  14), // Smaller font size
                                         ),
-                                        keyboardType: TextInputType.number,
-                                        style: const TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 14), // Smaller font size
-                                      ),
-                                      const SizedBox(height: 10),
-                                      TextFormField(
-                                        controller:
-                                            _tradeController.amountController,
-                                        decoration: InputDecoration(
-                                          labelText: 'Amount',
-                                          floatingLabelBehavior:
-                                              FloatingLabelBehavior.always,
-                                          labelStyle: const TextStyle(
-                                              color: Colors.white),
-                                          border: OutlineInputBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(15.0),
-                                            borderSide: BorderSide.none,
+                                        const SizedBox(height: 10),
+                                        TextFormField(
+                                          controller:
+                                              _tradeController.amountController,
+                                          decoration: InputDecoration(
+                                            labelText: 'Amount',
+                                            floatingLabelBehavior:
+                                                FloatingLabelBehavior.always,
+                                            labelStyle: const TextStyle(
+                                                color: Colors.white),
+                                            border: OutlineInputBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(15.0),
+                                              borderSide: BorderSide.none,
+                                            ),
+                                            filled: true,
+                                            fillColor: const Color(
+                                                0xFF2C2F33), // Specific fill color for dark mode
+
+                                            contentPadding:
+                                                const EdgeInsets.symmetric(
+                                                    vertical: 8,
+                                                    horizontal:
+                                                        12), // Reduced padding
                                           ),
-                                          filled: true,
-                                          fillColor: const Color(
-                                              0xFF2C2F33), // Specific fill color for dark mode
-
-                                          contentPadding:
-                                              const EdgeInsets.symmetric(
-                                                  vertical: 8,
-                                                  horizontal:
-                                                      12), // Reduced padding
+                                          keyboardType: TextInputType.number,
+                                          style: const TextStyle(
+                                              color: Colors.white,
+                                              fontSize:
+                                                  14), // Smaller font size
                                         ),
-                                        keyboardType: TextInputType.number,
-                                        style: const TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 14), // Smaller font size
+                                      ],
+                                    );
+                                  } else if (_tradeController
+                                          .selectedOrderType.value ==
+                                      "Market") {
+                                    return TextFormField(
+                                      controller:
+                                          _tradeController.amountController,
+                                      decoration: InputDecoration(
+                                        labelText: 'Amount',
+                                        floatingLabelBehavior:
+                                            FloatingLabelBehavior.always,
+                                        labelStyle: const TextStyle(
+                                            color: Colors.white),
+                                        border: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(15.0),
+                                          borderSide: BorderSide.none,
+                                        ),
+                                        filled: true,
+                                        fillColor: const Color(
+                                            0xFF2C2F33), // Specific fill color for dark mode
+                                        prefixIcon: const Icon(Icons.balance,
+                                            color: Colors.white),
+                                        contentPadding:
+                                            const EdgeInsets.symmetric(
+                                                vertical: 8,
+                                                horizontal:
+                                                    12), // Reduced padding
                                       ),
-                                    ],
-                                  );
-                                } else if (_tradeController
-                                        .selectedOrderType.value ==
-                                    "Market") {
-                                  return TextFormField(
-                                    controller:
-                                        _tradeController.amountController,
-                                    decoration: InputDecoration(
-                                      labelText: 'Amount',
-                                      floatingLabelBehavior:
-                                          FloatingLabelBehavior.always,
-                                      labelStyle:
-                                          const TextStyle(color: Colors.white),
-                                      border: OutlineInputBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(15.0),
-                                        borderSide: BorderSide.none,
-                                      ),
-                                      filled: true,
-                                      fillColor: const Color(
-                                          0xFF2C2F33), // Specific fill color for dark mode
-                                      prefixIcon: const Icon(Icons.balance,
-                                          color: Colors.white),
-                                      contentPadding:
-                                          const EdgeInsets.symmetric(
-                                              vertical: 8,
-                                              horizontal:
-                                                  12), // Reduced padding
-                                    ),
-                                    keyboardType: TextInputType.number,
-                                    style: const TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 14), // Smaller font size
-                                  );
-                                } else {
-                                  return Container();
-                                }
-                              }),
+                                      keyboardType: TextInputType.number,
+                                      style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 14), // Smaller font size
+                                    );
+                                  } else {
+                                    return Container();
+                                  }
+                                }),
 
-                              const SizedBox(height: 25),
-                              _buildSlider(),
+                                const SizedBox(height: 25),
+                                _buildSlider(),
 
-                              const SizedBox(height: 20),
-                              _buildTakerFees(),
-                              // const SizedBox(height: 10),
-                              // _buildTotalExclFees(),
-                              const SizedBox(height: 10),
-                              _buildCost(),
-                              const Divider(
-                                  color: Colors.white54), // Divider line
-                              _buildAvailableBalance(), // Display available balance here
-                              const SizedBox(height: 20),
-                              _buildTradeButton(
-                                  context), // Dropdown for Limit and Market
-                            ],
+                                const SizedBox(height: 20),
+                                _buildTakerFees(),
+                                // const SizedBox(height: 10),
+                                // _buildTotalExclFees(),
+                                const SizedBox(height: 10),
+                                _buildCost(),
+                                const Divider(
+                                    color: Colors.white54), // Divider line
+                                _buildAvailableBalance(), // Display available balance here
+                                const SizedBox(height: 20),
+                                _buildTradeButton(
+                                    context), // Dropdown for Limit and Market
+                              ],
+                            ),
                           ),
                         ),
+                        // OrderBook
+                        Expanded(
+                          flex: 4, // 4 parts out of 10
+                          child: TradeOrderBookWidget(pair: arguments['pair']),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+                    // Tab bar and view for orders
+                    Container(
+                      height: constraints.maxHeight - 300,
+                      child: Column(
+                        children: [
+                          Material(
+                            color: Theme.of(context).scaffoldBackgroundColor,
+                            child: const TabBar(
+                              tabs: [
+                                Tab(text: 'Open Orders'),
+                                Tab(text: 'Order History'),
+                              ],
+                              indicatorColor: Colors.orangeAccent,
+                              labelColor: Colors.white,
+                              unselectedLabelColor: Colors.grey,
+                            ),
+                          ),
+                          Expanded(
+                            child: TabBarView(
+                              children: [
+                                _buildOrdersList(_marketService, 'OPEN'),
+                                _buildOrdersList(_marketService, 'CLOSED'),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
-                      // OrderBook
-                      Expanded(
-                        flex: 4, // 4 parts out of 10
-                        child: TradeOrderBookWidget(pair: arguments['pair']),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(
-                      height: 10), // Some padding beneath the main row
-                  SizedBox(
-                    height: constraints.maxHeight - 300,
-                    child: _buildRecentTrades(),
-                  ),
-                ],
-              ),
-            );
-          },
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
         ),
       ),
     );
@@ -301,18 +334,159 @@ class TradeView extends StatelessWidget {
         ));
   }
 
-  // _buildTotalExclFees() {
-  //   return Obx(() => Row(
-  //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-  //         children: [
-  //           const Text("Total (excl. fees)",
-  //               style: TextStyle(color: Colors.white)),
-  //           Text(
-  //               "${_tradeController.totalExclFees.value.toStringAsFixed(2)} ${_tradeController.firstPairName}",
-  //               style: const TextStyle(color: Colors.white)),
-  //         ],
-  //       ));
-  // }
+  Widget _buildOrdersList(MarketService marketService, String statusFilter) {
+    return Obx(() {
+      // Retrieve the correct list based on the status filter
+      var filteredOrders = (statusFilter == 'OPEN')
+          ? _tradeController.openOrders
+          : _tradeController.orderHistory;
+
+      if (filteredOrders.isEmpty) {
+        return Align(
+          alignment: Alignment.topCenter,
+          child: Padding(
+            padding: const EdgeInsets.only(top: 20.0),
+            child: Text('No $statusFilter orders found'),
+          ),
+        );
+      }
+
+      return ListView.builder(
+        itemCount: filteredOrders.length,
+        itemBuilder: (context, index) {
+          final order = filteredOrders[index];
+          return _buildOrderCard(order, marketService, context);
+        },
+      );
+    });
+  }
+
+  Widget _buildOrderCard(
+      Order order, MarketService marketService, BuildContext context) {
+    return Card(
+      margin: const EdgeInsets.all(8),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text('Market:',
+                    style: TextStyle(fontWeight: FontWeight.bold)),
+                Text(order.symbol),
+              ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text('Date:',
+                    style: TextStyle(fontWeight: FontWeight.bold)),
+                // Use the created_at field directly since it's now a DateTime object
+                Text(DateFormat('MMMM dd, yyyy HH:mm:ss')
+                    .format(order.created_at)),
+              ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text('Side:',
+                    style: TextStyle(fontWeight: FontWeight.bold)),
+                Text(order.side),
+              ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text('Price:',
+                    style: TextStyle(fontWeight: FontWeight.bold)),
+                Text(order.price.toStringAsFixed(4)),
+              ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text('Amount:',
+                    style: TextStyle(fontWeight: FontWeight.bold)),
+                Text(order.amount.toString()),
+              ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text('Filled:',
+                    style: TextStyle(fontWeight: FontWeight.bold)),
+                Text(order.filled.toString()),
+              ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text('Status:',
+                    style: TextStyle(fontWeight: FontWeight.bold)),
+                Text(
+                  order.status,
+                  style: TextStyle(
+                    color: _getStatusColor(
+                        order.status), // Color the text based on the status
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+            if (order.status ==
+                'OPEN') // Only show cancel button for open orders
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  TextButton(
+                    onPressed: () async {
+                      bool success = await _marketService
+                          .cancelOrder(order.uuid); // Use UUID here
+                      if (success) {
+                        // Handle successful cancellation
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Order successfully cancelled.'),
+                            backgroundColor: Colors.green,
+                          ),
+                        );
+                        // Optionally, refresh the list or update the UI
+                      } else {
+                        // Handle cancellation failure
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Failed to cancel order.'),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                      }
+                    },
+                    child: Text('Cancel', style: TextStyle(color: Colors.red)),
+                  ),
+                ],
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Color _getStatusColor(String status) {
+    switch (status) {
+      case 'OPEN':
+        return Colors.orangeAccent;
+      case 'CLOSED':
+        return Colors.green;
+      case 'CANCELED':
+      case 'EXPIRED':
+      case 'REJECTED':
+        return Colors.redAccent;
+      default:
+        return Colors.grey;
+    }
+  }
 
   _buildCost() {
     return Obx(() => Row(

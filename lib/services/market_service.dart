@@ -348,6 +348,41 @@ class MarketService {
     }
   }
 
+  Future<bool> cancelOrder(String uuid) async {
+    final url = Uri.parse('${baseUrl}/api/exchange/orders/$uuid');
+    final response = await http.delete(url, headers: headers);
+
+    if (response.statusCode == 200) {
+      // Check the response body to confirm that the order was canceled
+      // You might need to adjust the logic based on your API's response structure
+      var responseData = json.decode(response.body);
+      return responseData['status'] == 'success';
+    } else {
+      // Handle errors or unsuccessful cancellation
+      print('Failed to cancel order: ${response.body}');
+      return false;
+    }
+  }
+
+  Future<List<Order>> fetchOrders() async {
+    final url = Uri.parse('${baseUrl}/api/exchange/orders');
+    final response = await http.get(url, headers: headers);
+
+    if (response.statusCode == 200) {
+      final jsonResponse = json.decode(response.body);
+      if (jsonResponse['status'] == 'success') {
+        List<Order> orders = List.from(jsonResponse['data']['result'])
+            .map((orderData) => Order.fromJson(orderData))
+            .toList();
+        return orders;
+      } else {
+        throw Exception('Failed to fetch orders');
+      }
+    } else {
+      throw Exception('Failed to fetch orders: ${response.statusCode}');
+    }
+  }
+
   Future<String> createOrder(String symbol, String type, String side,
       String amount, String price) async {
     final url = Uri.parse('${baseUrl}/api/exchange/orders');
@@ -474,6 +509,77 @@ class MarketMetadata {
       limits: json['limits'] ?? {},
       taker: (json['taker'] ?? 0.0).toDouble(),
       maker: (json['maker'] ?? 0.0).toDouble(),
+    );
+  }
+}
+
+class Order {
+  final int id;
+  final String uuid;
+  final String? referenceId;
+  final int userId;
+  final String status;
+  final String symbol;
+  final String type;
+  final String timeInForce;
+  final String side;
+  final double price;
+  final double? average;
+  final double amount;
+  final double filled;
+  final double remaining;
+  final double cost;
+  final List<dynamic>? trades;
+  final double fee;
+  final String feeCurrency;
+  final DateTime created_at;
+  final DateTime updatedAt;
+
+  Order({
+    required this.id,
+    required this.uuid,
+    this.referenceId,
+    required this.userId,
+    required this.status,
+    required this.symbol,
+    required this.type,
+    required this.timeInForce,
+    required this.side,
+    required this.price,
+    this.average,
+    required this.amount,
+    required this.filled,
+    required this.remaining,
+    required this.cost,
+    this.trades,
+    required this.fee,
+    required this.feeCurrency,
+    required this.created_at,
+    required this.updatedAt,
+  });
+
+  factory Order.fromJson(Map<String, dynamic> json) {
+    return Order(
+      id: json['id'],
+      uuid: json['uuid'],
+      referenceId: json['reference_id'],
+      userId: json['user_id'],
+      status: json['status'],
+      symbol: json['symbol'],
+      type: json['type'],
+      timeInForce: json['timeInForce'],
+      side: json['side'],
+      price: json['price'].toDouble(),
+      average: json['average']?.toDouble(),
+      amount: json['amount'].toDouble(),
+      filled: json['filled'].toDouble(),
+      remaining: json['remaining'].toDouble(),
+      cost: json['cost'].toDouble(),
+      trades: json['trades'],
+      fee: json['fee'].toDouble(),
+      feeCurrency: json['fee_currency'],
+      created_at: DateTime.parse(json['created_at']),
+      updatedAt: DateTime.parse(json['updated_at']),
     );
   }
 }

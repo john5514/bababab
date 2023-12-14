@@ -5,10 +5,12 @@ import 'package:bicrypto/Controllers/market/orederbook_controller.dart';
 import 'package:bicrypto/Controllers/wallets/spot%20wallet/spotWallet_controller.dart';
 import 'package:bicrypto/Routing/app_routes.dart';
 import 'package:bicrypto/services/api_service.dart';
+import 'package:bicrypto/services/market_service.dart';
 import 'package:bicrypto/services/profile_service.dart';
 import 'package:bicrypto/services/wallet_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:k_chart/flutter_k_chart.dart';
 import 'Style/styles.dart';
 import 'package:bicrypto/Controllers/Auth/login_controller.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
@@ -20,6 +22,7 @@ void main() async {
   // Pass the ApiService instance when creating WalletService
   Get.put(WalletService(apiService));
   Get.put(ApiService());
+  Get.put(MarketService(apiService));
   Get.put<ProfileService>(ProfileService(apiService));
   // Now put WalletSpotController in GetX
   Get.put(WalletSpotController(walletService: Get.find()));
