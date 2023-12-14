@@ -352,6 +352,10 @@ class MarketService {
     final url = Uri.parse('${baseUrl}/api/exchange/orders/$uuid');
     final response = await http.delete(url, headers: headers);
 
+    // Print the status code and response body for debugging
+    print('Cancel Order Response Status Code: ${response.statusCode}');
+    print('Cancel Order Response Body: ${response.body}');
+
     if (response.statusCode == 200) {
       // Check the response body to confirm that the order was canceled
       // You might need to adjust the logic based on your API's response structure
@@ -359,7 +363,7 @@ class MarketService {
       return responseData['status'] == 'success';
     } else {
       // Handle errors or unsuccessful cancellation
-      print('Failed to cancel order: ${response.body}');
+      print('Failed to cancel order: ${response.statusCode} ${response.body}');
       return false;
     }
   }

@@ -428,8 +428,7 @@ class TradeView extends StatelessWidget {
                 Text(
                   order.status,
                   style: TextStyle(
-                    color: _getStatusColor(
-                        order.status), // Color the text based on the status
+                    color: _getStatusColor(order.status),
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -437,33 +436,35 @@ class TradeView extends StatelessWidget {
             ),
             if (order.status ==
                 'OPEN') // Only show cancel button for open orders
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              Column(
                 children: [
-                  TextButton(
-                    onPressed: () async {
-                      bool success = await _marketService
-                          .cancelOrder(order.uuid); // Use UUID here
-                      if (success) {
-                        // Handle successful cancellation
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('Order successfully cancelled.'),
-                            backgroundColor: Colors.green,
-                          ),
-                        );
-                        // Optionally, refresh the list or update the UI
-                      } else {
-                        // Handle cancellation failure
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('Failed to cancel order.'),
-                            backgroundColor: Colors.red,
-                          ),
-                        );
-                      }
-                    },
-                    child: Text('Cancel', style: TextStyle(color: Colors.red)),
+                  Divider(color: Colors.grey[300]), // Light gray divider
+                  Align(
+                    // Center the cancel icon button
+                    alignment: Alignment.center,
+                    child: IconButton(
+                      icon: const Icon(Icons.cancel, color: Colors.red),
+                      onPressed: () async {
+                        bool success = await marketService
+                            .cancelOrder(order.uuid); // Use UUID here
+                        if (success) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Order successfully cancelled.'),
+                              backgroundColor: Colors.green,
+                            ),
+                          );
+                          // Optionally, refresh the list or update the UI
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Failed to cancel order.'),
+                              backgroundColor: Colors.red,
+                            ),
+                          );
+                        }
+                      },
+                    ),
                   ),
                 ],
               ),
