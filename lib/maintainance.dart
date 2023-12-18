@@ -35,13 +35,13 @@ class MaintenancePage extends StatelessWidget {
                   color: Colors.black54,
                 ),
               ),
-              const SizedBox(height: 30),
-              ElevatedButton(
-                onPressed: () {
-                  // Optional: Add logic to retry connection or reload the app
-                },
-                child: const Text('Retry'),
-              ),
+              // const SizedBox(height: 30),
+              // ElevatedButton(
+              //   onPressed: () {
+              //     // Optional: Add logic to retry connection or reload the app
+              //   },
+              //   child: const Text('Retry'),
+              // ),
             ],
           ),
         ),
