@@ -72,6 +72,7 @@ class NewsWidget extends StatelessWidget {
                     delegate: _SliverAppBarDelegate(
                       TabBar(
                         isScrollable: true,
+                        tabAlignment: TabAlignment.start,
                         tabs: newsController.categories
                             .map((category) => Tab(text: category))
                             .toList(),
