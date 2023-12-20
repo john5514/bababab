@@ -65,12 +65,17 @@ class WalletInfoController extends GetxController {
         'initiateStripePayment called with amount: $amount, currency: $currency');
 
     try {
-      double surcharge = amount * 0.05; // Calculate surcharge
-      double totalAmount = amount + surcharge;
-      print('Total amount with surcharge: $totalAmount');
+      double flatTax = 1.00; // Flat tax of $1
+      double percentageTaxRate = 0.03; // 3% tax
+      double percentageTax = amount * percentageTaxRate;
+      double totalAmount =
+          amount + flatTax + percentageTax; // Correct total amount with tax
 
-      final response = await WalletService(ApiService())
-          .callStripeIpnEndpoint(totalAmount, currency, surcharge);
+      // Log the calculated total amount for verification
+      print('Total amount to be paid: $totalAmount');
+
+      final response = await WalletService(ApiService()).callStripeIpnEndpoint(
+          totalAmount, currency, flatTax + percentageTax);
 
       print('Response from callStripeIpnEndpoint: $response');
 
@@ -81,8 +86,7 @@ class WalletInfoController extends GetxController {
         await Stripe.instance.initPaymentSheet(
           paymentSheetParameters: SetupPaymentSheetParameters(
             paymentIntentClientSecret: response['clientSecret'],
-            merchantDisplayName:
-                'Your Business Name', // Replace with your business name
+            merchantDisplayName: 'Your Business Name',
             style: ThemeMode.dark,
           ),
         );
@@ -94,8 +98,8 @@ class WalletInfoController extends GetxController {
             snackPosition: SnackPosition.BOTTOM);
 
         // Navigate to the home screen
-        Get.toNamed(
-            '/home'); // Replace '/home' with the route name of your home screen
+        Get.offAllNamed(
+            '/home'); // Make sure to navigate correctly based on your route setup
         print('Navigating to Home Screen');
       } else {
         print('Failed to receive a valid response or clientSecret');
