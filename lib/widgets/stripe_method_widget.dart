@@ -59,6 +59,7 @@ class _StripeMethodWidgetState extends State<StripeMethodWidget> {
                           await controller.initiateStripePayment(amount, "USD");
                         }
                       : null,
+                  // ignore: sort_child_properties_last
                   child: _isAgreedToTOS.value
                       ? const Text('Pay with Stripe')
                       : const Text('Accept TOS to continue'),

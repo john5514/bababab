@@ -44,7 +44,7 @@ dependencies:
   currency_symbols: ^0.0.1+2
   fl_chart: ^0.64.0
   intl: ^0.18.1
-  flutter_stripe: ^9.4.0
+  flutter_stripe: ^10.0.0
   syncfusion_flutter_charts: ^23.1.40
   k_chart: ^0.7.1
   web_socket_channel: ^2.4.0

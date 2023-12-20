@@ -41,17 +41,12 @@ class WalletService {
         url,
         headers: headers,
         body: jsonEncode({
-          'amount': (amount * 100)
-              .toInt(), // Convert to integer since Stripe expects amount in smallest currency unit
+          'amount': (amount * 100).toInt(), // Convert to integer for Stripe
           'currency': currency.toLowerCase(),
           'taxAmount': (taxAmount * 100).toInt(), // Convert to integer
+          'flutter': true, // Indicate this request is from a Flutter app
         }),
       );
-      // print('Loaded Headers: $headers');
-
-      // print(
-      //     'Response Status Code from Stripe IPN============: ${response?.statusCode}');
-      // print('Response Body from Stripe IPN===============: ${response?.body}');
 
       if (response?.statusCode == 200) {
         return jsonDecode(response!.body);
@@ -60,7 +55,7 @@ class WalletService {
       }
     } catch (e) {
       print('Error in callStripeIpnEndpoint: $e');
-      throw e; // Re-throwing the error so that any external caller can handle it if needed.
+      throw e;
     }
   }
 

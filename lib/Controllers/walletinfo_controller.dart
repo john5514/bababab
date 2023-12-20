@@ -1,3 +1,4 @@
+import 'package:bicrypto/Controllers/home_controller.dart';
 import 'package:bicrypto/services/api_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
@@ -60,27 +61,56 @@ class WalletInfoController extends GetxController {
   }
 
   Future<void> initiateStripePayment(double amount, String currency) async {
+    print(
+        'initiateStripePayment called with amount: $amount, currency: $currency');
+
     try {
-      // Calculate surcharge
-      double surcharge = amount * 0.05;
+      double surcharge = amount * 0.05; // Calculate surcharge
       double totalAmount = amount + surcharge;
+      print('Total amount with surcharge: $totalAmount');
 
       final response = await WalletService(ApiService())
           .callStripeIpnEndpoint(totalAmount, currency, surcharge);
-      // print('Response from Stripe IPN: $response');
 
-      if (response != null && response['url'] != null) {
-        // Parse the URL string into a Uri object.
-        final Uri checkoutUri = Uri.parse(response['url']);
+      print('Response from callStripeIpnEndpoint: $response');
 
-        if (await canLaunchUrl(checkoutUri)) {
-          await launchUrl(checkoutUri);
-        } else {
-          throw 'Could not launch $checkoutUri';
-        }
+      if (response != null && response['clientSecret'] != null) {
+        print('Received clientSecret: ${response['clientSecret']}');
+
+        // Initialize the payment sheet
+        await Stripe.instance.initPaymentSheet(
+          paymentSheetParameters: SetupPaymentSheetParameters(
+            paymentIntentClientSecret: response['clientSecret'],
+            merchantDisplayName:
+                'Your Business Name', // Replace with your business name
+            style: ThemeMode.dark,
+          ),
+        );
+
+        // Present the payment sheet
+        await Stripe.instance.presentPaymentSheet();
+        print('Payment is successful');
+        Get.snackbar('Success', 'Payment done successfully',
+            snackPosition: SnackPosition.BOTTOM);
+
+        // Navigate to the home screen
+        Get.toNamed(
+            '/home'); // Replace '/home' with the route name of your home screen
+        print('Navigating to Home Screen');
+      } else {
+        print('Failed to receive a valid response or clientSecret');
+        Get.snackbar('Error', 'Failed to initialize Stripe Payment Sheet',
+            snackPosition: SnackPosition.BOTTOM);
+        throw 'Failed to initialize Stripe Payment Sheet';
       }
+    } on StripeException catch (e) {
+      print('Payment failed: ${e.error.localizedMessage}');
+      Get.snackbar(
+          'Error', 'Stripe payment failed: ${e.error.localizedMessage}',
+          snackPosition: SnackPosition.BOTTOM);
+      // Handle the payment failure here, e.g., retry, display an error message, etc.
     } catch (e) {
-      print('Error: $e');
+      print('Error in initiateStripePayment: $e');
       Get.snackbar('Error', 'Stripe payment initiation failed: $e',
           snackPosition: SnackPosition.BOTTOM);
     }

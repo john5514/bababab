@@ -1,92 +1,111 @@
+import 'package:bicrypto/Controllers/wallets/spot%20wallet/spotWallet_controller.dart';
+import 'package:bicrypto/services/wallet_service.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:bicrypto/services/api_service.dart';
+import 'package:get/get.dart';
 
-class WalletSpotView extends StatefulWidget {
-  @override
-  _WebViewPageState createState() => _WebViewPageState();
-}
+class WalletSpotView extends StatelessWidget {
+  final WalletSpotController controller =
+      Get.put(WalletSpotController(walletService: Get.find<WalletService>()));
 
-class _WebViewPageState extends State<WalletSpotView>
-    with AutomaticKeepAliveClientMixin {
-  final apiService = ApiService();
-  InAppWebViewController? _webViewController;
-  PullToRefreshController? _pullToRefreshController;
-
-  @override
-  void initState() {
-    super.initState();
-    apiService.loadTokens();
-
-    _pullToRefreshController = PullToRefreshController(
-      options: PullToRefreshOptions(
-        color: Colors.blue,
-      ),
-      onRefresh: () async {
-        if (_webViewController != null) {
-          _webViewController!.reload();
-        }
-      },
-    );
-  }
-
-  Future<void> _setCookies(InAppWebViewController controller) async {
-    await apiService.loadTokens(); // Ensure the latest tokens are loaded.
-
-    CookieManager cookieManager = CookieManager.instance();
-
-    for (var entry in apiService.tokens.entries) {
-      var key = entry.key;
-      var value = entry.value;
-
-      if (value != null && value.isNotEmpty) {
-        await cookieManager.setCookie(
-          url: Uri.parse('https://v3.mash3div.com'),
-          name: key,
-          value: value,
-          domain: 'v3.mash3div.com',
-          path: '/',
-          isHttpOnly: false,
-          isSecure: true,
-          sameSite: HTTPCookieSameSitePolicy.LAX,
-        );
-      }
-    }
-
-    controller.loadUrl(
-      urlRequest: URLRequest(
-        url: Uri.parse('https://v3.mash3div.com/user/flutter/wallets/spot'),
-      ),
-    );
-  }
+  WalletSpotView({super.key});
 
   @override
   Widget build(BuildContext context) {
-    super.build(context);
     return Scaffold(
-      body: InAppWebView(
-        initialOptions: InAppWebViewGroupOptions(
-          crossPlatform: InAppWebViewOptions(
-            javaScriptEnabled: true,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        title: Obx(() => controller.isSearching.value
+            ? TextField(
+                onChanged: (value) => controller.filterCurrencies(value),
+                style: const TextStyle(color: Colors.white),
+                decoration: const InputDecoration(
+                  icon: Icon(Icons.search, color: Colors.white),
+                  hintText: "Search Currencies",
+                  hintStyle: TextStyle(color: Colors.white),
+                ),
+              )
+            : Text(
+                'Total Balance: \$${controller.totalEstimatedBalance.value.toStringAsFixed(2)}')),
+        actions: <Widget>[
+          Obx(() => controller.isSearching.value
+              ? IconButton(
+                  icon: const Icon(Icons.cancel),
+                  onPressed: () {
+                    controller.clearSearch();
+                  },
+                )
+              : IconButton(
+                  icon: const Icon(Icons.search),
+                  onPressed: () {
+                    controller.enableSearch();
+                  },
+                )),
+        ],
+      ),
+      body: Column(
+        children: [
+          Obx(() => Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  children: [
+                    Checkbox(
+                      value: controller.hideZeroBalances.value,
+                      onChanged: (bool? value) =>
+                          controller.setHideZeroBalances(value ?? false),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(4.0),
+                      ),
+                      // ignore: prefer_const_constructors
+                      side: BorderSide(color: Colors.grey),
+                      activeColor: Theme.of(context).hintColor,
+                    ),
+                    const Text(
+                      'Hide Zero Balances',
+                      style: TextStyle(color: Colors.grey, fontSize: 14),
+                    ),
+                  ],
+                ),
+              )),
+          Expanded(
+            child: Obx(() {
+              if (controller.isLoading.value) {
+                return const Center(child: CircularProgressIndicator());
+              }
+              return ListView.builder(
+                itemCount: controller.isSearching.isTrue
+                    ? controller.filteredCurrencies.length
+                    : controller.currencies.length,
+                itemBuilder: (context, index) {
+                  var currency = controller.isSearching.isTrue
+                      ? controller.filteredCurrencies[index]
+                      : controller.currencies[index];
+                  return ListTile(
+                    title: Text(
+                      currency['currency'], // Adjusted key
+                      style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16.0),
+                    ),
+                    subtitle: Text(
+                      currency['name'], // Adjusted key
+                      style:
+                          const TextStyle(color: Colors.white, fontSize: 14.0),
+                    ),
+                    trailing: Text(
+                      "${currency['balance']?.toStringAsFixed(1) ?? '0.0'}",
+                      style: const TextStyle(
+                          color: Colors.white, fontWeight: FontWeight.bold),
+                    ),
+                    onTap: () => controller.handleCurrencyTap(
+                        currency['currency']), // Adjusted key
+                  );
+                },
+              );
+            }),
           ),
-        ),
-        pullToRefreshController: _pullToRefreshController,
-        onWebViewCreated: (InAppWebViewController controller) {
-          _webViewController = controller;
-          _setCookies(controller);
-        },
-        onLoadStop: (controller, url) {
-          _pullToRefreshController?.endRefreshing();
-        },
-        onProgressChanged: (controller, progress) {
-          if (progress == 100) {
-            _pullToRefreshController?.endRefreshing();
-          }
-        },
+        ],
       ),
     );
   }
-
-  @override
-  bool get wantKeepAlive => true;
 }
