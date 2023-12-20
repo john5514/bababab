@@ -27,24 +27,24 @@ class SimplePairsListView extends StatelessWidget {
 
   Widget _buildHeader() {
     return Container(
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+      padding: const EdgeInsets.fromLTRB(16, 8, 24, 8),
       color: appTheme.scaffoldBackgroundColor,
       child: const Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Expanded(
-              flex: 6,
+              flex: 5,
               child: Text('Name / Vol',
                   style: TextStyle(
                       color: Colors.grey, fontFamily: 'Inter', fontSize: 12))),
           Expanded(
-              flex: 3,
+              flex: 4,
               child: Text('Last Price',
                   textAlign: TextAlign.end,
                   style: TextStyle(
                       color: Colors.grey, fontFamily: 'Inter', fontSize: 12))),
           Expanded(
-              flex: 3,
+              flex: 4,
               child: Text('24h Change',
                   textAlign: TextAlign.end,
                   style: TextStyle(
@@ -75,7 +75,7 @@ class SimplePairsListView extends StatelessWidget {
 
   Widget _buildNameAndVolume(Market market) {
     return Expanded(
-      flex: 6,
+      flex: 5,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -112,7 +112,7 @@ class SimplePairsListView extends StatelessWidget {
 
   Widget _buildLastPrice(Market market) {
     return Expanded(
-      flex: 3,
+      flex: 4,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.end,
@@ -144,7 +144,7 @@ class SimplePairsListView extends StatelessWidget {
 
   Widget _buildChange(Market market) {
     return Expanded(
-      flex: 3,
+      flex: 4,
       child: Container(
         padding: const EdgeInsets.only(
             left: 16), // Keep the padding to maintain distance from the edge

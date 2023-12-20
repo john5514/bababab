@@ -6,6 +6,9 @@ class NewsController extends GetxController {
   var newsList = <dynamic>[].obs;
   var page = 1.obs; // Track current page
   var showScrollToTopBtn = false.obs;
+  var categories = <String>[].obs; // Store unique categories
+  var newsByCategory =
+      <String, List<dynamic>>{}.obs; // News organized by category
 
   @override
   void onInit() {
@@ -26,6 +29,26 @@ class NewsController extends GetxController {
     } finally {
       isLoading(false);
     }
+    _extractCategories();
+    _organizeNewsByCategory();
+  }
+
+  void _extractCategories() {
+    Set<String> uniqueCategories = {};
+    for (var newsItem in newsList) {
+      uniqueCategories.addAll(newsItem['categories'].split('|'));
+    }
+    categories.assignAll(uniqueCategories);
+  }
+
+  void _organizeNewsByCategory() {
+    Map<String, List<dynamic>> organizedNews = {};
+    for (var category in categories) {
+      organizedNews[category] = newsList
+          .where((newsItem) => newsItem['categories'].contains(category))
+          .toList();
+    }
+    newsByCategory.assignAll(organizedNews);
   }
 
   void loadMore() {
