@@ -4,8 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:bicrypto/Controllers/Auth/profile/kyc_controller.dart';
 import 'package:bicrypto/Controllers/Auth/profile/profile_controller.dart';
 import 'package:bicrypto/Controllers/home_controller.dart';
-import 'package:bicrypto/Controllers/maintainace_controller.dart';
-import 'package:bicrypto/Controllers/market/orederbook_controller.dart';
+
 import 'package:bicrypto/Controllers/wallets/spot%20wallet/spotWallet_controller.dart';
 import 'package:bicrypto/Routing/app_routes.dart';
 import 'package:bicrypto/maintainance.dart';
@@ -30,7 +29,7 @@ void main() async {
   // Perform domain check using ProfileService
   try {
     final response =
-        await http.get(Uri.parse(profileService.baseUrl + '/api/auth/profile'));
+        await http.get(Uri.parse('${profileService.baseUrl}/api/auth/profile'));
     if (response.statusCode == 200) {
       initializeApp(apiService);
     } else {
