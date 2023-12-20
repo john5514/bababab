@@ -73,6 +73,16 @@ class NewsWidget extends StatelessWidget {
                       TabBar(
                         isScrollable: true,
                         tabAlignment: TabAlignment.start,
+                        dividerColor: Colors.transparent,
+                        labelColor: Theme.of(context)
+                            .colorScheme
+                            .onSurface, // Text color for selected tab
+                        unselectedLabelColor: Colors.white
+                            .withOpacity(0.6), // Text color for unselected tabs
+                        indicatorColor: Theme.of(context)
+                            .colorScheme
+                            .primary, // Color for the indicator
+                        indicatorSize: TabBarIndicatorSize.label,
                         tabs: newsController.categories
                             .map((category) => Tab(text: category))
                             .toList(),
