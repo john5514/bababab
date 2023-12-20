@@ -13,11 +13,10 @@ class SimpleMarketScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Access the app's theme data
     final ThemeData themeData = appTheme;
 
     // Define the border colors for each tab using the theme's color scheme
-    final List<Color> tabBorderColors = [
+    final List<Color> tabIndicatorColors = [
       themeData.colorScheme.secondary, // Green shade for 'Top Gainers'
       themeData.colorScheme.error, // Red shade for 'Top Losers'
       themeData.colorScheme.primary, // Orange shade for 'Trending'
@@ -27,32 +26,27 @@ class SimpleMarketScreen extends StatelessWidget {
     return Column(
       children: <Widget>[
         Obx(() {
-          // Use Obx to listen to tabIndex changes and rebuild the ButtonsTabBar
-          return ButtonsTabBar(
+          int tabIndex = _marketController.tabIndex.value;
+          return TabBar(
             controller: _marketController.tabController,
-            backgroundColor: themeData
-                .scaffoldBackgroundColor, // Use the scaffold background color
-            unselectedBackgroundColor: themeData
-                .scaffoldBackgroundColor, // Use the scaffold background color
-            labelStyle: themeData.textTheme.bodyLarge!.copyWith(
-                color:
-                    themeData.colorScheme.onSurface), // Use the onSurface color
+            labelStyle: themeData.textTheme.bodyLarge!
+                .copyWith(color: themeData.colorScheme.onSurface),
             unselectedLabelStyle: themeData.textTheme.bodyLarge!
                 .copyWith(color: Colors.white.withOpacity(0.6)),
-            borderWidth: 2,
-            borderColor: tabBorderColors[_marketController.tabIndex.value],
-
-            unselectedBorderColor:
-                appTheme.colorScheme.onSurface.withOpacity(0.1),
-            radius: 8,
-            contentPadding: const EdgeInsets.symmetric(horizontal: 11),
-            buttonMargin: const EdgeInsets.symmetric(horizontal: 4),
-            physics: const BouncingScrollPhysics(),
+            indicator: BoxDecoration(
+              border: Border(
+                bottom: BorderSide(
+                  color: tabIndicatorColors[
+                      tabIndex], // Selected tab's border color
+                  width: 2.0, // Width of the border
+                ),
+              ),
+            ),
             tabs: const [
-              Tab(icon: Icon(Icons.trending_up), text: 'Top Gainers'),
-              Tab(icon: Icon(Icons.trending_down), text: 'Top Losers'),
-              Tab(icon: Icon(Icons.trending_flat), text: 'Trending'),
-              Tab(icon: Icon(Icons.whatshot), text: 'Hot'),
+              Tab(text: 'Gainers'),
+              Tab(text: 'Losers'),
+              Tab(text: 'Trending'),
+              Tab(text: 'Hot'),
             ],
           );
         }),
