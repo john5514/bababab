@@ -117,61 +117,63 @@ class NewsWidget extends StatelessWidget {
         DateTime.fromMillisecondsSinceEpoch(newsItem['published_on'] * 1000);
     var relativeTime = timeago.format(publishedDate, locale: 'en_short');
 
-    return Column(
-      children: [
-        const SizedBox(height: 16), // Spacing before the item
-        Card(
-          color: Colors.transparent,
-          elevation: 0,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              ListTile(
-                leading: CircleAvatar(
-                  backgroundImage: NetworkImage(newsItem['source_info']['img']),
+    // Wrap the entire column in a GestureDetector
+    return GestureDetector(
+      onTap: () {
+        showNewsDetailsPopup(context, newsItem);
+      },
+      child: Column(
+        children: [
+          const SizedBox(height: 16), // Spacing before the item
+          Card(
+            color: Colors.transparent,
+            elevation: 0,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                ListTile(
+                  leading: CircleAvatar(
+                    backgroundImage:
+                        NetworkImage(newsItem['source_info']['img']),
+                  ),
+                  title: Text(
+                    newsItem['source_info']['name'],
+                    style: const TextStyle(
+                        color: Colors.white, fontFamily: 'Inter'),
+                  ),
+                  subtitle: Text(
+                    "$relativeTime ago",
+                    style:
+                        TextStyle(color: Colors.grey[400], fontFamily: 'Inter'),
+                  ),
                 ),
-                title: Text(
-                  newsItem['source_info']['name'],
-                  style:
-                      const TextStyle(color: Colors.white, fontFamily: 'Inter'),
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 16.0, vertical: 8.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        newsItem['title'],
+                        style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontFamily: 'Inter',
+                            fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        newsItem['body'],
+                        style: TextStyle(
+                            color: Colors.grey[350], fontFamily: 'Inter'),
+                        maxLines: 4,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
                 ),
-                subtitle: Text(
-                  "$relativeTime ago",
-                  style:
-                      TextStyle(color: Colors.grey[400], fontFamily: 'Inter'),
-                ),
-              ),
-              Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      newsItem['title'],
-                      style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontFamily: 'Inter',
-                          fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      newsItem['body'],
-                      style: TextStyle(
-                          color: Colors.grey[350], fontFamily: 'Inter'),
-                      maxLines: 4,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
-                ),
-              ),
-              newsItem['imageurl'] != null
-                  ? GestureDetector(
-                      onTap: () {
-                        showNewsDetailsPopup(context, newsItem);
-                      },
-                      child: Container(
+                newsItem['imageurl'] != null
+                    ? Container(
                         padding: const EdgeInsets.symmetric(horizontal: 16.0),
                         width: double.infinity,
                         height: 180.0,
@@ -182,18 +184,18 @@ class NewsWidget extends StatelessWidget {
                             fit: BoxFit.cover,
                           ),
                         ),
-                      ),
-                    )
-                  : Container(),
-            ],
+                      )
+                    : Container(),
+              ],
+            ),
           ),
-        ),
-        const SizedBox(height: 16), // Spacing after the item
-        Container(
-          height: 5, // The height of the divider
-          color: const Color.fromARGB(255, 0, 0, 0), // Color of the divider
-        ),
-      ],
+          const SizedBox(height: 16), // Spacing after the item
+          Container(
+            height: 5, // The height of the divider
+            color: const Color.fromARGB(255, 0, 0, 0), // Color of the divider
+          ),
+        ],
+      ),
     );
   }
 
