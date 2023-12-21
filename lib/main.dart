@@ -68,8 +68,10 @@ Future<void> initializeApp(ApiService apiService, ProfileService profileService,
 
   // Check login status
   await loginController.init();
-  Stripe.publishableKey =
-      'pk_test_51LPVEfLFyngRnuDVzYJ2cb5yF2BsE4fELcGumnvgjuLCCPWjHpEeDMVz6DOSilTNc2FihuK91zbNurhhyRZT0qTI000Zc1hT5B';
+
+  Stripe.publishableKey = const String.fromEnvironment('STRIPE_PUBLISHABLE_KEY',
+      defaultValue:
+          'pk_test_51LPVEfLFyngRnuDVzYJ2cb5yF2BsE4fELcGumnvgjuLCCPWjHpEeDMVz6DOSilTNc2FihuK91zbNurhhyRZT0qTI000Zc1hT5B');
 
   runApp(const MyApp());
 }
