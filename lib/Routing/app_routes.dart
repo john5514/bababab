@@ -1,3 +1,4 @@
+import 'package:bicrypto/Controllers/walletinfo_controller.dart';
 import 'package:bicrypto/views/Auth/emailverification.dart';
 import 'package:bicrypto/views/Auth/login_view.dart';
 import 'package:bicrypto/views/Auth/profile/otp_verification_screen.dart';
@@ -68,7 +69,19 @@ class AppRoutes {
       },
     ),
 
-    GetPage(name: '/stripe_method', page: () => StripeMethodWidget()),
+    GetPage(
+      name: '/stripe_method',
+      page: () {
+        final arguments = Get.arguments as Map<String, dynamic>?;
+        if (arguments != null) {
+          final method = arguments['method'] as Map<String, dynamic>;
+          final controller = Get.find<WalletInfoController>();
+          controller.selectedMethod.value = method;
+        }
+        return StripeMethodWidget();
+      },
+    ),
+
     GetPage(
       name: '/chart',
       page: () => ChartPage(pair: Get.arguments as String),

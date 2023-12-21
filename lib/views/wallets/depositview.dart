@@ -13,6 +13,7 @@ class DepositView extends StatelessWidget {
     final WalletInfoController controller = Get.find();
     // ignore: unused_local_variable
     final Map<String, dynamic> walletInfo = Get.arguments;
+    controller.refreshDepositOptions();
 
     return Scaffold(
       appBar: AppBar(

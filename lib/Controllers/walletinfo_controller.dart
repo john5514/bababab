@@ -42,6 +42,10 @@ class WalletInfoController extends GetxController {
     }
   }
 
+  void refreshDepositOptions() {
+    fetchAllDepositOptions();
+  }
+
 // Method to initialize wallet information
   void initializeWalletInfo(
       Map<String, dynamic> walletInfo, Map<String, dynamic> selectedMethod) {
@@ -50,7 +54,11 @@ class WalletInfoController extends GetxController {
         ? walletInfo['balance'].toDouble()
         : (walletInfo['balance'] ?? 0.0);
 
+    // Set new wallet info
     setWalletInfo(walletName, walletBalance, walletInfo, selectedMethod);
+
+    // Fetch new deposit options for the selected wallet
+    fetchAllDepositOptions();
   }
 
   @override
@@ -66,14 +74,22 @@ class WalletInfoController extends GetxController {
         'initiateStripePayment called with amount: $amount, currency: $currency');
 
     try {
-      double flatTax = 1.00; // Flat tax of $1
-      double percentageTaxRate = 0.03; // 3% tax
-      double percentageTax = amount * percentageTaxRate;
-      double totalAmount =
-          amount + flatTax + percentageTax; // Correct total amount with tax
+      if (selectedMethod.value == null) {
+        throw 'No payment method selected';
+      }
+      print('Selected method details: ${selectedMethod.value}');
 
-      // Log the calculated total amount for verification
-      print('Total amount to be paid: $totalAmount');
+      double flatTax = selectedMethod.value?['fixed_fee']?.toDouble() ?? 0.0;
+      double percentageTaxRate =
+          (selectedMethod.value?['percentage_fee'] ?? 0) / 100;
+      double percentageTax = amount * percentageTaxRate;
+      double totalAmount = amount + flatTax + percentageTax;
+
+      // Debugging print statements
+      print('Flat Tax: $flatTax');
+      print('Percentage Tax Rate: $percentageTaxRate');
+      print('Percentage Tax: $percentageTax');
+      print('Total amount to be paid with tax: $totalAmount');
 
       final response = await WalletService(ApiService()).callStripeIpnEndpoint(
           totalAmount, currency, flatTax + percentageTax);
@@ -83,7 +99,6 @@ class WalletInfoController extends GetxController {
       if (response != null && response['clientSecret'] != null) {
         print('Received clientSecret: ${response['clientSecret']}');
 
-        // Initialize the payment sheet
         await Stripe.instance.initPaymentSheet(
           paymentSheetParameters: SetupPaymentSheetParameters(
             paymentIntentClientSecret: response['clientSecret'],
@@ -92,15 +107,11 @@ class WalletInfoController extends GetxController {
           ),
         );
 
-        // Present the payment sheet
         await Stripe.instance.presentPaymentSheet();
         print('Payment is successful');
         Get.snackbar('Success', 'Payment done successfully',
             snackPosition: SnackPosition.BOTTOM);
-
-        // Navigate to the home screen
-        Get.offAllNamed(
-            '/home'); // Make sure to navigate correctly based on your route setup
+        Get.offAllNamed('/home');
         print('Navigating to Home Screen');
       } else {
         print('Failed to receive a valid response or clientSecret');
@@ -113,7 +124,6 @@ class WalletInfoController extends GetxController {
       Get.snackbar(
           'Error', 'Stripe payment failed: ${e.error.localizedMessage}',
           snackPosition: SnackPosition.BOTTOM);
-      // Handle the payment failure here, e.g., retry, display an error message, etc.
     } catch (e) {
       print('Error in initiateStripePayment: $e');
       Get.snackbar('Error', 'Stripe payment initiation failed: $e',
@@ -122,19 +132,32 @@ class WalletInfoController extends GetxController {
   }
 
   Future<void> fetchAllDepositOptions() async {
+    print(
+        "Fetching deposit options for wallet: ${walletInfo.value['currency']}");
+
     try {
       isLoading(true);
+
+      // Clear existing methods
+      fiatDepositMethods.clear();
 
       // Fetch deposit methods and gateways
       var methods = await walletService.fetchFiatDepositMethods();
       var gateways = await walletService.fetchFiatDepositGateways();
 
-      // Filter out PayPal from gateways
-      var filteredGateways =
-          gateways.where((gateway) => gateway['name'] != 'PayPal').toList();
+      // Get the wallet's currency
+      String walletCurrency = walletInfo.value['currency'] ?? '';
 
-      // Combine methods and filtered gateways into a single list
-      var allOptions = [...methods, ...filteredGateways];
+      // Filter out PayPal and gateways that do not support the wallet's currency
+      var supportedGateways = gateways.where((gateway) {
+        bool isNotPayPal = gateway['name'] != 'PayPal';
+        bool supportsWalletCurrency =
+            gateway['currencies']?.containsKey(walletCurrency) ?? false;
+        return isNotPayPal && supportsWalletCurrency;
+      }).toList();
+
+      // Combine methods and supported gateways into a single list
+      var allOptions = [...methods, ...supportedGateways];
 
       fiatDepositMethods.assignAll(allOptions);
     } catch (e) {
