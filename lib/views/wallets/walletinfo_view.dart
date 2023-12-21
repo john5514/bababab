@@ -21,57 +21,67 @@ class WalletInfoView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    ThemeData theme = appTheme; // Assuming appTheme is a ThemeData object.
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
           '${walletInfoController.walletName.value} Wallet',
-          style: TextStyle(color: appTheme.secondaryHeaderColor),
+          style: theme.textTheme.titleLarge
+              ?.copyWith(color: theme.colorScheme.onSurface),
         ),
-        backgroundColor: appTheme.scaffoldBackgroundColor,
+        backgroundColor: theme.scaffoldBackgroundColor,
         elevation: 0,
+        centerTitle:
+            true, // Center the title if that aligns with your design language
       ),
       body: Obx(
-        () => Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const SizedBox(height: 20),
-                // Display wallet balance with enhanced UI
-                Text(
-                  '${walletInfoController.walletName.value} Balance: ${walletInfoController.walletBalance.value}',
-                  style: appTheme.textTheme.bodyLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    fontFamily: 'Inter',
-                    fontSize: 24,
-                  ),
+        () => Padding(
+          padding: const EdgeInsets.all(
+              4.0), // Add padding around the content for better spacing
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: ListView(
+                  // Use a ListView for better handling of small screen sizes
+                  children: [
+                    const SizedBox(height: 20),
+                    // Display wallet balance with enhanced UI
+                    Text(
+                      '${walletInfoController.walletName.value} Balance: ${walletInfoController.walletBalance.value.toStringAsFixed(2)}', // Assuming balance is a double, format it
+                      style: theme.textTheme.displayLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: theme.colorScheme
+                            .onSurface, // Use the primary color for the balance
+                      ),
+                      textAlign: TextAlign.center, // Center the text
+                    ),
+                    const SizedBox(height: 20),
+                    // Display income and expense with icons
+                    incomeOutcome(),
+                    const SizedBox(
+                        height: 40), // Adjust the space between elements
+                    Text(
+                      'Weekly Summary (Last 7 Days)',
+                      style: theme.textTheme.headline6?.copyWith(
+                        color: theme.colorScheme
+                            .onSurface, // Use the secondary color for subtitles
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.center, // Center the text
+                    ),
+                    const SizedBox(height: 20),
+                    weeklytranssummarychart(),
+                  ],
                 ),
-                const SizedBox(height: 20),
-                // Display income and expense with icons
-                incomeOutcome(),
-
-                const SizedBox(height: 80),
-                Text(
-                  'Weekly Summary (Last 7 Days)',
-                  style: appTheme.textTheme.bodyLarge?.copyWith(
-                    color: const Color.fromARGB(255, 255, 255, 255),
-                    fontWeight: FontWeight.bold,
-                    fontFamily: 'Inter',
-                    fontSize: 20, // Adjust the font size as needed
-                  ),
-                ),
-
-                weeklytranssummarychart(),
-
-                const SizedBox(height: 40),
-              ],
-            ),
-            actionBtns(),
-          ],
+              ),
+              actionBtns(), // This will stick to the bottom due to the MainAxisAlignment.spaceBetween in the column
+            ],
+          ),
         ),
       ),
-      backgroundColor: appTheme.scaffoldBackgroundColor,
+      backgroundColor: theme.scaffoldBackgroundColor,
     );
   }
 
@@ -79,7 +89,9 @@ class WalletInfoView extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        const Icon(Icons.arrow_upward, color: Colors.green), // Income Icon
+        Icon(Icons.trending_up,
+            color: appTheme.colorScheme.secondary), // Updated icon
+        const SizedBox(width: 8), // Slightly reduce the spacing
         Obx(() {
           Map<String, double> balance =
               walletController.calculateBalanceForCurrency(
@@ -89,15 +101,15 @@ class WalletInfoView extends StatelessWidget {
           return Text(
             '+$currencySymbol${balance['income']?.toStringAsFixed(2)}',
             style: appTheme.textTheme.bodyLarge?.copyWith(
-              color: Colors.green,
+              color: appTheme.colorScheme.primary, // Use theme's primary color
               fontWeight: FontWeight.bold,
-              fontFamily: 'Inter',
-              fontSize: 20, // Adjust the font size as needed
             ),
           );
         }),
-        const SizedBox(width: 20),
-        const Icon(Icons.arrow_downward, color: Colors.red), // Expense Icon
+        const SizedBox(width: 20), // Keep the spacing for visual separation
+        Icon(Icons.trending_down,
+            color: appTheme.colorScheme.error), // Updated icon
+        const SizedBox(width: 8), // Slightly reduce the spacing
         Obx(() {
           Map<String, double> balance =
               walletController.calculateBalanceForCurrency(
@@ -107,10 +119,8 @@ class WalletInfoView extends StatelessWidget {
           return Text(
             '-$currencySymbol${balance['expense']?.toStringAsFixed(2)}',
             style: appTheme.textTheme.bodyLarge?.copyWith(
-              color: Colors.red,
+              color: appTheme.colorScheme.error, // Use theme's error color
               fontWeight: FontWeight.bold,
-              fontFamily: 'Inter',
-              fontSize: 20, // Adjust the font size as needed
             ),
           );
         }),
@@ -120,12 +130,15 @@ class WalletInfoView extends StatelessWidget {
 
   Padding actionBtns() {
     return Padding(
-      padding: const EdgeInsets.all(10.0),
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           Expanded(
-            child: OutlinedButton(
+            child: ElevatedButton.icon(
+              icon: Icon(Icons.account_balance_wallet,
+                  color: appTheme.colorScheme.onPrimary),
+              label: Text('Deposit'),
               onPressed: () {
                 Get.toNamed('/deposit', arguments: {
                   'walletName': walletInfoController.walletName.value,
@@ -134,19 +147,23 @@ class WalletInfoView extends StatelessWidget {
                       .walletInfo.value, // Include walletInfo
                 });
               },
-              style: OutlinedButton.styleFrom(
-                side: const BorderSide(color: Colors.green),
-                padding: const EdgeInsets.all(15),
-              ),
-              child: const Text(
-                'Deposit',
-                style: TextStyle(color: Colors.green),
+              style: ElevatedButton.styleFrom(
+                primary:
+                    appTheme.colorScheme.primary, // Button background color
+                onPrimary:
+                    appTheme.colorScheme.onPrimary, // Text and icon color
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(30),
+                ),
               ),
             ),
           ),
-          const SizedBox(width: 10),
+          const SizedBox(width: 20),
           Expanded(
-            child: OutlinedButton(
+            child: ElevatedButton.icon(
+              icon: Icon(Icons.money_off, color: appTheme.colorScheme.onError),
+              label: Text('Withdraw'),
               onPressed: () {
                 Get.toNamed('/withdraw', arguments: {
                   'walletName': walletInfoController.walletName.value,
@@ -155,13 +172,14 @@ class WalletInfoView extends StatelessWidget {
                       .walletInfo.value, // Include walletInfo
                 });
               },
-              style: OutlinedButton.styleFrom(
-                side: const BorderSide(color: Colors.red),
-                padding: const EdgeInsets.all(15),
+              style: ElevatedButton.styleFrom(
+                primary: appTheme.colorScheme.error, // Button background color
+                onPrimary: appTheme.colorScheme.onError, // Text and icon color
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(30),
+                ),
               ),
-              // Rest of the button styling
-              child:
-                  const Text('Withdraw', style: TextStyle(color: Colors.red)),
             ),
           ),
         ],
@@ -173,112 +191,130 @@ class WalletInfoView extends StatelessWidget {
     return AspectRatio(
       aspectRatio: 1,
       child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Container(
-          height: 300,
-          color: const Color.fromARGB(255, 17, 1, 39), // Twilight background
-          child: BarChart(
-            BarChartData(
-              maxY: getMaxY(), // <-- Use the dynamic maxY
-              barTouchData: BarTouchData(
-                touchTooltipData: BarTouchTooltipData(
-                  tooltipBgColor: Colors.grey,
-                  getTooltipItem: (a, b, c, d) => null,
-                ),
-              ),
-              titlesData: FlTitlesData(
-                show: true,
-                leftTitles: AxisTitles(
-                  sideTitles: SideTitles(
-                    showTitles: true,
-                    reservedSize: 38,
-                    getTitlesWidget: (double value, TitleMeta meta) {
-                      switch (value.toInt()) {
-                        case 0:
-                          return const Text('0k',
-                              style:
-                                  TextStyle(color: Colors.grey, fontSize: 14));
-                        case 5:
-                          return const Text('5k',
-                              style:
-                                  TextStyle(color: Colors.grey, fontSize: 14));
-                        case 10:
-                          return const Text('10k',
-                              style:
-                                  TextStyle(color: Colors.grey, fontSize: 14));
-                        case 15:
-                          return const Text('15k',
-                              style:
-                                  TextStyle(color: Colors.grey, fontSize: 14));
-                        case 20:
-                          return const Text('20k',
-                              style:
-                                  TextStyle(color: Colors.grey, fontSize: 14));
-                        default:
-                          return const Text(
-                              ''); // Return empty string for other values
-                      }
-                    },
+        padding: const EdgeInsets.all(8), // Reduced padding
+        child: SizedBox(
+          // Use SizedBox to set minimum height
+          height: 350, // Set a minimum height for the card
+          child: Card(
+            elevation: 4,
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            color: appTheme.cardColor,
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: BarChart(
+                BarChartData(
+                  maxY: getMaxY(), // <-- Use the dynamic maxY
+                  barTouchData: BarTouchData(
+                    touchTooltipData: BarTouchTooltipData(
+                      tooltipBgColor: Colors.grey,
+                      getTooltipItem: (a, b, c, d) => null,
+                    ),
                   ),
-                ),
-                bottomTitles: AxisTitles(
-                  sideTitles: SideTitles(
-                    showTitles: true,
-                    reservedSize: 80,
-                    getTitlesWidget: (double value, TitleMeta meta) {
-                      final titles = ['Mn', 'Te', 'Wd', 'Tu', 'Fr', 'St', 'Su'];
-                      return Padding(
-                        padding: const EdgeInsets.only(
-                            top: 20), // Adjust this value to your liking
-                        child: Text(
-                          titles[value.toInt()],
-                          style:
-                              const TextStyle(color: Colors.grey, fontSize: 14),
+                  titlesData: FlTitlesData(
+                    show: true,
+                    leftTitles: AxisTitles(
+                      sideTitles: SideTitles(
+                        showTitles: true,
+                        reservedSize: 38,
+                        getTitlesWidget: (double value, TitleMeta meta) {
+                          switch (value.toInt()) {
+                            case 0:
+                              return const Text('0k',
+                                  style: TextStyle(
+                                      color: Colors.grey, fontSize: 14));
+                            case 5:
+                              return const Text('5k',
+                                  style: TextStyle(
+                                      color: Colors.grey, fontSize: 14));
+                            case 10:
+                              return const Text('10k',
+                                  style: TextStyle(
+                                      color: Colors.grey, fontSize: 14));
+                            case 15:
+                              return const Text('15k',
+                                  style: TextStyle(
+                                      color: Colors.grey, fontSize: 14));
+                            case 20:
+                              return const Text('20k',
+                                  style: TextStyle(
+                                      color: Colors.grey, fontSize: 14));
+                            default:
+                              return const Text(
+                                  ''); // Return empty string for other values
+                          }
+                        },
+                      ),
+                    ),
+                    bottomTitles: AxisTitles(
+                      sideTitles: SideTitles(
+                        showTitles: true,
+                        reservedSize: 80,
+                        getTitlesWidget: (double value, TitleMeta meta) {
+                          final titles = [
+                            'Mn',
+                            'Te',
+                            'Wd',
+                            'Tu',
+                            'Fr',
+                            'St',
+                            'Su'
+                          ];
+                          return Padding(
+                            padding: const EdgeInsets.only(
+                                top: 20), // Adjust this value to your liking
+                            child: Text(
+                              titles[value.toInt()],
+                              style: const TextStyle(
+                                  color: Colors.grey, fontSize: 14),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+
+                  barGroups: walletController.weeklySummaries.map((summary) {
+                    int index =
+                        walletController.weeklySummaries.indexOf(summary);
+
+                    double incomeHeight =
+                        (summary.income > 20000 ? 20000 : summary.income) /
+                            1000; // Normalize and cap at 20,000
+                    double expenseHeight =
+                        (summary.expense > 20000 ? 20000 : summary.expense) /
+                            1000; // Normalize and cap at 20,000
+
+                    Color incomeColor = summary.income > 20000
+                        ? Colors.yellow
+                        : leftBarColor; // Set to yellow if exceeds limit
+                    Color expenseColor = summary.expense > 20000
+                        ? Colors.yellow
+                        : rightBarColor; // Set to yellow if exceeds limit
+
+                    return BarChartGroupData(
+                      x: index,
+                      barRods: [
+                        BarChartRodData(
+                          toY: incomeHeight,
+                          color: incomeColor,
+                          width: barWidth,
+                          borderRadius: BorderRadius.circular(6),
                         ),
-                      );
-                    },
-                  ),
+                        BarChartRodData(
+                          toY: expenseHeight,
+                          color: expenseColor,
+                          width: barWidth,
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                      ],
+                    );
+                  }).toList(),
+
+                  borderData: FlBorderData(show: false), // Remove border
+                  gridData: const FlGridData(show: false),
                 ),
               ),
-
-              barGroups: walletController.weeklySummaries.map((summary) {
-                int index = walletController.weeklySummaries.indexOf(summary);
-
-                double incomeHeight =
-                    (summary.income > 20000 ? 20000 : summary.income) /
-                        1000; // Normalize and cap at 20,000
-                double expenseHeight =
-                    (summary.expense > 20000 ? 20000 : summary.expense) /
-                        1000; // Normalize and cap at 20,000
-
-                Color incomeColor = summary.income > 20000
-                    ? Colors.yellow
-                    : leftBarColor; // Set to yellow if exceeds limit
-                Color expenseColor = summary.expense > 20000
-                    ? Colors.yellow
-                    : rightBarColor; // Set to yellow if exceeds limit
-
-                return BarChartGroupData(
-                  x: index,
-                  barRods: [
-                    BarChartRodData(
-                      toY: incomeHeight,
-                      color: incomeColor,
-                      width: barWidth,
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    BarChartRodData(
-                      toY: expenseHeight,
-                      color: expenseColor,
-                      width: barWidth,
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                  ],
-                );
-              }).toList(),
-
-              borderData: FlBorderData(show: false), // Remove border
-              gridData: const FlGridData(show: false),
             ),
           ),
         ),
