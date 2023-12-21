@@ -7,6 +7,8 @@ class ApiService {
       defaultValue: 'v3.mash3div.com');
 
   // Build the full URL by prepending 'https://'
+  String get baseDomainUrl => 'https://$domain/';
+
   String get baseUrl => 'https://$domain/api/auth/';
   Map<String, String?> tokens = {
     'access-token': null,

@@ -41,10 +41,10 @@ class _WebViewPageState extends State<KYCScreen>
 
       if (value != null && value.isNotEmpty) {
         await cookieManager.setCookie(
-          url: Uri.parse('https://v3.mash3div.com'),
+          url: Uri.parse(apiService.baseDomainUrl),
           name: key,
           value: value,
-          domain: 'v3.mash3div.com',
+          domain: Uri.parse(apiService.baseDomainUrl).host,
           path: '/',
           isHttpOnly: false,
           isSecure: true,
@@ -55,7 +55,7 @@ class _WebViewPageState extends State<KYCScreen>
 
     controller.loadUrl(
       urlRequest: URLRequest(
-        url: Uri.parse('https://v3.mash3div.com/user/flutter/kyc'),
+        url: Uri.parse('${apiService.baseDomainUrl}/user/flutter/kyc'),
       ),
     );
   }
@@ -82,6 +82,11 @@ class _WebViewPageState extends State<KYCScreen>
           if (progress == 100) {
             _pullToRefreshController?.endRefreshing();
           }
+        },
+        onReceivedServerTrustAuthRequest: (controller, challenge) async {
+          // Bypass SSL certificate errors, only for development use
+          return ServerTrustAuthResponse(
+              action: ServerTrustAuthResponseAction.PROCEED);
         },
       ),
     );

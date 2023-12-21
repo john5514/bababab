@@ -43,10 +43,12 @@ class _CurrencySpotViewState extends State<CurrencySpotView>
       var value = entry.value;
       if (value != null && value.isNotEmpty) {
         await cookieManager.setCookie(
-          url: Uri.parse('https://v3.mash3div.com'),
+          url: Uri.parse(
+              apiService.baseDomainUrl), // Use base domain from ApiService
           name: key,
           value: value,
-          domain: 'v3.mash3div.com',
+          domain: Uri.parse(apiService.baseDomainUrl)
+              .host, // Use host from ApiService
           path: '/',
           isHttpOnly: false,
           isSecure: true,
@@ -56,7 +58,7 @@ class _CurrencySpotViewState extends State<CurrencySpotView>
     }
 
     String url =
-        'https://v3.mash3div.com/user/flutter/wallets/spot/${widget.currencyCode.toLowerCase()}';
+        '${apiService.baseDomainUrl}/user/flutter/wallets/spot/${widget.currencyCode.toLowerCase()}';
     controller.loadUrl(urlRequest: URLRequest(url: Uri.parse(url)));
   }
 
@@ -72,7 +74,7 @@ class _CurrencySpotViewState extends State<CurrencySpotView>
         ),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(5.0), // Apply general padding of 5 pixels
+        padding: const EdgeInsets.all(5.0),
         child: InAppWebView(
           initialOptions: InAppWebViewGroupOptions(
             crossPlatform: InAppWebViewOptions(
@@ -91,6 +93,11 @@ class _CurrencySpotViewState extends State<CurrencySpotView>
             if (progress == 100) {
               _pullToRefreshController?.endRefreshing();
             }
+          },
+          onReceivedServerTrustAuthRequest: (controller, challenge) async {
+            // Bypass SSL certificate errors, only for development use
+            return ServerTrustAuthResponse(
+                action: ServerTrustAuthResponseAction.PROCEED);
           },
         ),
       ),

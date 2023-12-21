@@ -509,6 +509,9 @@ class TradeView extends StatelessWidget {
         orElse: () => {'balance': 0.0} // Default to 0 if not found
         )['balance'];
 
+    // Check if currencyBalance is null and set it to 0.0 if it is
+    currencyBalance = currencyBalance ?? 0.0;
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -730,9 +733,14 @@ class TradeView extends StatelessWidget {
 
   Widget _buildSlider() {
     return Obx(() {
-      double maxSliderValue = _walletSpotController.currencies.firstWhere(
-          (currency) => currency['currency'] == _tradeController.secondPairName,
-          orElse: () => {'balance': 0.0})['balance'];
+      // Attempt to find the currency balance and cast it to a double.
+      // If the balance is null or the currency isn't found, default to 0.0.
+      double maxSliderValue = (_walletSpotController.currencies.firstWhere(
+                  (currency) =>
+                      currency['currency'] == _tradeController.secondPairName,
+                  orElse: () => {'balance': 0.0})['balance'] as num? ??
+              0.0)
+          .toDouble();
 
       // Update the available balance in the controller
       _tradeController.updateAvailableBalance(maxSliderValue);

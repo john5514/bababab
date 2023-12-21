@@ -40,10 +40,10 @@ class _WebViewPageState extends State<TwoStepVerificationScreen>
 
       if (value != null && value.isNotEmpty) {
         await cookieManager.setCookie(
-          url: Uri.parse('https://v3.mash3div.com'),
+          url: Uri.parse(apiService.baseDomainUrl),
           name: key,
           value: value,
-          domain: 'v3.mash3div.com',
+          domain: Uri.parse(apiService.baseDomainUrl).host,
           path: '/',
           isHttpOnly: false,
           isSecure: true,
@@ -54,7 +54,8 @@ class _WebViewPageState extends State<TwoStepVerificationScreen>
 
     controller.loadUrl(
       urlRequest: URLRequest(
-        url: Uri.parse('https://v3.mash3div.com/user/flutter/two-factor'),
+        url: Uri.parse(
+            '${apiService.baseDomainUrl}user/flutter/two-factor'), // Use variable for URL
       ),
     );
   }
@@ -81,6 +82,11 @@ class _WebViewPageState extends State<TwoStepVerificationScreen>
           if (progress == 100) {
             _pullToRefreshController?.endRefreshing();
           }
+        },
+        onReceivedServerTrustAuthRequest: (controller, challenge) async {
+          // This bypasses all SSL certificate errors, use with caution in production
+          return ServerTrustAuthResponse(
+              action: ServerTrustAuthResponseAction.PROCEED);
         },
       ),
     );

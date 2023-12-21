@@ -15,22 +15,19 @@ import 'package:bicrypto/services/profile_service.dart';
 import 'package:bicrypto/services/wallet_service.dart';
 import 'package:bicrypto/Controllers/Auth/login_controller.dart';
 import 'Style/styles.dart';
+import 'dart:io';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  HttpOverrides.global = new MyHttpOverrides();
 
   // Initialize ApiService
   final ApiService apiService = ApiService();
   Get.put<ApiService>(apiService);
 
-  // Initialize ProfileService
-  final ProfileService profileService = ProfileService(apiService);
-  Get.put<ProfileService>(profileService);
-
-  // Perform domain check using ProfileService
+  // Perform domain check using ApiService
   try {
-    final response =
-        await http.get(Uri.parse('${profileService.baseUrl}/api/auth/profile'));
+    final response = await http.get(Uri.parse(apiService.baseDomainUrl));
     if (response.statusCode == 200) {
       initializeApp(apiService);
     } else {
@@ -41,11 +38,7 @@ void main() async {
   }
 }
 
-void initializeApp(ApiService apiService) async {
-  // Create and register ApiService instance
-  final ApiService apiService = ApiService();
-  Get.put<ApiService>(apiService);
-
+Future<void> initializeApp(ApiService apiService) async {
   // Register other services and controllers
   Get.put<WalletService>(WalletService(apiService));
   Get.put<MarketService>(MarketService(apiService));
@@ -56,7 +49,7 @@ void initializeApp(ApiService apiService) async {
       WalletSpotController(walletService: Get.find()));
   Get.put<ProfileController>(ProfileController(profileService: Get.find()));
   Get.put<KYCController>(KYCController(profileService: Get.find()));
-  Get.put(HomeController(), permanent: true);
+  Get.put<HomeController>(HomeController(), permanent: true);
 
   // Initialize LoginController and check login status
   final LoginController loginController = Get.put(LoginController());
@@ -75,8 +68,8 @@ class MyApp extends StatelessWidget {
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'BiCrypto',
-      theme: appTheme, // Your dark theme
-      themeMode: ThemeMode.dark, // Force the app to use the dark theme
+      theme: appTheme,
+      themeMode: ThemeMode.dark,
       initialRoute: loginController.isLoggedIn.value ? '/home' : '/',
       getPages: AppRoutes.routes,
     );
@@ -106,5 +99,14 @@ class ErrorApp extends StatelessWidget {
         body: Center(child: Text('An error occurred during initialization')),
       ),
     );
+  }
+}
+
+class MyHttpOverrides extends HttpOverrides {
+  @override
+  HttpClient createHttpClient(SecurityContext? context) {
+    return super.createHttpClient(context)
+      ..badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
   }
 }
