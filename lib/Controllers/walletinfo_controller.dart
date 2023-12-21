@@ -105,7 +105,7 @@ class WalletInfoController extends GetxController {
         print('Payment is successful');
         Get.snackbar('Success', 'Payment done successfully',
             snackPosition: SnackPosition.BOTTOM);
-        Get.offAllNamed('/home');
+        Get.offNamed('/home');
         print('Navigating to Home Screen');
       } else {
         print('Failed to receive a valid response or clientSecret');
