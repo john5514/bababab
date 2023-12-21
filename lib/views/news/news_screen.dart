@@ -1,4 +1,5 @@
 import 'package:bicrypto/Controllers/home_controller.dart';
+import 'package:bicrypto/Controllers/market/market_controller.dart';
 import 'package:bicrypto/Controllers/news/news_controller.dart';
 import 'package:bicrypto/Style/styles.dart';
 import 'package:bicrypto/widgets/market/SimplifiedMarketScreen%20.dart';
@@ -39,7 +40,14 @@ class NewsWidget extends StatelessWidget {
                       // You might want to adjust this height to take into account the SafeArea padding.
                       height: MediaQuery.of(context).size.height * 0.5 -
                           MediaQuery.of(context).padding.top,
-                      child: SimpleMarketScreen(),
+                      child: Obx(() {
+                        // Check if the data in MarketController is ready
+                        if (Get.find<MarketController>().isLoading.value) {
+                          return Center(child: CircularProgressIndicator());
+                        } else {
+                          return SimpleMarketScreen();
+                        }
+                      }),
                     ),
                   ),
                   SliverToBoxAdapter(

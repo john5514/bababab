@@ -28,18 +28,21 @@ class _MainSettingsScreenState extends State<MainSettingsScreen>
   void fetchProfile() async {
     ProfileService profileService = ProfileService(ApiService());
     var profileData = await profileService.getProfile();
-    if (profileData != null && profileData['status'] == 'success') {
-      // Add a null check for twofactor before trying to access its keys
-      var twoFactorData = profileData['data']['result']['twofactor'];
-      setState(() {
-        isTwoFactorEnabled =
-            twoFactorData != null ? twoFactorData['enabled'] : false;
-      });
-    } else {
-      // Handle the case when the profile data is not fetched successfully
-      setState(() {
-        isTwoFactorEnabled = false;
-      });
+    if (mounted) {
+      // Check if the widget is still mounted
+      if (profileData != null && profileData['status'] == 'success') {
+        // Add a null check for twofactor before trying to access its keys
+        var twoFactorData = profileData['data']['result']['twofactor'];
+        setState(() {
+          isTwoFactorEnabled =
+              twoFactorData != null ? twoFactorData['enabled'] : false;
+        });
+      } else {
+        // Handle the case when the profile data is not fetched successfully
+        setState(() {
+          isTwoFactorEnabled = false;
+        });
+      }
     }
   }
 

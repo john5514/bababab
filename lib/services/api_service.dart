@@ -36,7 +36,9 @@ class ApiService {
   }
 
   Future<Map<String, dynamic>> fetchSettings() async {
-    final response = await http.get(Uri.parse('${baseDomainUrl}settings'));
+    final response = await http.get(Uri.parse('${baseDomainUrl}api/settings'));
+    print('Fetch Settings Response: ${response.body}'); // Debug log
+
     if (response.statusCode == 200) {
       return json.decode(response.body);
     } else {
@@ -171,21 +173,6 @@ class ApiService {
       // print('Error occurred: $e');
       return false;
     }
-  }
-
-  Future<Map<String, dynamic>> sendEmailVerification(String email) async {
-    final response = await http.post(
-      Uri.parse('${baseUrl}verify/email/send'),
-      headers: {
-        'Content-Type': 'application/json',
-        // Do not include the 'refresh-token' if it's not required according to the API documentation
-      },
-      body: jsonEncode({'email': email}),
-    );
-
-    final responseJson = json.decode(response.body);
-    print('Response from sendEmailVerification: $responseJson');
-    return responseJson;
   }
 
   Future<Map<String, dynamic>> verifyEmailToken(String token) async {

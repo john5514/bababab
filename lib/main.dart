@@ -43,6 +43,16 @@ void main() async {
   } catch (e) {
     runApp(const MaintenanceApp());
   }
+  try {
+    if (loginController.isEmailVerificationEnabled.value &&
+        !loginController.isEmailVerified.value) {
+      Get.toNamed('/email-verification');
+    } else {
+      Get.offAllNamed('/home');
+    }
+  } catch (e) {
+    print("Error during navigation: $e");
+  }
 }
 
 Future<void> initializeApp(ApiService apiService, ProfileService profileService,
@@ -70,18 +80,12 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final LoginController loginController = Get.find();
-    // Determine the initial route based on the login and email verification status
-    String initialRoute = '/';
-    if (loginController.isLoggedIn.value) {
-      initialRoute = loginController.isEmailVerified.value ? '/home' : '/';
-    }
-
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'BiCrypto',
       theme: appTheme,
       themeMode: ThemeMode.dark,
-      initialRoute: initialRoute,
+      initialRoute: loginController.isLoggedIn.value ? '/home' : '/',
       getPages: AppRoutes.routes,
     );
   }

@@ -39,25 +39,37 @@ class LoginController extends GetxController {
 
   Future<void> init() async {
     await apiService.loadTokens();
-    // First, check if we should auto-logout the user due to the 12-day inactivity
+    // Check for auto logout due to 12-day inactivity
     if (await apiService.shouldAutoLogout()) {
       logout();
-    } else {
-      // Next, check if all required tokens are present and valid
-      if (apiService.tokens.isNotEmpty &&
-          apiService.tokens['access-token'] != null &&
-          apiService.tokens['access-token']!.isNotEmpty &&
-          apiService.tokens['session-id'] != null &&
-          apiService.tokens['session-id']!.isNotEmpty &&
-          apiService.tokens['csrf-token'] != null &&
-          apiService.tokens['csrf-token']!.isNotEmpty &&
-          apiService.tokens['refresh-token'] != null &&
-          apiService.tokens['refresh-token']!.isNotEmpty) {
-        isLoggedIn.value = true; // Update isLoggedIn based on the token status
+      return;
+    }
+
+    bool tokensValid = apiService.tokens['access-token'] != null &&
+        apiService.tokens['access-token']!.isNotEmpty &&
+        apiService.tokens['session-id'] != null &&
+        apiService.tokens['session-id']!.isNotEmpty &&
+        apiService.tokens['csrf-token'] != null &&
+        apiService.tokens['csrf-token']!.isNotEmpty &&
+        apiService.tokens['refresh-token'] != null &&
+        apiService.tokens['refresh-token']!.isNotEmpty;
+
+    if (tokensValid) {
+      isLoggedIn.value = true;
+      await fetchAndSetEmailVerificationSetting();
+      if (isEmailVerificationEnabled.value) {
+        await checkEmailVerification();
+        // Redirect after verification check
+        if (!isEmailVerified.value) {
+          logout(); // Log out if email verification is required but not verified
+        } else {
+          navigateToHome();
+        }
       } else {
-        isLoggedIn.value =
-            false; // If any token is missing or invalid, set isLoggedIn to false
+        navigateToHome();
       }
+    } else {
+      isLoggedIn.value = false;
     }
   }
 
@@ -98,13 +110,18 @@ class LoginController extends GetxController {
         isLoggedIn.value = true;
         userEmail.value = email;
 
-        // Fetch email verification setting
+        // Fetch email verification setting and user profile
         await fetchAndSetEmailVerificationSetting();
-
-        // After login, check email verification status
         await checkEmailVerification();
+
+        // Redirect based on email verification
+        if (isEmailVerificationEnabled.value && !isEmailVerified.value) {
+          Get.toNamed('/email-verification');
+        } else {
+          Get.offAllNamed('/home');
+        }
       } else {
-        handleLoginError(error, context);
+        // handleLoginError(error, context);
       }
     } catch (e) {
       handleLoginError(e.toString(), context);
@@ -120,23 +137,33 @@ class LoginController extends GetxController {
       if (profileResponse != null && profileResponse['status'] == 'success') {
         final userProfile = profileResponse['data']['result'];
         isEmailVerified.value = userProfile['email_verified'];
-
-        if (!isEmailVerified.value && isEmailVerificationEnabled.value) {
-          Get.offNamed('/email-verification');
-        } else if (!isEmailVerificationEnabled.value || isEmailVerified.value) {
-          Get.offAllNamed('/home');
-        }
+        // No need to navigate here; it's handled in init()
       } else {
         throw Exception('Failed to fetch user profile');
       }
     } catch (e) {
-      showFlushbar("Error", 'Failed to check email verification', Get.context!);
+      // Handle error properly
+      print('Error in checkEmailVerification: $e');
+    }
+  }
+
+  void navigateToHome() {
+    if (Get.context != null) {
+      Get.offAllNamed('/home');
+    }
+  }
+
+  void navigateToEmailVerification() {
+    if (Get.context != null) {
+      Get.toNamed('/email-verification');
     }
   }
 
   Future<void> fetchAndSetEmailVerificationSetting() async {
     try {
       final settingsResponse = await apiService.fetchSettings();
+      print('Settings Response: $settingsResponse'); // Debug log
+
       if (settingsResponse['status'] == 'success') {
         final settings = settingsResponse['data']['result'];
         final emailVerificationSetting = settings.firstWhere(
@@ -145,10 +172,13 @@ class LoginController extends GetxController {
         );
         isEmailVerificationEnabled.value =
             emailVerificationSetting['value'] == 'Enabled';
+        print(
+            'Email Verification Setting: ${isEmailVerificationEnabled.value}'); // Debug log
       } else {
         throw Exception('Failed to fetch settings');
       }
     } catch (e) {
+      print('Error in fetchAndSetEmailVerificationSetting: $e'); // Debug log
       showFlushbar("Error", 'Failed to fetch email verification setting',
           Get.context!, Colors.red);
     }

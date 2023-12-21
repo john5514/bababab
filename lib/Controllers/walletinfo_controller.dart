@@ -1,4 +1,5 @@
 import 'package:bicrypto/Controllers/home_controller.dart';
+import 'package:bicrypto/Style/styles.dart';
 import 'package:bicrypto/services/api_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
@@ -296,10 +297,13 @@ class WalletInfoController extends GetxController {
     Get.back();
 //style snakbar for darktheme
 
-    Get.snackbar('Success', 'Deposit successful',
-        backgroundColor: Colors.grey[850],
-        colorText: Colors.white,
-        snackPosition: SnackPosition.BOTTOM);
+    Get.snackbar(
+      'Success',
+      'Deposit request sent successfully.',
+      backgroundColor: Colors.green,
+      colorText: Colors.white,
+      snackPosition: SnackPosition.BOTTOM,
+    );
   }
 
   void constructAndPostWithdrawalPayload(Map<String, dynamic> payload,

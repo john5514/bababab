@@ -1,3 +1,4 @@
+import 'package:bicrypto/Style/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:bicrypto/Controllers/walletinfo_controller.dart';
@@ -31,7 +32,7 @@ class PayoneerSelectedMethodPage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Card(
-              color: Colors.grey[850], // Dark card background
+              color: appTheme.colorScheme.surface, // Dark card background
               margin: const EdgeInsets.symmetric(vertical: 8.0),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(10.0),
@@ -83,7 +84,7 @@ class PayoneerSelectedMethodPage extends StatelessWidget {
             ),
             const SizedBox(height: 20),
             Card(
-              color: Colors.grey[850],
+              color: appTheme.colorScheme.surface,
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Column(

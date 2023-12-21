@@ -55,12 +55,14 @@ class FiatWalletView extends StatelessWidget {
             ),
             width: double
                 .infinity, // This will make the container stretch to the full width of the screen
-            child: const Text(
-              'Transactions',
-              style: TextStyle(
-                color: Colors.white, // Adjust text color to match your design
-                fontWeight: FontWeight.bold,
-                fontSize: 18, // Adjust font size as needed
+            child: const Center(
+              child: Text(
+                'Transactions',
+                style: TextStyle(
+                  color: Colors.white, // Adjust text color to match your design
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18, // Adjust font size as needed
+                ),
               ),
             ),
           ),
