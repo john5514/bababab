@@ -47,81 +47,84 @@ class SpotWalletDetailView extends StatelessWidget {
       ),
       body: Column(
         children: [
-          Obx(() => Text(
-                "Balance: ${controller.walletDetails['balance']?.toStringAsFixed(2) ?? '0.00'}",
-                style: const TextStyle(fontSize: 20, color: Colors.white),
+          Obx(() => Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Text(
+                  "Balance: ${controller.walletDetails['balance']?.toStringAsFixed(2) ?? '0.00'}",
+                  style: const TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white),
+                ),
               )),
           const SizedBox(height: 20),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                  child: ElevatedButton.icon(
-                    icon: const Icon(
-                        Icons.swap_horiz), // Replace with your transfer icon
-                    label: const Text("Transfer"),
-                    onPressed: () {
-                      Get.to(() =>
-                          SpotTransferView()); // Navigate to the transfer page
-                    },
-                    style: ElevatedButton.styleFrom(
-                      foregroundColor: Colors.white,
-                      backgroundColor: Colors.blue,
-                      padding: const EdgeInsets.all(4), // Reduced padding
-                      minimumSize: const Size(88, 36), // Reduced minimum size
-                    ),
-                  ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                _buildActionButton(
+                  context,
+                  icon: Icons.swap_horiz,
+                  label: "Transfer",
+                  onPressed: () => Get.to(() => SpotTransferView()),
+                  borderColor: Colors.blueAccent, // Use Binance Pro's color
+                  textColor: Colors.blueAccent, // Use Binance Pro's color
                 ),
-              ),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                  child: ElevatedButton.icon(
-                    icon: const Icon(Icons
-                        .account_balance_wallet), // Replace with your deposit icon
-                    label: const Text("Deposit"),
-                    onPressed: () {
-                      showDepositInstructions(
-                          context, controller.walletDetails.value);
-                    },
-                    style: ElevatedButton.styleFrom(
-                      foregroundColor: Colors.white,
-                      backgroundColor: Colors.green,
-                      padding: const EdgeInsets.all(4), // Reduced padding
-                      minimumSize: const Size(88, 36), // Reduced minimum size
-                    ),
-                  ),
+                _buildActionButton(
+                  context,
+                  icon: Icons.account_balance_wallet,
+                  label: "Deposit",
+                  onPressed: () => showDepositInstructions(
+                      context, controller.walletDetails.value),
+                  borderColor: Colors.green, // Use Binance Pro's color
+                  textColor: Colors.green, // Use Binance Pro's color
                 ),
-              ),
-              ElevatedButton.icon(
-                icon: const Icon(Icons
-                    .remove_circle_outline), // Use an appropriate icon for withdrawal
-                label: const Text("Withdraw"),
-                onPressed: () {
-                  // Navigate to WithdrawView and pass the currency as an argument
-                  Get.to(
+                _buildActionButton(
+                  context,
+                  icon: Icons.remove_circle_outline,
+                  label: "Withdraw",
+                  onPressed: () => Get.to(
                     () => SpotWithdrawView(),
-                    arguments: {
-                      'currency': walletDetails[
-                          'currency'], // Make sure walletDetails has a 'currency' key
-                    },
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  foregroundColor: Colors.white,
-                  backgroundColor: Colors.red,
-                  padding: const EdgeInsets.all(4), // Reduced padding
-                  minimumSize: const Size(88, 36), // Reduced minimum size
+                    arguments: {'currency': walletDetails['currency']},
+                  ),
+                  borderColor: Colors.redAccent, // Use Binance Pro's color
+                  textColor: Colors.redAccent, // Use Binance Pro's color
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
           const SizedBox(height: 20),
           Expanded(
               child: TransactionDisplay(transactions: controller.transactions)),
         ],
+      ),
+    );
+  }
+
+  Widget _buildActionButton(BuildContext context,
+      {required IconData icon,
+      required String label,
+      required VoidCallback onPressed,
+      required Color borderColor, // Add a border color parameter
+      required Color textColor}) {
+    // Add a text color parameter
+    return Expanded(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+        child: OutlinedButton.icon(
+          icon: Icon(icon, size: 24, color: textColor), // Set icon color
+          label:
+              Text(label, style: TextStyle(color: textColor)), // Set text color
+          onPressed: onPressed,
+          style: OutlinedButton.styleFrom(
+            side: BorderSide(color: borderColor), // Add border color
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(30.0),
+            ),
+            padding: const EdgeInsets.symmetric(vertical: 12.0),
+          ),
+        ),
       ),
     );
   }
