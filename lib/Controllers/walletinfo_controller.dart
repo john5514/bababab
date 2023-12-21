@@ -83,16 +83,10 @@ class WalletInfoController extends GetxController {
       double percentageTaxRate =
           (selectedMethod.value?['percentage_fee'] ?? 0) / 100;
       double percentageTax = amount * percentageTaxRate;
-      double totalAmount = amount + flatTax + percentageTax;
 
-      // Debugging print statements
-      print('Flat Tax: $flatTax');
-      print('Percentage Tax Rate: $percentageTaxRate');
-      print('Percentage Tax: $percentageTax');
-      print('Total amount to be paid with tax: $totalAmount');
-
-      final response = await WalletService(ApiService()).callStripeIpnEndpoint(
-          totalAmount, currency, flatTax + percentageTax);
+      // Now you're sending the original amount and tax separately
+      final response = await WalletService(ApiService())
+          .callStripeIpnEndpoint(amount, currency, flatTax + percentageTax);
 
       print('Response from callStripeIpnEndpoint: $response');
 

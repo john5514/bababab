@@ -43,7 +43,7 @@ class WalletService {
         body: jsonEncode({
           'amount': (amount * 100).toInt(), // Convert to integer for Stripe
           'currency': currency.toLowerCase(),
-          'taxAmount': (taxAmount * 100).toInt(), // Convert to integer
+          'taxAmount': (taxAmount * 100).toInt(), // Convert to integer for tax
           'flutter': true, // Indicate this request is from a Flutter app
         }),
       );
