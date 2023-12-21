@@ -4,6 +4,7 @@ import 'package:bicrypto/services/wallet_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
+import 'package:lottie/lottie.dart';
 
 class SpotWithdrawView extends StatelessWidget {
   final SpotWithdrawController controller =
@@ -43,6 +44,11 @@ class SpotWithdrawView extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              Lottie.asset(
+                'assets/animations/cash-withdrawal.json',
+                height: 320,
+                fit: BoxFit.cover,
+              ),
               Text("Select Chain:",
                   style: textTheme.titleMedium
                       ?.copyWith(fontWeight: FontWeight.bold)),

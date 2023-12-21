@@ -3,6 +3,7 @@ import 'package:bicrypto/style/styles.dart';
 import 'package:bicrypto/services/wallet_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:lottie/lottie.dart';
 
 class SpotTransferView extends StatelessWidget {
   final SpotTransferController controller =
@@ -34,6 +35,10 @@ class SpotTransferView extends StatelessWidget {
           key: _formKey,
           child: Column(
             children: [
+              Lottie.asset(
+                'assets/animations/online-banking.json',
+                fit: BoxFit.fitHeight,
+              ),
               TextFormField(
                 controller: _uuidController,
                 style: TextStyle(color: inputTextColor),

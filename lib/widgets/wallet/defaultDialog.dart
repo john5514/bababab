@@ -1,3 +1,4 @@
+import 'package:bicrypto/Style/styles.dart';
 import 'package:bicrypto/views/wallets/spot/spotDeposit_view.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -10,7 +11,7 @@ void showDepositInstructions(
     type: AlertType.none,
     title: "DEPOSIT INSTRUCTIONS",
     style: AlertStyle(
-      backgroundColor: Colors.grey[850],
+      backgroundColor: appTheme.colorScheme.surface,
       titleStyle: const TextStyle(
         fontFamily: 'Inter',
         color: Colors.white,
@@ -136,7 +137,7 @@ void showDepositInstructions(
                 'currency'], // Make sure walletDetails has a 'currency' key
           },
         ),
-        color: Colors.blueAccent,
+        color: Colors.grey,
         child: const Text(
           "NEXT",
           style: TextStyle(
