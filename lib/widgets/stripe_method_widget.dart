@@ -1,9 +1,6 @@
 import 'package:bicrypto/Controllers/walletinfo_controller.dart';
-import 'package:bicrypto/services/api_service.dart';
-import 'package:bicrypto/services/wallet_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:flutter_stripe/flutter_stripe.dart';
 
 class StripeMethodWidget extends StatefulWidget {
   const StripeMethodWidget({super.key});
@@ -17,57 +14,88 @@ class _StripeMethodWidgetState extends State<StripeMethodWidget> {
   final RxBool _isAgreedToTOS = false.obs;
   final WalletInfoController controller = Get.find<WalletInfoController>();
 
-  final ApiService apiService = Get.find<ApiService>();
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Stripe', style: TextStyle(color: Colors.white)),
-        backgroundColor: Colors.orange,
+        title:
+            const Text('Stripe Payment', style: TextStyle(color: Colors.white)),
+        backgroundColor: Colors.blueAccent, // Stripe-like blue color
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            TextField(
-              controller: _amountController,
-              style: const TextStyle(color: Colors.orange),
-              keyboardType: TextInputType.number,
-              decoration: const InputDecoration(
-                labelText: 'Amount',
-                prefix: Text('USD '),
+      body: SingleChildScrollView(
+        // Added for scrolling
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              TextField(
+                controller: _amountController,
+                style: const TextStyle(color: Colors.white),
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                  labelText: 'Amount',
+                  labelStyle: const TextStyle(color: Colors.white),
+                  prefix:
+                      const Text('USD ', style: TextStyle(color: Colors.white)),
+                  prefixIcon: const Icon(Icons.attach_money,
+                      color: Colors.white), // Added icon
+                  border: OutlineInputBorder(
+                    // Added border
+                    borderRadius: BorderRadius.circular(8.0),
+                    borderSide: const BorderSide(color: Colors.white),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    // Added border for enabled state
+                    borderRadius: BorderRadius.circular(8.0),
+                    borderSide: const BorderSide(color: Colors.white),
+                  ),
+                ),
               ),
-            ),
-            const SizedBox(height: 20),
-            Obx(() => CheckboxListTile(
-                  title: const Text(
-                    'I agree to the Terms Of Service',
-                    style: TextStyle(color: Colors.white, fontSize: 12),
-                  ),
-                  value: _isAgreedToTOS.value,
-                  onChanged: (value) => _isAgreedToTOS.value = value!,
-                  activeColor: Colors.orange,
-                  checkColor: Colors.black,
-                )),
-            const SizedBox(height: 20),
-            Obx(() => ElevatedButton(
-                  onPressed: _isAgreedToTOS.value
-                      ? () async {
-                          double amount = double.parse(_amountController.text);
-                          await controller.initiateStripePayment(amount, "USD");
-                        }
-                      : null,
-                  // ignore: sort_child_properties_last
-                  child: _isAgreedToTOS.value
-                      ? const Text('Pay with Stripe')
-                      : const Text('Accept TOS to continue'),
-                  style: ElevatedButton.styleFrom(
-                    primary: _isAgreedToTOS.value ? Colors.orange : Colors.grey,
-                  ),
-                ))
-          ],
+              const SizedBox(height: 20),
+              Obx(() => CheckboxListTile(
+                    title: const Text(
+                      'I agree to the Terms Of Service',
+                      style: TextStyle(color: Colors.white, fontSize: 12),
+                    ),
+                    value: _isAgreedToTOS.value,
+                    onChanged: (value) => _isAgreedToTOS.value = value!,
+                    activeColor: Colors.blueAccent, // Stripe-like blue color
+                    checkColor: Colors.white,
+                  )),
+              const SizedBox(height: 20),
+              Obx(() => ElevatedButton.icon(
+                    onPressed: _isAgreedToTOS.value
+                        ? () async {
+                            double amount =
+                                double.parse(_amountController.text);
+                            String currency =
+                                controller.walletInfo.value['currency'] ??
+                                    "USD"; // Correctly accessing currency
+                            await controller.initiateStripePayment(
+                                amount, currency);
+                          }
+                        : null,
+                    icon: const Icon(Icons.account_balance_wallet,
+                        color: Colors.white), // Wallet icon
+                    label: _isAgreedToTOS.value
+                        ? const Text('Pay with Stripe')
+                        : const Text('Accept TOS to continue'),
+                    style: ElevatedButton.styleFrom(
+                      primary: _isAgreedToTOS.value
+                          ? Colors.blueAccent
+                          : Colors.grey, // Stripe-like blue color
+                      onPrimary: Colors.white, // Text color
+                      shape: RoundedRectangleBorder(
+                        // Rounded corners
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 15, horizontal: 30),
+                    ),
+                  )),
+            ],
+          ),
         ),
       ),
     );
