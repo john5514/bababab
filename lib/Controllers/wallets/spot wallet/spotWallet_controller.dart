@@ -56,14 +56,19 @@ class WalletSpotController extends GetxController {
     filteredCurrencies.clear();
   }
 
+  Future<void> refreshCurrencies() async {
+    fetchCurrencies();
+    // Any additional logic if needed during refresh
+  }
+
   void fetchCurrencies() async {
     isLoading(true);
     try {
       var response = await walletService.getExchangeCurrencies();
       if (response['status'] == 'success') {
         var fetchedCurrencies = response['data']['result'];
-        currencies.assignAll(fetchedCurrencies);
         originalCurrencies.assignAll(fetchedCurrencies);
+        updateFilteredCurrencies(); // To respect the hide zero balances setting
         await fetchBalancesForCurrencies();
       }
     } catch (e) {

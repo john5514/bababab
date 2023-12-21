@@ -17,15 +17,19 @@ class WalletSpotView extends StatelessWidget {
         title: Obx(() => controller.isSearching.value
             ? TextField(
                 onChanged: (value) => controller.filterCurrencies(value),
-                style: const TextStyle(color: Colors.white),
-                decoration: const InputDecoration(
-                  icon: Icon(Icons.search, color: Colors.white),
+                style: TextStyle(color: Theme.of(context).primaryColor),
+                decoration: InputDecoration(
+                  icon:
+                      Icon(Icons.search, color: Theme.of(context).primaryColor),
                   hintText: "Search Currencies",
-                  hintStyle: TextStyle(color: Colors.white),
+                  hintStyle: TextStyle(color: Theme.of(context).hintColor),
                 ),
               )
             : Text(
-                'Total Balance: \$${controller.totalEstimatedBalance.value.toStringAsFixed(2)}')),
+                'Total Balance: \$${controller.totalEstimatedBalance.value.toStringAsFixed(2)}',
+                style: TextStyle(
+                    color: Theme.of(context).textTheme.headline6?.color),
+              )),
         actions: <Widget>[
           Obx(() => controller.isSearching.value
               ? IconButton(
@@ -55,13 +59,14 @@ class WalletSpotView extends StatelessWidget {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(4.0),
                       ),
-                      // ignore: prefer_const_constructors
-                      side: BorderSide(color: Colors.grey),
+                      side: BorderSide(color: Theme.of(context).dividerColor),
                       activeColor: Theme.of(context).hintColor,
                     ),
-                    const Text(
+                    Text(
                       'Hide Zero Balances',
-                      style: TextStyle(color: Colors.grey, fontSize: 14),
+                      style: TextStyle(
+                          color: Theme.of(context).textTheme.subtitle1?.color,
+                          fontSize: 14),
                     ),
                   ],
                 ),
@@ -71,36 +76,68 @@ class WalletSpotView extends StatelessWidget {
               if (controller.isLoading.value) {
                 return const Center(child: CircularProgressIndicator());
               }
-              return ListView.builder(
-                itemCount: controller.isSearching.isTrue
-                    ? controller.filteredCurrencies.length
-                    : controller.currencies.length,
-                itemBuilder: (context, index) {
-                  var currency = controller.isSearching.isTrue
-                      ? controller.filteredCurrencies[index]
-                      : controller.currencies[index];
-                  return ListTile(
-                    title: Text(
-                      currency['currency'], // Adjusted key
-                      style: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16.0),
-                    ),
-                    subtitle: Text(
-                      currency['name'], // Adjusted key
-                      style:
-                          const TextStyle(color: Colors.white, fontSize: 14.0),
-                    ),
-                    trailing: Text(
-                      "${currency['balance']?.toStringAsFixed(1) ?? '0.0'}",
-                      style: const TextStyle(
-                          color: Colors.white, fontWeight: FontWeight.bold),
-                    ),
-                    onTap: () => controller.handleCurrencyTap(
-                        currency['currency']), // Adjusted key
-                  );
-                },
+              return RefreshIndicator(
+                onRefresh: controller.refreshCurrencies,
+                child: ListView.builder(
+                  itemCount: controller.isSearching.isTrue
+                      ? controller.filteredCurrencies.length
+                      : controller.currencies.length,
+                  itemBuilder: (context, index) {
+                    var currency = controller.isSearching.isTrue
+                        ? controller.filteredCurrencies[index]
+                        : controller.currencies[index];
+                    return ListTile(
+                      title: Text(
+                        currency['currency'], // Adjusted key
+                        style: TextStyle(
+                            color: Theme.of(context).textTheme.bodyLarge?.color,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16.0),
+                      ),
+                      subtitle: Text(
+                        currency['name'], // Adjusted key
+                        style: TextStyle(
+                            color: Theme.of(context).textTheme.bodyText2?.color,
+                            fontSize: 14.0),
+                      ),
+                      trailing: RichText(
+                        text: TextSpan(
+                          style: TextStyle(
+                            // Default text style
+                            color: Theme.of(context).textTheme.bodyText1?.color,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16, // Normal text size
+                          ),
+                          children: <TextSpan>[
+                            TextSpan(
+                              text: currency['balance']?.floor().toString() ??
+                                  '0', // Whole number part
+                            ),
+                            const TextSpan(
+                              text: ".",
+                              style: TextStyle(
+                                fontSize:
+                                    16, // Size for the decimal point, keep it consistent with the whole number part
+                              ),
+                            ),
+                            TextSpan(
+                              text: ((currency['balance'] ?? 0) * 10 % 10)
+                                  .toInt()
+                                  .toString(), // Decimal part
+                              style: const TextStyle(
+                                fontSize:
+                                    22, // Larger text size for the decimal part
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      onTap: () => controller.handleCurrencyTap(
+                          currency['currency']), // Adjusted key
+                    );
+                  },
+                ),
               );
             }),
           ),
