@@ -17,77 +17,125 @@ class _MainSettingsScreenState extends State<MainSettingsScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   bool isTwoFactorEnabled = false;
+  bool isKYCEnabled = false;
+  bool _isTabControllerInitialized = false;
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 4, vsync: this);
-    fetchProfile();
+    initializeSettings();
   }
 
-  void fetchProfile() async {
-    ProfileService profileService = ProfileService(ApiService());
-    var profileData = await profileService.getProfile();
-    if (mounted) {
-      // Check if the widget is still mounted
-      if (profileData != null && profileData['status'] == 'success') {
-        // Add a null check for twofactor before trying to access its keys
+  Future<void> initializeSettings() async {
+    await fetchSettings();
+  }
+
+  Future<void> fetchProfile() async {
+    try {
+      ProfileService profileService = ProfileService(ApiService());
+      var profileData = await profileService.getProfile();
+      if (mounted &&
+          profileData != null &&
+          profileData['status'] == 'success') {
         var twoFactorData = profileData['data']['result']['twofactor'];
+        isTwoFactorEnabled = twoFactorData != null && twoFactorData['enabled'];
+      }
+    } catch (e) {
+      // Handle any errors here
+      isTwoFactorEnabled = false;
+    }
+  }
+
+  Future<void> fetchSettings() async {
+    try {
+      ApiService apiService = ApiService();
+      var settingsResponse = await apiService.fetchSettings();
+      var settingsData = settingsResponse['data']['result'] as List<dynamic>;
+
+      if (mounted) {
+        // Loop through all settings and update the flags
+        for (var setting in settingsData) {
+          if (setting['key'] == 'kyc_status') {
+            isKYCEnabled = setting['value'] == 'Enabled';
+          }
+          if (setting['key'] == 'two_factor') {
+            isTwoFactorEnabled = setting['value'] == 'Enabled';
+          }
+        }
+      }
+    } catch (e) {
+      // Handle any errors here
+      isKYCEnabled = false;
+      isTwoFactorEnabled = false;
+    } finally {
+      if (mounted) {
+        int tabLength = 2; // Start with the default two tabs.
+        if (isKYCEnabled) tabLength++;
+        if (isTwoFactorEnabled) tabLength++;
+
+        // Reinitialize the TabController with the updated length
+        _tabController = TabController(length: tabLength, vsync: this);
+
         setState(() {
-          isTwoFactorEnabled =
-              twoFactorData != null ? twoFactorData['enabled'] : false;
-        });
-      } else {
-        // Handle the case when the profile data is not fetched successfully
-        setState(() {
-          isTwoFactorEnabled = false;
+          _isTabControllerInitialized = true;
         });
       }
     }
   }
 
   @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    ThemeData theme = Theme.of(context);
+    // Check if _tabController is initialized before building the Scaffold
+    if (!_isTabControllerInitialized) {
+      return Scaffold(
+        body: Center(
+            child: CircularProgressIndicator()), // or some loading indicator
+      );
+    }
+
+    List<Tab> tabs = [
+      const Tab(text: 'Profile'),
+      const Tab(text: 'Change Password'),
+    ];
+    List<Widget> tabViews = [
+      ProfileView(),
+      ChangePasswordScreen(),
+    ];
+
+    if (isTwoFactorEnabled) {
+      tabs.add(const Tab(text: 'Two-Step Verify'));
+      tabViews.add(TwoStepVerificationScreen());
+    }
+
+    if (isKYCEnabled) {
+      tabs.add(const Tab(text: 'KYC Verify'));
+      tabViews.add(KYCScreen());
+    }
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Settings',
-          style: TextStyle(color: Colors.white),
-        ),
-        backgroundColor: theme.scaffoldBackgroundColor,
+        title: const Text('Settings'),
         bottom: TabBar(
+          tabAlignment: TabAlignment.start,
           controller: _tabController,
-          isScrollable: true, // Enable horizontal scrolling
-          tabs: const [
-            Tab(text: 'Profile'),
-            Tab(text: 'Change Password'),
-            Tab(text: 'Two-Step Verification'),
-            Tab(text: 'KYC Verification'), // New tab for KYC
-          ],
+          isScrollable:
+              true, // Set this to true for a horizontally scrollable TabBar
+          tabs: tabs,
         ),
       ),
       body: TabBarView(
         controller: _tabController,
-        physics:
-            const NeverScrollableScrollPhysics(), // Disable swipe navigation
 
-        children: [
-          ProfileView(),
-          ChangePasswordScreen(),
-          isTwoFactorEnabled
-              ? CongratulationsScreen()
-              : TwoStepVerificationScreen(),
-          KYCScreen(), // Add the KYC screen here
-        ],
+        physics:
+            NeverScrollableScrollPhysics(), // Prevent swipe navigation between tabs
+        children: tabViews,
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
   }
 }
