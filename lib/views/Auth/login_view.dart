@@ -4,7 +4,8 @@ import 'package:get/get.dart';
 import 'package:lottie/lottie.dart';
 
 class LoginView extends StatelessWidget {
-  final LoginController authController = Get.put(LoginController());
+  final LoginController authController = Get.find<
+      LoginController>(); // Use Get.find to find the already created instance
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final RxBool passwordVisible = false.obs;

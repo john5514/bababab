@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:another_flushbar/flushbar.dart';
 import 'package:bicrypto/services/api_service.dart';
+import 'package:bicrypto/services/profile_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -10,13 +13,28 @@ class LoginController extends GetxController {
   var emailErrorMessage = ''.obs; // Specific to email
   var passwordErrorMessage = ''.obs; // Specific to password
   var trustFor14Days = false.obs; // New property for "Trust for 14 days"
+  var isEmailVerificationEnabled = false.obs; // Observable property
 
+  var isEmailVerified = false.obs;
+  var isEmailSent = false.obs;
   final ApiService apiService = ApiService();
+  final ProfileService profileService;
+  LoginController(this.profileService); // Constructor injection
 
   @override
   void onInit() {
     super.onInit();
     init();
+  }
+
+  void autoCheckEmailVerification() {
+    Timer.periodic(Duration(seconds: 30), (timer) async {
+      await checkEmailVerification();
+      if (isEmailVerified.value) {
+        timer.cancel(); // Stop the timer if email is verified
+        Get.offAllNamed('/home'); // Navigate to the home screen
+      }
+    });
   }
 
   Future<void> init() async {
@@ -76,11 +94,15 @@ class LoginController extends GetxController {
           await apiService.login(email, password, trustDevice: trustFor14Days);
 
       if (error == null) {
-        await apiService.saveLoginTimestamp(); // Save the login timestamp
+        await apiService.saveLoginTimestamp();
         isLoggedIn.value = true;
         userEmail.value = email;
-        Get.offAllNamed('/home');
-        showFlushbar("Success", "Login successful!", context, Colors.blue);
+
+        // Fetch email verification setting
+        await fetchAndSetEmailVerificationSetting();
+
+        // After login, check email verification status
+        await checkEmailVerification();
       } else {
         handleLoginError(error, context);
       }
@@ -88,6 +110,47 @@ class LoginController extends GetxController {
       handleLoginError(e.toString(), context);
     } finally {
       isLoading.value = false;
+    }
+  }
+
+  @override
+  Future<void> checkEmailVerification() async {
+    try {
+      final profileResponse = await profileService.getProfile();
+      if (profileResponse != null && profileResponse['status'] == 'success') {
+        final userProfile = profileResponse['data']['result'];
+        isEmailVerified.value = userProfile['email_verified'];
+
+        if (!isEmailVerified.value && isEmailVerificationEnabled.value) {
+          Get.offNamed('/email-verification');
+        } else if (!isEmailVerificationEnabled.value || isEmailVerified.value) {
+          Get.offAllNamed('/home');
+        }
+      } else {
+        throw Exception('Failed to fetch user profile');
+      }
+    } catch (e) {
+      showFlushbar("Error", 'Failed to check email verification', Get.context!);
+    }
+  }
+
+  Future<void> fetchAndSetEmailVerificationSetting() async {
+    try {
+      final settingsResponse = await apiService.fetchSettings();
+      if (settingsResponse['status'] == 'success') {
+        final settings = settingsResponse['data']['result'];
+        final emailVerificationSetting = settings.firstWhere(
+          (setting) => setting['key'] == 'email_verification',
+          orElse: () => {'value': 'Disabled'},
+        );
+        isEmailVerificationEnabled.value =
+            emailVerificationSetting['value'] == 'Enabled';
+      } else {
+        throw Exception('Failed to fetch settings');
+      }
+    } catch (e) {
+      showFlushbar("Error", 'Failed to fetch email verification setting',
+          Get.context!, Colors.red);
     }
   }
 
@@ -109,6 +172,59 @@ class LoginController extends GetxController {
       emailErrorMessage.value = error;
     }
     showFlushbar("Error", error, context);
+  }
+
+  Future<void> sendEmailVerification() async {
+    isLoading.value = true;
+    try {
+      final response =
+          await profileService.sendEmailVerification(userEmail.value);
+      String message = response['message'] as String? ??
+          'Verification email sent successfully';
+      showFlushbar("Success", message, Get.context!, Colors.green);
+      // Assume that if the email was sent successfully, the email is not verified yet.
+      isEmailSent.value = true; // Indicate that an email has been sent
+    } catch (e) {
+      showFlushbar("Error", e.toString(), Get.context!, Colors.red);
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<void> resendEmailVerification() async {
+    isLoading.value = true;
+    try {
+      final response =
+          await profileService.resendEmailVerification(userEmail.value);
+      String message = response['message'] as String? ??
+          'Verification email resent successfully';
+      showFlushbar("Success", message, Get.context!, Colors.green);
+      // Assume that if the email was resent successfully, the email is not verified yet.
+      isEmailSent.value = true; // Indicate that an email has been sent
+    } catch (e) {
+      showFlushbar("Error", e.toString(), Get.context!, Colors.red);
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  Future<void> verifyEmailToken(String token) async {
+    isLoading.value = true;
+    try {
+      final response = await profileService.verifyEmailToken(token);
+      isLoading.value = false;
+
+      // Check the response and handle it
+      if (response['status'] == 'success') {
+        isEmailVerified.value = true;
+        Get.offAllNamed('/home');
+      } else {
+        throw Exception('Failed to verify email token');
+      }
+    } catch (e) {
+      isLoading.value = false;
+      showFlushbar("Error", e.toString(), Get.context!, Colors.red);
+    }
   }
 
   Future<void> logout() async {

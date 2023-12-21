@@ -1,3 +1,4 @@
+import 'package:bicrypto/views/Auth/emailverification.dart';
 import 'package:bicrypto/views/Auth/login_view.dart';
 import 'package:bicrypto/views/Auth/profile/otp_verification_screen.dart';
 import 'package:bicrypto/views/Auth/register_view.dart';
@@ -84,5 +85,9 @@ class AppRoutes {
     GetPage(
         name: '/otp-verification',
         page: () => OTPVerificationScreen()), // Add this line
+    GetPage(
+      name: '/email-verification',
+      page: () => EmailVerificationScreen(),
+    ),
   ];
 }

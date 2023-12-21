@@ -35,6 +35,15 @@ class ApiService {
     return false;
   }
 
+  Future<Map<String, dynamic>> fetchSettings() async {
+    final response = await http.get(Uri.parse('${baseDomainUrl}settings'));
+    if (response.statusCode == 200) {
+      return json.decode(response.body);
+    } else {
+      throw Exception('Failed to fetch settings');
+    }
+  }
+
   Future<void> checkAndPerformAutoLogout() async {
     if (await shouldAutoLogout()) {
       await logout();
@@ -162,5 +171,29 @@ class ApiService {
       // print('Error occurred: $e');
       return false;
     }
+  }
+
+  Future<Map<String, dynamic>> sendEmailVerification(String email) async {
+    final response = await http.post(
+      Uri.parse('${baseUrl}verify/email/send'),
+      headers: {
+        'Content-Type': 'application/json',
+        // Do not include the 'refresh-token' if it's not required according to the API documentation
+      },
+      body: jsonEncode({'email': email}),
+    );
+
+    final responseJson = json.decode(response.body);
+    print('Response from sendEmailVerification: $responseJson');
+    return responseJson;
+  }
+
+  Future<Map<String, dynamic>> verifyEmailToken(String token) async {
+    final response = await http.post(
+      Uri.parse('${baseUrl}verify/email/token'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'token': token}),
+    );
+    return json.decode(response.body);
   }
 }

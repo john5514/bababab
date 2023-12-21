@@ -52,6 +52,60 @@ class ProfileService {
     }
   }
 
+  Future<Map<String, dynamic>> sendEmailVerification(String email) async {
+    await loadHeaders();
+    final response = await http.post(
+      Uri.parse('${baseUrl}/api/auth/verify/email/send'),
+      headers: headers,
+      body: jsonEncode({'email': email}),
+    );
+
+    if (response.statusCode == 200) {
+      return json.decode(response.body);
+    } else {
+      print(
+          'Failed to send verification email. Status code: ${response.statusCode}');
+      return json.decode(response.body);
+    }
+  }
+
+  Future<Map<String, dynamic>> resendEmailVerification(String email) async {
+    await loadHeaders(); // Ensure headers are loaded with the latest tokens
+
+    final response = await http.post(
+      Uri.parse(
+          '${baseUrl}/api/auth/verify/email/send'), // The endpoint might be the same as send email verification
+      headers: headers,
+      body: jsonEncode({'email': email}),
+    );
+
+    if (response.statusCode == 200) {
+      return json.decode(response.body); // Return the response body as a Map
+    } else {
+      print(
+          'Failed to resend verification email. Status code: ${response.statusCode}');
+      return json.decode(response.body); // Return the error response as well
+    }
+  }
+
+  Future<Map<String, dynamic>> verifyEmailToken(String token) async {
+    await loadHeaders(); // Make sure to load the headers with tokens
+
+    final response = await http.post(
+      Uri.parse('${baseUrl}/api/auth/verify/email/token'),
+      headers: headers,
+      body: jsonEncode({'token': token}),
+    );
+
+    if (response.statusCode == 200) {
+      return json.decode(response.body); // Return the response body as a Map
+    } else {
+      print(
+          'Failed to verify email token. Status code: ${response.statusCode}');
+      return json.decode(response.body); // Return the error response as well
+    }
+  }
+
   Future<bool> updateProfile(Map<String, dynamic> profileData) async {
     await loadHeaders();
     final Uri url = Uri.parse('${baseUrl}/api/auth/profile');

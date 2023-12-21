@@ -5,7 +5,6 @@ import 'package:http/http.dart' as http;
 import 'package:bicrypto/Controllers/Auth/profile/kyc_controller.dart';
 import 'package:bicrypto/Controllers/Auth/profile/profile_controller.dart';
 import 'package:bicrypto/Controllers/home_controller.dart';
-
 import 'package:bicrypto/Controllers/wallets/spot%20wallet/spotWallet_controller.dart';
 import 'package:bicrypto/Routing/app_routes.dart';
 import 'package:bicrypto/maintainance.dart';
@@ -25,11 +24,19 @@ void main() async {
   final ApiService apiService = ApiService();
   Get.put<ApiService>(apiService);
 
+  // Initialize ProfileService
+  final ProfileService profileService = ProfileService(apiService);
+  Get.put<ProfileService>(profileService);
+
+  // Initialize LoginController
+  final LoginController loginController =
+      Get.put(LoginController(profileService));
+
   // Perform domain check using ApiService
   try {
     final response = await http.get(Uri.parse(apiService.baseDomainUrl));
     if (response.statusCode == 200) {
-      initializeApp(apiService);
+      initializeApp(apiService, profileService, loginController);
     } else {
       runApp(const MaintenanceApp());
     }
@@ -38,24 +45,22 @@ void main() async {
   }
 }
 
-Future<void> initializeApp(ApiService apiService) async {
+Future<void> initializeApp(ApiService apiService, ProfileService profileService,
+    LoginController loginController) async {
   // Register other services and controllers
   Get.put<WalletService>(WalletService(apiService));
   Get.put<MarketService>(MarketService(apiService));
-  Get.put<ProfileService>(ProfileService(apiService));
-
-  // Register controllers
+  Get.put<ProfileController>(ProfileController(profileService: profileService));
+  Get.put<KYCController>(KYCController(profileService: profileService));
+  Get.put<HomeController>(HomeController(), permanent: true);
   Get.put<WalletSpotController>(
       WalletSpotController(walletService: Get.find()));
-  Get.put<ProfileController>(ProfileController(profileService: Get.find()));
-  Get.put<KYCController>(KYCController(profileService: Get.find()));
-  Get.put<HomeController>(HomeController(), permanent: true);
 
-  // Initialize LoginController and check login status
-  final LoginController loginController = Get.put(LoginController());
+  // Check login status
   await loginController.init();
   Stripe.publishableKey =
       'pk_test_51LPVEfLFyngRnuDVzYJ2cb5yF2BsE4fELcGumnvgjuLCCPWjHpEeDMVz6DOSilTNc2FihuK91zbNurhhyRZT0qTI000Zc1hT5B';
+
   runApp(const MyApp());
 }
 
@@ -65,12 +70,18 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final LoginController loginController = Get.find();
+    // Determine the initial route based on the login and email verification status
+    String initialRoute = '/';
+    if (loginController.isLoggedIn.value) {
+      initialRoute = loginController.isEmailVerified.value ? '/home' : '/';
+    }
+
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'BiCrypto',
       theme: appTheme,
       themeMode: ThemeMode.dark,
-      initialRoute: loginController.isLoggedIn.value ? '/home' : '/',
+      initialRoute: initialRoute,
       getPages: AppRoutes.routes,
     );
   }
