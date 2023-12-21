@@ -58,7 +58,7 @@ class _CurrencySpotViewState extends State<CurrencySpotView>
     }
 
     String url =
-        '${apiService.baseDomainUrl}/user/flutter/wallets/spot/${widget.currencyCode.toLowerCase()}';
+        '${apiService.baseDomainUrl}user/flutter/wallets/spot/${widget.currencyCode.toLowerCase()}';
     controller.loadUrl(urlRequest: URLRequest(url: Uri.parse(url)));
   }
 

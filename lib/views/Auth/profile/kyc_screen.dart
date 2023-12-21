@@ -55,7 +55,7 @@ class _WebViewPageState extends State<KYCScreen>
 
     controller.loadUrl(
       urlRequest: URLRequest(
-        url: Uri.parse('${apiService.baseDomainUrl}/user/flutter/kyc'),
+        url: Uri.parse('${apiService.baseDomainUrl}user/flutter/kyc'),
       ),
     );
   }
