@@ -1,6 +1,7 @@
 import 'package:bicrypto/Controllers/walletinfo_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:lottie/lottie.dart';
 
 class StripeMethodWidget extends StatefulWidget {
   const StripeMethodWidget({super.key});
@@ -94,6 +95,10 @@ class _StripeMethodWidgetState extends State<StripeMethodWidget> {
                           vertical: 15, horizontal: 30),
                     ),
                   )),
+              Lottie.asset(
+                'assets/animations/stripe.json',
+                fit: BoxFit.cover,
+              ),
             ],
           ),
         ),
