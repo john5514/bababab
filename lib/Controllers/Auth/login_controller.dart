@@ -79,24 +79,21 @@ class LoginController extends GetxController {
     emailErrorMessage.value = '';
     passwordErrorMessage.value = '';
 
-    bool hasError = false;
-
     if (email.isEmpty) {
       emailErrorMessage.value = 'Please enter your email';
-      hasError = true;
+      isLoading.value = false;
+      showFlushbar("Error", 'Please correct the errors', context);
+      return;
+    } else if (!GetUtils.isEmail(email)) {
+      emailErrorMessage.value = 'Invalid email format';
+      isLoading.value = false;
+      showFlushbar("Error", 'Please correct the errors', context);
+      return;
     }
 
     if (password.isEmpty) {
       passwordErrorMessage.value = 'Please enter your password';
-      hasError = true;
-    }
-
-    if (!GetUtils.isEmail(email)) {
-      emailErrorMessage.value = 'Invalid email format';
-      hasError = true;
-    }
-
-    if (hasError) {
+      isLoading.value = false;
       showFlushbar("Error", 'Please correct the errors', context);
       return;
     }
@@ -121,12 +118,19 @@ class LoginController extends GetxController {
           Get.offAllNamed('/home');
         }
       } else {
-        // handleLoginError(error, context);
+        isLoading.value =
+            false; // You need to set this to false if there's an error.
+        handleLoginError(error, context);
       }
     } catch (e) {
+      isLoading.value =
+          false; // Ensure this is set to false when an exception occurs
       handleLoginError(e.toString(), context);
     } finally {
-      isLoading.value = false;
+      // If no early return occurred due to an error, set isLoading to false here.
+      if (isLoading.value == true) {
+        isLoading.value = false;
+      }
     }
   }
 

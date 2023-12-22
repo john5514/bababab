@@ -2,6 +2,7 @@ import 'package:bicrypto/Controllers/home_controller.dart';
 import 'package:bicrypto/Style/styles.dart';
 import 'package:bicrypto/services/api_service.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:get/get.dart';
 import 'package:bicrypto/services/wallet_service.dart';
@@ -69,6 +70,12 @@ class WalletInfoController extends GetxController {
     fetchFiatWithdrawMethods();
   }
 
+  @override
+  void onReady() {
+    super.onReady();
+    refreshDepositOptions(); // This will call fetchAllDepositOptions
+  }
+
   Future<void> initiateStripePayment(double amount, String currency) async {
     print(
         'initiateStripePayment called with amount: $amount, currency: $currency');
@@ -105,7 +112,8 @@ class WalletInfoController extends GetxController {
         print('Payment is successful');
         Get.snackbar('Success', 'Payment done successfully',
             snackPosition: SnackPosition.BOTTOM);
-        Get.offNamed('/home');
+        navigateBackToDeposit();
+
         print('Navigating to Home Screen');
       } else {
         print('Failed to receive a valid response or clientSecret');
@@ -123,6 +131,19 @@ class WalletInfoController extends GetxController {
       Get.snackbar('Error', 'Stripe payment initiation failed: $e',
           snackPosition: SnackPosition.BOTTOM);
     }
+  }
+
+  void navigateBackToDeposit() {
+    // Use a callback to ensure fetchAllDepositOptions is called after the navigation transition
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      fetchAllDepositOptions();
+    });
+
+    // If you need to go back two steps, you can do it like this:
+    int count = 0;
+    Navigator.popUntil(Get.context!, (route) {
+      return count++ == 3;
+    });
   }
 
   Future<void> fetchAllDepositOptions() async {

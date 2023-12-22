@@ -1,3 +1,4 @@
+import 'package:bicrypto/Controllers/wallet_controller.dart';
 import 'package:bicrypto/Controllers/walletinfo_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -16,15 +17,18 @@ class _StripeMethodWidgetState extends State<StripeMethodWidget> {
   final WalletInfoController controller = Get.find<WalletInfoController>();
 
   @override
+  @override
   Widget build(BuildContext context) {
+    final WalletController walletController = Get.find<WalletController>();
+    String currencyCode = controller.walletInfo.value['currency'] ?? "USD";
+    String currencySymbol = walletController.getCurrencySymbol(currencyCode);
     return Scaffold(
       appBar: AppBar(
-        title:
-            const Text('Stripe Payment', style: TextStyle(color: Colors.white)),
+        title: Text('$currencyCode Payment',
+            style: TextStyle(color: Colors.white)),
         backgroundColor: Colors.blueAccent, // Stripe-like blue color
       ),
       body: SingleChildScrollView(
-        // Added for scrolling
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
@@ -37,17 +41,15 @@ class _StripeMethodWidgetState extends State<StripeMethodWidget> {
                 decoration: InputDecoration(
                   labelText: 'Amount',
                   labelStyle: const TextStyle(color: Colors.white),
-                  prefix:
-                      const Text('USD ', style: TextStyle(color: Colors.white)),
-                  prefixIcon: const Icon(Icons.attach_money,
-                      color: Colors.white), // Added icon
+                  // Use the currencySymbol and currencyCode dynamically
+                  prefix: Text('$currencySymbol ',
+                      style: TextStyle(color: Colors.white)),
+                  prefixIcon: const Icon(Icons.money, color: Colors.white),
                   border: OutlineInputBorder(
-                    // Added border
                     borderRadius: BorderRadius.circular(8.0),
                     borderSide: const BorderSide(color: Colors.white),
                   ),
                   enabledBorder: OutlineInputBorder(
-                    // Added border for enabled state
                     borderRadius: BorderRadius.circular(8.0),
                     borderSide: const BorderSide(color: Colors.white),
                   ),
