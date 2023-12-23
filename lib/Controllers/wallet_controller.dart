@@ -13,7 +13,8 @@ class WeeklySummary {
 }
 
 class WalletController extends GetxController {
-  final WalletService walletService = WalletService(ApiService());
+  final WalletService walletService;
+  WalletController(this.walletService);
   int dayOfYear(DateTime date) {
     return date.difference(DateTime(date.year, 1, 1)).inDays + 1;
   }
@@ -22,6 +23,7 @@ class WalletController extends GetxController {
   var fiatBalance = 0.0.obs;
   var fiatTransactions = [].obs;
   var fiatWalletTransactions = <dynamic>[].obs;
+  var fiatWalletsEnabled = false.obs;
 
   var currencies = [].obs;
   var selectedCurrency = ''.obs;
@@ -40,6 +42,7 @@ class WalletController extends GetxController {
     fetchCurrencies();
     fetchFiatWalletInfo();
     fetchWeeklySummary();
+    fetchSettings();
   }
 
   String getCurrencySymbol(String currencyCode) {
@@ -125,6 +128,36 @@ class WalletController extends GetxController {
       Map<String, double> balance = calculateBalanceForCurrency(currency);
       // print(
       //     "Balance for $currency: ${balance['income']} - ${balance['expense']}");
+    }
+  }
+
+  void fetchSettings() async {
+    isLoading(true);
+    try {
+      // Call the fetchSettings method from the ApiService
+      var settingsResponse = await walletService.apiService.fetchSettings();
+      if (settingsResponse.containsKey('data') &&
+          settingsResponse['data'].containsKey('result')) {
+        List<dynamic> results = settingsResponse['data']['result'];
+        var fiatWalletSetting = results.firstWhere(
+          (setting) => setting['key'] == 'fiat_wallets',
+          orElse: () => null,
+        );
+
+        if (fiatWalletSetting != null) {
+          fiatWalletsEnabled(fiatWalletSetting['value'] == 'Enabled');
+          print('Fiat Wallets setting is: ${fiatWalletSetting['value']}');
+        } else {
+          print('Fiat Wallets setting not found');
+        }
+      } else {
+        print('Settings response format is not as expected');
+      }
+    } catch (e) {
+      // Handle any errors here
+      print('Error fetching settings: $e');
+    } finally {
+      isLoading(false);
     }
   }
 

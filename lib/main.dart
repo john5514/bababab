@@ -1,3 +1,4 @@
+import 'package:bicrypto/Controllers/wallet_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:get/get.dart';
@@ -24,6 +25,23 @@ void main() async {
   final ApiService apiService = ApiService();
   Get.put<ApiService>(apiService);
 
+  // Fetch settings and check for maintenance mode
+  try {
+    var settings = await apiService.fetchSettings();
+    if (settings['data']['result'].any((setting) =>
+        setting['key'] == 'site_maintenance' &&
+        setting['value'] == 'Enabled')) {
+      runApp(const MaintenanceApp());
+      return; // Stop further execution if in maintenance mode
+    }
+  } catch (e) {
+    if (e is SocketException) {
+      runApp(NetworkErrorApp()); // A custom app to handle network errors
+    } else {
+      runApp(const ErrorApp());
+    }
+    return;
+  }
   // Initialize ProfileService
   final ProfileService profileService = ProfileService(apiService);
   Get.put<ProfileService>(profileService);
@@ -32,17 +50,10 @@ void main() async {
   final LoginController loginController =
       Get.put(LoginController(profileService));
 
-  // Perform domain check using ApiService
-  try {
-    final response = await http.get(Uri.parse(apiService.baseDomainUrl));
-    if (response.statusCode == 200) {
-      initializeApp(apiService, profileService, loginController);
-    } else {
-      runApp(const MaintenanceApp());
-    }
-  } catch (e) {
-    runApp(const MaintenanceApp());
-  }
+  // Initialize other services and controllers
+  initializeApp(apiService, profileService, loginController);
+
+  // Check for email verification and navigate accordingly
   try {
     if (loginController.isEmailVerificationEnabled.value &&
         !loginController.isEmailVerified.value) {
@@ -57,12 +68,16 @@ void main() async {
 
 Future<void> initializeApp(ApiService apiService, ProfileService profileService,
     LoginController loginController) async {
+  // Create an instance of WalletService
+  WalletService walletService = WalletService(apiService);
+
   // Register other services and controllers
-  Get.put<WalletService>(WalletService(apiService));
+  Get.put<WalletService>(walletService);
   Get.put<MarketService>(MarketService(apiService));
   Get.put<ProfileController>(ProfileController(profileService: profileService));
   Get.put<KYCController>(KYCController(profileService: profileService));
   Get.put<HomeController>(HomeController(), permanent: true);
+  Get.put<WalletController>(WalletController(walletService));
   Get.put<WalletSpotController>(
       WalletSpotController(walletService: Get.find()));
 
@@ -125,5 +140,21 @@ class MyHttpOverrides extends HttpOverrides {
     return super.createHttpClient(context)
       ..badCertificateCallback =
           (X509Certificate cert, String host, int port) => true;
+  }
+}
+
+class NetworkErrorApp extends StatelessWidget {
+  const NetworkErrorApp({super.key});
+
+  // Define how this app should look like
+  @override
+  Widget build(BuildContext context) {
+    return const MaterialApp(
+      home: Scaffold(
+        body: Center(
+            child: Text(
+                'Network error occurred. Please check your connection and try again.')),
+      ),
+    );
   }
 }

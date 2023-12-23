@@ -8,12 +8,22 @@ import 'package:bicrypto/Controllers/wallet_controller.dart'; // Import your Wal
 import 'package:bicrypto/Style/styles.dart'; // Import your custom theme
 
 class WalletView extends StatelessWidget {
-  final WalletController walletController = Get.put(WalletController());
+  final WalletController walletController = Get.find<WalletController>();
 
   WalletView({super.key});
 
   @override
   Widget build(BuildContext context) {
+    return Obx(() {
+      if (walletController.fiatWalletsEnabled.value) {
+        return _buildTabbedView();
+      } else {
+        return _buildSpotOnlyView();
+      }
+    });
+  }
+
+  Widget _buildTabbedView() {
     return DefaultTabController(
       length: 2,
       child: Scaffold(
@@ -28,15 +38,23 @@ class WalletView extends StatelessWidget {
           ),
         ),
         body: TabBarView(
-          physics:
-              const NeverScrollableScrollPhysics(), // Disable swipe navigation
-
+          physics: const NeverScrollableScrollPhysics(),
           children: [
-            FiatWalletView(), // Your FiatWalletView goes here
-            WalletSpotView(), // Placeholder for Spot Wallets
+            FiatWalletView(),
+            WalletSpotView(),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildSpotOnlyView() {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Wallet'),
+        backgroundColor: appTheme.scaffoldBackgroundColor,
+      ),
+      body: WalletSpotView(),
     );
   }
 }
