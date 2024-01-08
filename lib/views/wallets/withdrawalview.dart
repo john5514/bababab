@@ -1,9 +1,9 @@
 // ignore_for_file: invalid_use_of_protected_member
 
-import 'package:bicrypto/Style/styles.dart';
+import 'package:bitcuit/Style/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:bicrypto/Controllers/walletinfo_controller.dart';
+import 'package:bitcuit/Controllers/walletinfo_controller.dart';
 
 class WithdrawalView extends StatelessWidget {
   const WithdrawalView({Key? key}) : super(key: key);

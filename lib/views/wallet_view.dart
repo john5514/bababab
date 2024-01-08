@@ -1,11 +1,11 @@
 // WalletView.dart
 
-import 'package:bicrypto/views/wallets/FiatWalletView.dart';
-import 'package:bicrypto/views/wallets/spot/spot_screen.dart';
+import 'package:bitcuit/views/wallets/FiatWalletView.dart';
+import 'package:bitcuit/views/wallets/spot/spot_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:bicrypto/Controllers/wallet_controller.dart'; // Import your WalletController
-import 'package:bicrypto/Style/styles.dart'; // Import your custom theme
+import 'package:bitcuit/Controllers/wallet_controller.dart'; // Import your WalletController
+import 'package:bitcuit/Style/styles.dart'; // Import your custom theme
 
 class WalletView extends StatelessWidget {
   final WalletController walletController = Get.find<WalletController>();

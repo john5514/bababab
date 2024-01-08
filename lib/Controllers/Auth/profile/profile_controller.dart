@@ -2,8 +2,8 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:bicrypto/services/profile_service.dart';
-import 'package:bicrypto/services/api_service.dart'; // Adjust the import path as necessary
+import 'package:bitcuit/services/profile_service.dart';
+import 'package:bitcuit/services/api_service.dart'; // Adjust the import path as necessary
 
 class ProfileController extends GetxController {
   final ProfileService profileService;

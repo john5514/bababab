@@ -1,8 +1,8 @@
-import 'package:bicrypto/Controllers/market/market_controller.dart';
-import 'package:bicrypto/Style/styles.dart';
-import 'package:bicrypto/services/market_service.dart';
-import 'package:bicrypto/widgets/market/pairs_list.dart';
-import 'package:bicrypto/widgets/market/search_pairs.dart';
+import 'package:bitcuit/Controllers/market/market_controller.dart';
+import 'package:bitcuit/Style/styles.dart';
+import 'package:bitcuit/services/market_service.dart';
+import 'package:bitcuit/widgets/market/pairs_list.dart';
+import 'package:bitcuit/widgets/market/search_pairs.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';

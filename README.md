@@ -1,4 +1,4 @@
-# bicrypto
+# bitcuit
 
 crypto app
 

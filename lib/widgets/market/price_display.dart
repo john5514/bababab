@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:bicrypto/Controllers/market/chart__controller.dart';
+import 'package:bitcuit/Controllers/market/chart__controller.dart';
 import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 
 class PriceDisplay extends StatelessWidget {

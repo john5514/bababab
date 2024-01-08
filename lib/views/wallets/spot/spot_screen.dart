@@ -1,5 +1,5 @@
-import 'package:bicrypto/Controllers/wallets/spot%20wallet/spotWallet_controller.dart';
-import 'package:bicrypto/services/wallet_service.dart';
+import 'package:bitcuit/Controllers/wallets/spot%20wallet/spotWallet_controller.dart';
+import 'package:bitcuit/services/wallet_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 

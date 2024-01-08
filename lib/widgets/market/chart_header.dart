@@ -1,8 +1,8 @@
-import 'package:bicrypto/Style/styles.dart';
-import 'package:bicrypto/widgets/market/timeframe.dart';
+import 'package:bitcuit/Style/styles.dart';
+import 'package:bitcuit/widgets/market/timeframe.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:bicrypto/Controllers/market/chart__controller.dart';
+import 'package:bitcuit/Controllers/market/chart__controller.dart';
 
 class ChartHeader extends StatelessWidget {
   final ChartController _chartController;

@@ -1,19 +1,19 @@
-import 'package:bicrypto/Controllers/wallet_controller.dart';
+import 'package:bitcuit/Controllers/wallet_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
-import 'package:bicrypto/Controllers/Auth/profile/kyc_controller.dart';
-import 'package:bicrypto/Controllers/Auth/profile/profile_controller.dart';
-import 'package:bicrypto/Controllers/home_controller.dart';
-import 'package:bicrypto/Controllers/wallets/spot%20wallet/spotWallet_controller.dart';
-import 'package:bicrypto/Routing/app_routes.dart';
-import 'package:bicrypto/maintainance.dart';
-import 'package:bicrypto/services/api_service.dart';
-import 'package:bicrypto/services/market_service.dart';
-import 'package:bicrypto/services/profile_service.dart';
-import 'package:bicrypto/services/wallet_service.dart';
-import 'package:bicrypto/Controllers/Auth/login_controller.dart';
+import 'package:bitcuit/Controllers/Auth/profile/kyc_controller.dart';
+import 'package:bitcuit/Controllers/Auth/profile/profile_controller.dart';
+import 'package:bitcuit/Controllers/home_controller.dart';
+import 'package:bitcuit/Controllers/wallets/spot%20wallet/spotWallet_controller.dart';
+import 'package:bitcuit/Routing/app_routes.dart';
+import 'package:bitcuit/maintainance.dart';
+import 'package:bitcuit/services/api_service.dart';
+import 'package:bitcuit/services/market_service.dart';
+import 'package:bitcuit/services/profile_service.dart';
+import 'package:bitcuit/services/wallet_service.dart';
+import 'package:bitcuit/Controllers/Auth/login_controller.dart';
 import 'Style/styles.dart';
 import 'dart:io';
 
@@ -86,7 +86,7 @@ Future<void> initializeApp(ApiService apiService, ProfileService profileService,
 
   Stripe.publishableKey = const String.fromEnvironment('STRIPE_PUBLISHABLE_KEY',
       defaultValue:
-          'pk_test_51LPVEfLFyngRnuDVzYJ2cb5yF2BsE4fELcGumnvgjuLCCPWjHpEeDMVz6DOSilTNc2FihuK91zbNurhhyRZT0qTI000Zc1hT5B');
+          'pk_test_51LPVEfLFyngRnuDVzYJ2cb5yF2BsE4fELcGumnvgjuLCCPWjHpEeDMVz6DOSilTNc2FihuK91zbNurhhyRZT0qTI000Zc1hT5Bb');
 
   runApp(const MyApp());
 }
@@ -99,7 +99,7 @@ class MyApp extends StatelessWidget {
     final LoginController loginController = Get.find();
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'BiCrypto',
+      title: 'bitcuit',
       theme: appTheme,
       themeMode: ThemeMode.dark,
       initialRoute: loginController.isLoggedIn.value ? '/home' : '/',

@@ -1,6 +1,6 @@
 import 'dart:math';
-import 'package:bicrypto/Controllers/market/orederbook_controller.dart';
-import 'package:bicrypto/services/orderbook_service.dart';
+import 'package:bitcuit/Controllers/market/orederbook_controller.dart';
+import 'package:bitcuit/services/orderbook_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 

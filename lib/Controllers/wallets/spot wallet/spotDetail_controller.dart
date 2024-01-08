@@ -1,4 +1,4 @@
-import 'package:bicrypto/services/wallet_service.dart';
+import 'package:bitcuit/services/wallet_service.dart';
 import 'package:get/get.dart';
 
 class SpotWalletDetailController extends GetxController {

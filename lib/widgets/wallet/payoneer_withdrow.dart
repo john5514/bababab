@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:bicrypto/Controllers/walletinfo_controller.dart';
+import 'package:bitcuit/Controllers/walletinfo_controller.dart';
 
 class PayoneerWithdrawalPage extends StatelessWidget {
   final Map<String, dynamic> selectedMethod;

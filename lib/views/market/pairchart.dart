@@ -1,13 +1,13 @@
-import 'package:bicrypto/Controllers/market/customizechart_controller.dart';
-import 'package:bicrypto/Controllers/wallets/spot%20wallet/spotWallet_controller.dart';
-import 'package:bicrypto/Style/styles.dart';
-import 'package:bicrypto/widgets/market/chart_header.dart';
-import 'package:bicrypto/widgets/market/costomize%20_chart.dart';
-import 'package:bicrypto/widgets/market/orderbook.dart';
+import 'package:bitcuit/Controllers/market/customizechart_controller.dart';
+import 'package:bitcuit/Controllers/wallets/spot%20wallet/spotWallet_controller.dart';
+import 'package:bitcuit/Style/styles.dart';
+import 'package:bitcuit/widgets/market/chart_header.dart';
+import 'package:bitcuit/widgets/market/costomize%20_chart.dart';
+import 'package:bitcuit/widgets/market/orderbook.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:k_chart/flutter_k_chart.dart';
-import 'package:bicrypto/Controllers/market/chart__controller.dart';
+import 'package:bitcuit/Controllers/market/chart__controller.dart';
 
 class ChartPage extends StatelessWidget {
   final String pair;

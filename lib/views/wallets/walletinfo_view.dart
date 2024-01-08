@@ -1,8 +1,8 @@
-import 'package:bicrypto/Controllers/walletinfo_controller.dart';
-import 'package:bicrypto/Controllers/wallet_controller.dart';
+import 'package:bitcuit/Controllers/walletinfo_controller.dart';
+import 'package:bitcuit/Controllers/wallet_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:bicrypto/Style/styles.dart';
+import 'package:bitcuit/Style/styles.dart';
 import 'package:fl_chart/fl_chart.dart';
 
 class WalletInfoView extends StatelessWidget {

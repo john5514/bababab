@@ -1,4 +1,4 @@
-import 'package:bicrypto/services/news_service.dart';
+import 'package:bitcuit/services/news_service.dart';
 import 'package:get/get.dart';
 
 class NewsController extends GetxController {

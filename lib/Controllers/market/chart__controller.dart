@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'dart:math';
-import 'package:bicrypto/services/api_service.dart';
-import 'package:bicrypto/services/market_service.dart';
-import 'package:bicrypto/services/wallet_service.dart';
+import 'package:bitcuit/services/api_service.dart';
+import 'package:bitcuit/services/market_service.dart';
+import 'package:bitcuit/services/wallet_service.dart';
 import 'package:get/get.dart';
 import 'package:k_chart/flutter_k_chart.dart';
 import 'package:flutter/material.dart'; // <-- Added this line for UniqueKey

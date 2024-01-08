@@ -1,5 +1,5 @@
-import 'package:bicrypto/Controllers/Auth/login_controller.dart';
-import 'package:bicrypto/Controllers/Auth/profile/profile_controller.dart';
+import 'package:bitcuit/Controllers/Auth/login_controller.dart';
+import 'package:bitcuit/Controllers/Auth/profile/profile_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 

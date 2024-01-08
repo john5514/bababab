@@ -1,8 +1,8 @@
 import 'dart:async';
 
 import 'package:another_flushbar/flushbar.dart';
-import 'package:bicrypto/services/api_service.dart';
-import 'package:bicrypto/services/profile_service.dart';
+import 'package:bitcuit/services/api_service.dart';
+import 'package:bitcuit/services/profile_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:bicrypto/Controllers/market/chart__controller.dart';
+import 'package:bitcuit/Controllers/market/chart__controller.dart';
 
 class TimeFrameSelector extends StatelessWidget {
   final ChartController controller;

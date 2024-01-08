@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:bicrypto/services/api_service.dart';
+import 'package:bitcuit/services/api_service.dart';
 
 class CurrencySpotView extends StatefulWidget {
   final String currencyCode;

@@ -1,11 +1,11 @@
-import 'package:bicrypto/Style/styles.dart';
-import 'package:bicrypto/services/api_service.dart';
-import 'package:bicrypto/services/profile_service.dart';
-import 'package:bicrypto/views/Auth/profile/changepassword_screen.dart';
-import 'package:bicrypto/views/Auth/profile/congratulations_screen.dart';
-import 'package:bicrypto/views/Auth/profile/kyc_screen.dart';
-import 'package:bicrypto/views/Auth/profile/profile_view.dart';
-import 'package:bicrypto/views/Auth/profile/two_step_verification_screen.dart';
+import 'package:bitcuit/Style/styles.dart';
+import 'package:bitcuit/services/api_service.dart';
+import 'package:bitcuit/services/profile_service.dart';
+import 'package:bitcuit/views/Auth/profile/changepassword_screen.dart';
+import 'package:bitcuit/views/Auth/profile/congratulations_screen.dart';
+import 'package:bitcuit/views/Auth/profile/kyc_screen.dart';
+import 'package:bitcuit/views/Auth/profile/profile_view.dart';
+import 'package:bitcuit/views/Auth/profile/two_step_verification_screen.dart';
 import 'package:flutter/material.dart';
 
 class MainSettingsScreen extends StatefulWidget {

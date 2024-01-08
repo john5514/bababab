@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:bicrypto/services/wallet_service.dart';
+import 'package:bitcuit/services/wallet_service.dart';
 
 class SpotTransferController extends GetxController {
   final WalletService walletService;

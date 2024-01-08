@@ -1,6 +1,6 @@
 import 'dart:convert';
-import 'package:bicrypto/Controllers/wallet_controller.dart';
-import 'package:bicrypto/services/api_service.dart';
+import 'package:bitcuit/Controllers/wallet_controller.dart';
+import 'package:bitcuit/services/api_service.dart';
 import 'package:http_client_helper/http_client_helper.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;

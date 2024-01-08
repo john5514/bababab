@@ -1,4 +1,4 @@
-import 'package:bicrypto/Controllers/wallets/spot%20wallet/spotDeposit_controller.dart';
+import 'package:bitcuit/Controllers/wallets/spot%20wallet/spotDeposit_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 

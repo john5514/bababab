@@ -1,6 +1,6 @@
-import 'package:bicrypto/widgets/wallet/deposit_dialog.dart';
+import 'package:bitcuit/widgets/wallet/deposit_dialog.dart';
 import 'package:get/get.dart';
-import 'package:bicrypto/services/wallet_service.dart';
+import 'package:bitcuit/services/wallet_service.dart';
 import 'dart:async';
 
 class SpotDepositController extends GetxController {

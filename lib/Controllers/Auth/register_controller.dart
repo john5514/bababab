@@ -1,6 +1,6 @@
 import 'package:another_flushbar/flushbar.dart';
-import 'package:bicrypto/models/user_model.dart';
-import 'package:bicrypto/services/api_service.dart';
+import 'package:bitcuit/models/user_model.dart';
+import 'package:bitcuit/services/api_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 

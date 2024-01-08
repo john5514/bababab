@@ -1,4 +1,4 @@
-import 'package:bicrypto/Controllers/Auth/profile/changepassword_controller.dart';
+import 'package:bitcuit/Controllers/Auth/profile/changepassword_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:lottie/lottie.dart';

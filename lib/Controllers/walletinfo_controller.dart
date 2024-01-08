@@ -1,11 +1,11 @@
-import 'package:bicrypto/Controllers/home_controller.dart';
-import 'package:bicrypto/Style/styles.dart';
-import 'package:bicrypto/services/api_service.dart';
+import 'package:bitcuit/Controllers/home_controller.dart';
+import 'package:bitcuit/Style/styles.dart';
+import 'package:bitcuit/services/api_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:get/get.dart';
-import 'package:bicrypto/services/wallet_service.dart';
+import 'package:bitcuit/services/wallet_service.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class WalletInfoController extends GetxController {

@@ -1,12 +1,12 @@
-import 'package:bicrypto/Controllers/home_controller.dart'; // <-- Import HomeController
-import 'package:bicrypto/views/Auth/profile/tabbar.dart';
-import 'package:bicrypto/views/market/markethome.dart';
-import 'package:bicrypto/views/news/news_screen.dart';
-import 'package:bicrypto/views/wallet_view.dart'; // <-- Import WalletView
-import 'package:bicrypto/views/webview/fiat.dart';
+import 'package:bitcuit/Controllers/home_controller.dart'; // <-- Import HomeController
+import 'package:bitcuit/views/Auth/profile/tabbar.dart';
+import 'package:bitcuit/views/market/markethome.dart';
+import 'package:bitcuit/views/news/news_screen.dart';
+import 'package:bitcuit/views/wallet_view.dart'; // <-- Import WalletView
+import 'package:bitcuit/views/webview/fiat.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:bicrypto/Style/styles.dart';
+import 'package:bitcuit/Style/styles.dart';
 
 class HomeView extends StatelessWidget {
   final HomeController homeController = Get.find();

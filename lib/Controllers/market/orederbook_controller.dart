@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'package:bicrypto/services/orderbook_service.dart';
+import 'package:bitcuit/services/orderbook_service.dart';
 import 'package:get/get.dart';
 
 class OrderBookController extends GetxController {

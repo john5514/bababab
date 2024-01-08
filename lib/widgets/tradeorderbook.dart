@@ -1,8 +1,8 @@
 import 'dart:math';
-import 'package:bicrypto/Controllers/market/orederbook_controller.dart';
-import 'package:bicrypto/services/orderbook_service.dart';
-import 'package:bicrypto/widgets/market/orderbook.dart';
-import 'package:bicrypto/widgets/market/price_display.dart';
+import 'package:bitcuit/Controllers/market/orederbook_controller.dart';
+import 'package:bitcuit/services/orderbook_service.dart';
+import 'package:bitcuit/widgets/market/orderbook.dart';
+import 'package:bitcuit/widgets/market/price_display.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 

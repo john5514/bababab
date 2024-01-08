@@ -1,5 +1,5 @@
-import 'package:bicrypto/Controllers/wallet_controller.dart';
-import 'package:bicrypto/Controllers/walletinfo_controller.dart';
+import 'package:bitcuit/Controllers/wallet_controller.dart';
+import 'package:bitcuit/Controllers/walletinfo_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:lottie/lottie.dart';

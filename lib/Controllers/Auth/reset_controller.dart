@@ -1,4 +1,4 @@
-import 'package:bicrypto/services/api_service.dart';
+import 'package:bitcuit/services/api_service.dart';
 import 'package:get/get.dart';
 
 class ForgotPasswordController extends GetxController {

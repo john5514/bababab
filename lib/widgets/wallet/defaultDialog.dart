@@ -1,5 +1,5 @@
-import 'package:bicrypto/Style/styles.dart';
-import 'package:bicrypto/views/wallets/spot/spotDeposit_view.dart';
+import 'package:bitcuit/Style/styles.dart';
+import 'package:bitcuit/views/wallets/spot/spotDeposit_view.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';

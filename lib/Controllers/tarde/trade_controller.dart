@@ -1,9 +1,9 @@
 import 'dart:convert';
 
-import 'package:bicrypto/Controllers/market/chart__controller.dart';
-import 'package:bicrypto/Controllers/market/orederbook_controller.dart';
-import 'package:bicrypto/services/api_service.dart';
-import 'package:bicrypto/services/market_service.dart';
+import 'package:bitcuit/Controllers/market/chart__controller.dart';
+import 'package:bitcuit/Controllers/market/orederbook_controller.dart';
+import 'package:bitcuit/services/api_service.dart';
+import 'package:bitcuit/services/market_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 

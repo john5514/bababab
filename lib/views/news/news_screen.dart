@@ -1,8 +1,8 @@
-import 'package:bicrypto/Controllers/home_controller.dart';
-import 'package:bicrypto/Controllers/market/market_controller.dart';
-import 'package:bicrypto/Controllers/news/news_controller.dart';
-import 'package:bicrypto/Style/styles.dart';
-import 'package:bicrypto/widgets/market/SimplifiedMarketScreen%20.dart';
+import 'package:bitcuit/Controllers/home_controller.dart';
+import 'package:bitcuit/Controllers/market/market_controller.dart';
+import 'package:bitcuit/Controllers/news/news_controller.dart';
+import 'package:bitcuit/Style/styles.dart';
+import 'package:bitcuit/widgets/market/SimplifiedMarketScreen%20.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:timeago/timeago.dart' as timeago;

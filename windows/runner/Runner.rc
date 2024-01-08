@@ -90,12 +90,12 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "mashdiv.com" "\0"
-            VALUE "FileDescription", "bicrypto" "\0"
+            VALUE "FileDescription", "bitcuit" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "bicrypto" "\0"
+            VALUE "InternalName", "bitcuit" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2023 mashdiv.com. All rights reserved." "\0"
-            VALUE "OriginalFilename", "bicrypto.exe" "\0"
-            VALUE "ProductName", "bicrypto" "\0"
+            VALUE "OriginalFilename", "bitcuit.exe" "\0"
+            VALUE "ProductName", "bitcuit" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

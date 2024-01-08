@@ -1,5 +1,5 @@
-import 'package:bicrypto/Controllers/Auth/profile/two_step_verification_controller.dart';
-import 'package:bicrypto/Style/styles.dart';
+import 'package:bitcuit/Controllers/Auth/profile/two_step_verification_controller.dart';
+import 'package:bitcuit/Style/styles.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';

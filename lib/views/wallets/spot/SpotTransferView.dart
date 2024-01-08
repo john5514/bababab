@@ -1,6 +1,6 @@
-import 'package:bicrypto/Controllers/wallets/spot%20wallet/spot_transfer_controller.dart.dart';
-import 'package:bicrypto/style/styles.dart';
-import 'package:bicrypto/services/wallet_service.dart';
+import 'package:bitcuit/Controllers/wallets/spot%20wallet/spot_transfer_controller.dart.dart';
+import 'package:bitcuit/style/styles.dart';
+import 'package:bitcuit/services/wallet_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:lottie/lottie.dart';

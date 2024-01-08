@@ -1,4 +1,4 @@
-import 'package:bicrypto/Controllers/market/customizechart_controller.dart';
+import 'package:bitcuit/Controllers/market/customizechart_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:k_chart/k_chart_widget.dart';

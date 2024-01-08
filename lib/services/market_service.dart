@@ -2,9 +2,9 @@ import 'dart:convert';
 import 'dart:async';
 import 'dart:io';
 import 'dart:ui';
-import 'package:bicrypto/services/api_service.dart';
+import 'package:bitcuit/services/api_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:bicrypto/Controllers/market/chart__controller.dart';
+import 'package:bitcuit/Controllers/market/chart__controller.dart';
 import 'package:http/http.dart' as http;
 
 class MarketService {

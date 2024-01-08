@@ -1,7 +1,7 @@
-import 'package:bicrypto/Controllers/market/market_controller.dart';
-import 'package:bicrypto/Style/styles.dart';
-import 'package:bicrypto/services/market_service.dart';
-import 'package:bicrypto/widgets/market/simple_pairlist.dart';
+import 'package:bitcuit/Controllers/market/market_controller.dart';
+import 'package:bitcuit/Style/styles.dart';
+import 'package:bitcuit/services/market_service.dart';
+import 'package:bitcuit/widgets/market/simple_pairlist.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:buttons_tabbar/buttons_tabbar.dart';

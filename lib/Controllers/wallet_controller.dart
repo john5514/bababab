@@ -1,8 +1,8 @@
-import 'package:bicrypto/Controllers/walletinfo_controller.dart';
-import 'package:bicrypto/services/api_service.dart';
+import 'package:bitcuit/Controllers/walletinfo_controller.dart';
+import 'package:bitcuit/services/api_service.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:get/get.dart';
-import 'package:bicrypto/services/wallet_service.dart';
+import 'package:bitcuit/services/wallet_service.dart';
 
 class WeeklySummary {
   final String week;

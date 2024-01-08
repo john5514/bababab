@@ -1,6 +1,6 @@
 import 'dart:async';
-import 'package:bicrypto/services/api_service.dart';
-import 'package:bicrypto/services/market_service.dart';
+import 'package:bitcuit/services/api_service.dart';
+import 'package:bitcuit/services/market_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 

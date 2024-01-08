@@ -1,7 +1,7 @@
-import 'package:bicrypto/Controllers/home_controller.dart';
-import 'package:bicrypto/services/profile_service.dart';
-import 'package:bicrypto/views/Auth/profile/tabbar.dart';
-import 'package:bicrypto/views/home_screen.dart';
+import 'package:bitcuit/Controllers/home_controller.dart';
+import 'package:bitcuit/services/profile_service.dart';
+import 'package:bitcuit/views/Auth/profile/tabbar.dart';
+import 'package:bitcuit/views/home_screen.dart';
 import 'package:get/get.dart';
 
 class TwoStepVerificationController extends GetxController {

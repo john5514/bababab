@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:bicrypto/services/profile_service.dart';
+import 'package:bitcuit/services/profile_service.dart';
 
 class KYCController extends GetxController {
   final ProfileService profileService;

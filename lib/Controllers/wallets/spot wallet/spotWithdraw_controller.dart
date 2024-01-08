@@ -1,4 +1,4 @@
-import 'package:bicrypto/services/wallet_service.dart';
+import 'package:bitcuit/services/wallet_service.dart';
 import 'package:get/get.dart';
 import 'package:collection/collection.dart'; // make sure to add this package for firstWhereOrNull
 

@@ -1,4 +1,4 @@
-import 'package:bicrypto/Controllers/Auth/register_controller.dart';
+import 'package:bitcuit/Controllers/Auth/register_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
